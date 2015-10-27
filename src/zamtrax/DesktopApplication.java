@@ -3,12 +3,10 @@ package zamtrax;
 final class DesktopApplication implements Application {
 
 	private ApplicationListener applicationListener;
-	private Thread thread;
 	private boolean isRunning;
 	private Window window;
 
 	public DesktopApplication(int windowWidth, int windowHeight, String title, boolean vSync, double targetUPS) {
-		thread = new Thread(runnable);
 		window = new Window(windowWidth, windowHeight, title, vSync);
 
 		Time.setTargetUPS((float) targetUPS);
@@ -21,11 +19,12 @@ final class DesktopApplication implements Application {
 
 	@Override
 	public void start() {
-		if (isRunning || thread.isAlive()) {
+		if (isRunning) {
 			return;
 		}
 
-		thread.start();
+		isRunning = true;
+		run();
 	}
 
 	@Override
@@ -45,7 +44,7 @@ final class DesktopApplication implements Application {
 		return window.getHeight();
 	}
 
-	private Runnable runnable = () -> {
+	private void run() {
 		window.show();
 
 		isRunning = true;
@@ -81,7 +80,7 @@ final class DesktopApplication implements Application {
 		}
 
 		dispose();
-	};
+	}
 
 	private void update() {
 		window.processEvents();
