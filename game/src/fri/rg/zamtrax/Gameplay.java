@@ -1,3 +1,5 @@
+package fri.rg.zamtrax;
+
 import zamtrax.*;
 import zamtrax.components.Camera;
 import zamtrax.components.MeshFilter;

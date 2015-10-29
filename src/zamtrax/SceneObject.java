@@ -24,7 +24,12 @@ public final class SceneObject {
 		}
 
 		components.add(component);
-		component.onCreate();
+
+		if (component instanceof Renderer) {
+			Game.getInstance().getCurrentScene().getRenderModule().addRenderer((Renderer) component);
+		}
+
+		component.onAdd();
 
 		return component;
 	}

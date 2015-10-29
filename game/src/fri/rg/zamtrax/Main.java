@@ -1,3 +1,5 @@
+package fri.rg.zamtrax;
+
 import zamtrax.Game;
 
 public class Main {

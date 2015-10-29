@@ -50,4 +50,12 @@ public class Scene implements Disposable {
 		return root;
 	}
 
+	final RenderModule getRenderModule() {
+		return renderModule;
+	}
+
+	final PhysicsModule getPhysicsModule() {
+		return physicsModule;
+	}
+
 }

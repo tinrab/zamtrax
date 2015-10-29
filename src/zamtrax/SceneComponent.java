@@ -5,7 +5,10 @@ public abstract class SceneComponent {
 	private SceneObject sceneObject;
 	private boolean isEnabled;
 
-	public void onCreate() {
+	public void onAdd() {
+	}
+
+	public void onRemove() {
 	}
 
 	public void onEnable() {

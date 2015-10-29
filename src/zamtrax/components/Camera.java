@@ -39,7 +39,7 @@ public class Camera extends SceneComponent {
 	private Color clearColor;
 
 	@Override
-	public void onCreate() {
+	public void onAdd() {
 		if (mainCamera == null) {
 			mainCamera = this;
 		}

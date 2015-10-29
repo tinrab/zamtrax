@@ -1,3 +1,5 @@
+package fri.rg.zamtrax;
+
 import zamtrax.*;
 
 public class FPSController extends SceneComponent {
@@ -7,7 +9,7 @@ public class FPSController extends SceneComponent {
 	private Transform transform;
 
 	@Override
-	public void onCreate() {
+	public void onAdd() {
 		transform = getTransform();
 	}
 

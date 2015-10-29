@@ -1,3 +1,5 @@
+package fri.rg.zamtrax;
+
 import zamtrax.SceneComponent;
 import zamtrax.Time;
 import zamtrax.Transform;
@@ -10,7 +12,7 @@ public class Rotate extends SceneComponent {
 	private Transform transform;
 
 	@Override
-	public void onCreate() {
+	public void onAdd() {
 		axis = new Vector3(1.0f, 0.0f, 0.0f);
 		speed = 50.0f;
 		transform = getTransform();

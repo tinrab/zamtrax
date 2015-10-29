@@ -1,19 +1,18 @@
 package zamtrax.components;
 
 import zamtrax.Matrix4;
-import zamtrax.Renderable;
-import zamtrax.SceneComponent;
+import zamtrax.Renderer;
 import zamtrax.Transform;
 import zamtrax.resources.Material;
 
-public class MeshRenderer extends SceneComponent implements Renderable {
+public class MeshRenderer extends Renderer {
 
 	private MeshFilter meshFilter;
 	private Material material;
 	private Transform transform;
 
 	@Override
-	public void onCreate() {
+	public void onAdd() {
 		transform = getTransform();
 		meshFilter = getObject().getComponent(MeshFilter.class);
 	}

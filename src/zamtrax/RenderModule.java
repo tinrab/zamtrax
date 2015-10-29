@@ -2,16 +2,27 @@ package zamtrax;
 
 import zamtrax.components.Camera;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.lwjgl.opengl.GL11.*;
 
 public final class RenderModule extends Module {
 
-	private SceneObject root;
+	private List<Renderer> renderers;
 
 	public RenderModule(Scene scene) {
 		super(scene);
 
-		this.root = scene.getRoot();
+		renderers = new ArrayList<>();
+	}
+
+	public void addRenderer(Renderer renderer) {
+		renderers.add(renderer);
+	}
+
+	public boolean removeRenderer(Renderer renderer) {
+		return renderers.remove(renderer);
 	}
 
 	@Override
@@ -33,19 +44,9 @@ public final class RenderModule extends Module {
 			glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 		}
 
-		render(viewProjection, root);
-	}
-
-	private void render(Matrix4 viewProjection, SceneObject object) {
-		object.getComponents().stream().filter(component -> component instanceof Renderable).forEach(component -> {
-			Renderable renderable = (Renderable) component;
-
-			renderable.render(viewProjection);
-		});
-
-		object.getChildren().forEach(child -> {
-			render(viewProjection, child);
-		});
+		for (Renderer renderer : renderers) {
+			renderer.render(viewProjection);
+		}
 	}
 
 	@Override
