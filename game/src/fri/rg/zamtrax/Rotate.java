@@ -14,7 +14,7 @@ public class Rotate extends SceneComponent {
 	@Override
 	public void onAdd() {
 		axis = new Vector3(1.0f, 0.0f, 0.0f);
-		speed = 50.0f;
+		speed = 1.0f;
 		transform = getTransform();
 	}
 

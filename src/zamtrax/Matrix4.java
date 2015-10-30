@@ -63,10 +63,6 @@ public class Matrix4 {
 		Matrix4 ry = new Matrix4();
 		Matrix4 rz = new Matrix4();
 
-		x *= Mathf.DEG_TO_RAD;
-		y *= Mathf.DEG_TO_RAD;
-		z *= Mathf.DEG_TO_RAD;
-
 		rz.elements[0][0] = Mathf.cos(z);
 		rz.elements[0][1] = Mathf.sin(z);
 		rz.elements[0][2] = 0;
@@ -326,6 +322,22 @@ public class Matrix4 {
 		return new javax.vecmath.Matrix4f(floats);
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				sb.append(elements[i][j]);
+				sb.append(' ');
+			}
+
+			sb.append('\n');
+		}
+
+		return sb.toString();
+	}
+
 	public static Matrix4 createOrthographic(float left, float right, float bottom, float top, float near, float far) {
 		Matrix4 m = new Matrix4();
 
@@ -352,6 +364,12 @@ public class Matrix4 {
 		Matrix4 m = new Matrix4();
 
 		return m.loadRotation(forward, up);
+	}
+
+	public static Matrix4 createRotation(float x, float y, float z) {
+		Matrix4 m = new Matrix4();
+
+		return m.loadRotation(x, y, z);
 	}
 
 	public static Matrix4 createTranslation(Vector3 translation) {

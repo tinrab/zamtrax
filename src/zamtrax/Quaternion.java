@@ -17,7 +17,7 @@ public class Quaternion {
 	}
 
 	public Quaternion(Vector3 axis, float angle) {
-		float a = (angle * Mathf.DEG_TO_RAD) / 2.0f;
+		float a = angle / 2.0f;
 		float s = Mathf.sin(a);
 
 		x = axis.x * s;
