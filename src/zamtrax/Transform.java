@@ -13,8 +13,61 @@ public class Transform {
 		scale = new Vector3(1.0f, 1.0f, 1.0f);
 	}
 
+	public void translate(Vector3 translation) {
+		translate(translation, Space.SELF);
+	}
+
+	public void translate(Vector3 translation, Space relativeTo) {
+		translate(translation.x, translation.y, translation.z, relativeTo);
+	}
+
+	public void translate(float x, float y, float z) {
+		translate(x, y, z, Space.SELF);
+	}
+
+	public void translate(float x, float y, float z, Space space) {
+		switch (space) {
+			case WORLD:
+				break;
+			case SELF:
+				position = position.add(x, y, z);
+				break;
+		}
+	}
+
+	public void rotate(float x, float y, float z) {
+		rotate(x, y, z, Space.SELF);
+	}
+
+	public void rotate(float x, float y, float z, Space relativeTo) {
+		rotate(new Vector3(x, y, z), relativeTo);
+	}
+
+	public void rotate(Vector3 eulerAngles) {
+		rotate(eulerAngles, Space.SELF);
+	}
+
+	public void rotate(Vector3 eulerAngles, Space relativeTo) {
+		rotate(Quaternion.fromEuler(eulerAngles), relativeTo);
+	}
+
 	public void rotate(Vector3 axis, float angle) {
-		rotation = new Quaternion(axis, angle).mul(rotation).normalized();
+		rotate(axis, angle, Space.SELF);
+	}
+
+	public void rotate(Vector3 axis, float angle, Space relativeTo) {
+		rotate(Quaternion.fromAxisAngle(axis, angle), relativeTo);
+	}
+
+	public void rotate(Quaternion rotation, Space relativeTo) {
+		switch (relativeTo) {
+			case WORLD:
+				//TODO
+				break;
+			case SELF:
+				this.rotation.set(rotation.mul(this.rotation).normalized());
+				break;
+		}
 	}
 
 	public void lookAt(Vector3 point, Vector3 up) {
@@ -23,37 +76,6 @@ public class Transform {
 
 	public Quaternion getLookAtRotation(Vector3 point, Vector3 up) {
 		return new Quaternion(Matrix4.createRotation(point.sub(position).normalized(), up));
-	}
-
-	public void translate(Vector3 translation) {
-		translate(translation, Space.WORLD);
-	}
-
-	public void translate(Vector3 translation, Space space) {
-		translate(translation.x, translation.y, translation.z, space);
-	}
-
-	public void translate(float x, float y, float z) {
-		translate(x, y, z, Space.WORLD);
-	}
-
-	public void translate(float x, float y, float z, Space space) {
-		switch (space) {
-			case WORLD:
-				position = position.add(x, y, z);
-				break;
-			case LOCAL:
-				// TODO
-				break;
-		}
-	}
-
-	public Vector3 getScale() {
-		return scale;
-	}
-
-	public void setScale(Vector3 scale) {
-		this.scale = scale;
 	}
 
 	public Transform getParent() {
@@ -65,22 +87,75 @@ public class Transform {
 	}
 
 	public Vector3 getPosition() {
-		return position;
+		if (parent != null) {
+			return parent.getLocalToWorldMatrix().transformPoint(position);
+		}
+
+		return new Vector3(position);
 	}
 
 	public void setPosition(Vector3 position) {
+		// TODO
+		this.position = position;
+	}
+
+	public Vector3 getLocalPosition() {
+		return new Vector3(position);
+	}
+
+	public void setLocalPosition(Vector3 position) {
 		this.position = position;
 	}
 
 	public Quaternion getRotation() {
-		return rotation;
+		if (parent != null) {
+			return parent.getRotation().mul(rotation);
+		}
+
+		return new Quaternion(rotation);
 	}
 
 	public void setRotation(Quaternion rotation) {
+		// TODO
 		this.rotation = rotation;
 	}
 
-	public Matrix4 getTransformation() {
+	public Quaternion getLocalRotation() {
+		return new Quaternion(rotation);
+	}
+
+	public void setLocalRotation(Quaternion rotation) {
+		this.rotation = rotation;
+	}
+
+	public Vector3 getScale() {
+		if (parent != null) {
+			parent.getScale().mul(scale);
+		}
+
+		return new Vector3(scale);
+	}
+
+	public void setScale(Vector3 scale) {
+		// TODO
+		this.scale = scale;
+	}
+
+	public Vector3 getLocalScale() {
+		return new Vector3(scale);
+	}
+
+	public void setLocalScale(Vector3 scale) {
+		this.scale = scale;
+	}
+
+	public Matrix4 getWorldToLocalMatrix() {
+		// TODO
+		return null;
+	}
+
+	public Matrix4 getLocalToWorldMatrix() {
+		this.setPosition(position);
 		Matrix4 t = Matrix4.createTranslation(position);
 		Matrix4 r = rotation.toMatrix();
 		Matrix4 s = Matrix4.createScale(scale);
@@ -88,28 +163,34 @@ public class Transform {
 		Matrix4 result = t.mul(r.mul(s));
 
 		if (parent != null) {
-			result = parent.getTransformation().mul(result);
+			result = parent.getLocalToWorldMatrix().mul(result);
 		}
 
 		return result;
 	}
 
-	public Vector3 getTransformedPosition() {
-		if (parent != null) {
-			parent.getTransformation().transformPoint(position);
-		}
-
-		return position;
+	public Vector3 forward() {
+		return getRotation().rotatePoint(Vector3.FORWARD);
 	}
 
-	public Quaternion getTransformedRotation() {
-		Quaternion parentRotation = Quaternion.createIdentity();
+	public Vector3 back() {
+		return getRotation().rotatePoint(Vector3.BACK);
+	}
 
-		if (parent != null) {
-			parentRotation = parent.getTransformedRotation();
-		}
+	public Vector3 left() {
+		return getRotation().rotatePoint(Vector3.LEFT);
+	}
 
-		return parentRotation.mul(rotation);
+	public Vector3 right() {
+		return getRotation().rotatePoint(Vector3.RIGHT);
+	}
+
+	public Vector3 up() {
+		return getRotation().rotatePoint(Vector3.UP);
+	}
+
+	public Vector3 down() {
+		return getRotation().rotatePoint(Vector3.DOWN);
 	}
 
 }

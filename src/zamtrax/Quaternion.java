@@ -16,16 +16,6 @@ public class Quaternion {
 		this.w = w;
 	}
 
-	public Quaternion(Vector3 axis, float angle) {
-		float a = angle / 2.0f;
-		float s = Mathf.sin(a);
-
-		x = axis.x * s;
-		y = axis.y * s;
-		z = axis.z * s;
-		w = Mathf.cos(a);
-	}
-
 	public Quaternion(Quaternion q) {
 		this.x = q.x;
 		this.y = q.y;
@@ -165,6 +155,10 @@ public class Quaternion {
 		return x * q.x + y * q.y + z * q.z + w * q.w;
 	}
 
+	public Vector3 rotatePoint(Vector3 v) {
+		return v.rotate(this);
+	}
+
 	public Matrix4 toMatrix() {
 		Vector3 forward = new Vector3(2.0f * (x * z - w * y), 2.0f * (y * z + w * x), 1.0f - 2.0f * (x * x + y * y));
 		Vector3 up = new Vector3(2.0f * (x * y + w * z), 1.0f - 2.0f * (x * x + z * z), 2.0f * (y * z - w * x));
@@ -177,30 +171,6 @@ public class Quaternion {
 
 	public javax.vecmath.Quat4f toVecmath() {
 		return new javax.vecmath.Quat4f(x, y, z, w);
-	}
-
-	public Vector3 forward() {
-		return new Vector3(0.0f, 0.0f, 1.0f).rotate(this);
-	}
-
-	public Vector3 back() {
-		return new Vector3(0.0f, 0.0f, -1.0f).rotate(this);
-	}
-
-	public Vector3 left() {
-		return new Vector3(-1.0f, 0.0f, 0.0f).rotate(this);
-	}
-
-	public Vector3 right() {
-		return new Vector3(1.0f, 0.0f, 0.0f).rotate(this);
-	}
-
-	public Vector3 up() {
-		return new Vector3(0.0f, 1.0f, 0.0f).rotate(this);
-	}
-
-	public Vector3 down() {
-		return new Vector3(0.0f, -1.0f, 0.0f).rotate(this);
 	}
 
 	public static Quaternion nlerp(Quaternion a, Quaternion b, float t) {
@@ -238,6 +208,21 @@ public class Quaternion {
 
 	public static Quaternion createIdentity() {
 		return new Quaternion().loadIdentity();
+	}
+
+	public static Quaternion fromAxisAngle(Vector3 axis, float angle) {
+		float a = angle / 2.0f;
+		float s = Mathf.sin(a);
+
+		return new Quaternion(axis.x * s, axis.y * s, axis.z * s, Mathf.cos(a));
+	}
+
+	public static Quaternion fromEuler(Vector3 eulerAngles) {
+		Quaternion rx = fromAxisAngle(Vector3.RIGHT, eulerAngles.x);
+		Quaternion ry = fromAxisAngle(Vector3.UP, eulerAngles.y);
+		Quaternion rz = fromAxisAngle(Vector3.BACK, eulerAngles.z);
+
+		return rz.mul(ry.mul(rx));
 	}
 
 }

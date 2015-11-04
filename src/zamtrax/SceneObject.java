@@ -9,6 +9,7 @@ public final class SceneObject {
 	private Transform transform;
 	private List<SceneComponent> components;
 	private List<SceneObject> children;
+	private boolean active;
 
 	SceneObject() {
 		transform = new Transform();
@@ -50,6 +51,28 @@ public final class SceneObject {
 		sceneObject.getTransform().setParent(transform);
 	}
 
+	public void destroy() {
+		setActive(false);
+
+		Game.getInstance().getCurrentScene().destroy(this);
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		if(this.active && !active) {
+			this.active = false;
+
+			components.forEach(SceneComponent::onDisable);
+		} else if(!this.active && active) {
+			this.active = true;
+
+			components.forEach(SceneComponent::onEnable);
+		}
+	}
+
 	public Transform getTransform() {
 		return transform;
 	}
@@ -76,6 +99,10 @@ public final class SceneObject {
 	}
 
 	public static SceneObject create(SceneObject parent) {
+		if(parent == null) {
+			parent = Game.getInstance().getCurrentScene().getRoot();
+		}
+
 		SceneObject sceneObject = new SceneObject();
 
 		parent.addChild(sceneObject);

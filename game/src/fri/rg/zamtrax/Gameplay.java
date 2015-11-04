@@ -51,26 +51,23 @@ public class Gameplay extends Scene {
 					.build();
 		}
 
-		for (int i = 0; i < 100; i++) {
-			SceneObject test = SceneObject.create();
-			MeshFilter mf = test.addComponent(MeshFilter.class);
-			MeshRenderer mr = test.addComponent(MeshRenderer.class);
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				for (int k = 0; k < 8; k++) {
+					SceneObject test = SceneObject.create();
 
-			mr.setMaterial(materials[Random.randomInteger(materials.length)]);
+					MeshFilter mf = test.addComponent(MeshFilter.class);
+					MeshRenderer mr = test.addComponent(MeshRenderer.class);
 
-			mf.setMesh(mesh);
+					mr.setMaterial(materials[Random.randomInteger(materials.length)]);
+					mf.setMesh(mesh);
 
-			Rotate r = test.addComponent(Rotate.class);
-			r.setAxis(Random.direction());
+					Rotate r = test.addComponent(Rotate.class);
+					r.setAxis(Random.direction());
 
-			Vector3 pos = new Vector3();
-			pos.x = Random.randomFloat() * 20.0f - 10.0f;
-			pos.y = Random.randomFloat() * 20.0f - 10.0f;
-			pos.z = Random.randomFloat() * 20.0f + 2.0f;
-
-			test.getTransform().setPosition(pos);
-
-			test.getTransform().setScale(new Vector3(1.0f, 1.0f, 1.0f).mul(Random.randomFloat() * 1.0f + 0.4f));
+					test.getTransform().setPosition(new Vector3(i, j, k).mul(3.0f));
+				}
+			}
 		}
 	}
 

@@ -3,7 +3,7 @@ package zamtrax;
 public abstract class SceneComponent {
 
 	private SceneObject sceneObject;
-	private boolean isEnabled;
+	private boolean enabled;
 
 	public void onAdd() {
 	}
@@ -33,16 +33,16 @@ public abstract class SceneComponent {
 	}
 
 	public final boolean isEnabled() {
-		return isEnabled;
+		return enabled && sceneObject.isActive();
 	}
 
 	public final void setEnabled(boolean enabled) {
-		if (enabled && !isEnabled) {
-			isEnabled = true;
+		if (enabled && !this.enabled) {
+			this.enabled = true;
 
 			onEnable();
-		} else if (!enabled && isEnabled) {
-			isEnabled = false;
+		} else if (!enabled && this.enabled) {
+			this.enabled = false;
 
 			onDisable();
 		}

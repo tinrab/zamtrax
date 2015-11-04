@@ -50,8 +50,8 @@ public class Camera extends SceneComponent {
 	}
 
 	public Matrix4 getViewProjection() {
-		Matrix4 r = transform.getTransformedRotation().conjugate().toMatrix();
-		Vector3 p = transform.getTransformedPosition().mul(-1.0f);
+		Matrix4 r = transform.getRotation().conjugate().toMatrix();
+		Vector3 p = transform.getPosition().mul(-1.0f);
 
 		Matrix4 cameraTranslation = Matrix4.createTranslation(p.x, p.y, p.z);
 

@@ -1,5 +1,7 @@
 package zamtrax;
 
+import org.omg.CORBA.TIMEOUT;
+
 final class DesktopApplication implements Application {
 
 	private ApplicationListener applicationListener;
@@ -51,45 +53,52 @@ final class DesktopApplication implements Application {
 
 		applicationListener.create();
 
-		long lastTime = System.nanoTime();
-		double ns = 1000000000.0 / Time.getTargetUPS();
+		final double frameTime = 1.0 / Time.getTargetUPS();
+		final int maxSkippedFrames = 10;
+
+		double currentTime, previousTime, elapsedTime;
+
+		double lag = 0.0;
+		double lastFPSUpdate = 0.0;
+
 		int frames = 0;
-		long timer = System.currentTimeMillis();
-		double delta = 0.0;
+		int skippedFrames = 0;
+
+		previousTime = Time.currentSeconds();
 
 		while (isRunning && !window.isClosed()) {
-			long now = System.nanoTime();
-			delta += (now - lastTime) / ns;
-			lastTime = now;
+			currentTime = Time.currentSeconds();
+			elapsedTime = currentTime - previousTime;
 
-			while (delta >= 1.0) {
-				update();
-				delta--;
+			lag += elapsedTime;
+
+			while (lag > frameTime && skippedFrames < maxSkippedFrames) {
+				Time.setDeltaTime((float) frameTime);
+				applicationListener.update();
+
+				lag -= frameTime;
+				skippedFrames++;
 			}
+
+			Time.setInterpolation((float) (lag / frameTime));
+			applicationListener.render();
 
 			frames++;
-			render();
 
-			if (System.currentTimeMillis() - timer >= 1000) {
-				timer += 1000;
-
+			if (currentTime - lastFPSUpdate >= 1.0) {
 				Time.setFPS(frames);
-
 				frames = 0;
+				lastFPSUpdate = currentTime;
 			}
+
+			window.render();
+			window.processEvents();
+
+			skippedFrames = 0;
+			previousTime = currentTime;
 		}
 
 		dispose();
-	}
-
-	private void update() {
-		window.processEvents();
-		applicationListener.update();
-	}
-
-	private void render() {
-		applicationListener.render();
-		window.render();
 	}
 
 	private void dispose() {

@@ -19,7 +19,7 @@ public class MeshRenderer extends Renderer {
 
 	@Override
 	public void render(Matrix4 viewProjection) {
-		Matrix4 model = transform.getTransformation();
+		Matrix4 model = transform.getLocalToWorldMatrix();
 		Matrix4 mvp = viewProjection.mul(model);
 
 		material.bind();
