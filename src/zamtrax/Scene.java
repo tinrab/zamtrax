@@ -8,6 +8,7 @@ public class Scene implements Disposable {
 	private SceneObject root;
 	private List<SceneObject> destroyedObjects;
 
+	private LogicModule logicModule;
 	private PhysicsModule physicsModule;
 	private RenderModule renderModule;
 
@@ -15,11 +16,13 @@ public class Scene implements Disposable {
 		root = new SceneObject();
 		destroyedObjects = new ArrayList<>();
 
+		logicModule = new LogicModule(this);
 		physicsModule = new PhysicsModule(this);
 		renderModule = new RenderModule(this);
 	}
 
 	public void onEnter() {
+		logicModule.onCreate();
 		physicsModule.onCreate();
 		renderModule.onCreate();
 	}
@@ -28,8 +31,7 @@ public class Scene implements Disposable {
 	}
 
 	final void update() {
-		update(root);
-
+		logicModule.update();
 		physicsModule.update();
 		renderModule.update();
 
@@ -54,13 +56,6 @@ public class Scene implements Disposable {
 		destroyedObjects.clear();
 	}
 
-	final void update(SceneObject sceneObject) {
-		sceneObject.getComponents().forEach(SceneComponent::update);
-
-		//sceneObject.getTransform().update();
-		sceneObject.getChildren().forEach(this::update);
-	}
-
 	final void render() {
 		renderModule.render();
 	}
@@ -71,6 +66,7 @@ public class Scene implements Disposable {
 
 	@Override
 	public final void dispose() {
+		logicModule.dispose();
 		physicsModule.dispose();
 		renderModule.dispose();
 	}

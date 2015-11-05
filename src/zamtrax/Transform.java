@@ -3,14 +3,35 @@ package zamtrax;
 public class Transform {
 
 	private Transform parent;
-	private Vector3 position;
-	private Quaternion rotation;
-	private Vector3 scale;
+	private Matrix4 parentMatrix;
+	private Vector3 position, oldPosition;
+	private Quaternion rotation, oldRotation;
+	private Vector3 scale, oldScale;
+
+	private boolean changed;
 
 	Transform() {
 		position = new Vector3();
 		rotation = Quaternion.createIdentity();
 		scale = new Vector3(1.0f, 1.0f, 1.0f);
+
+		oldPosition = new Vector3();
+		oldRotation = Quaternion.createIdentity();
+		oldScale = new Vector3(1.0f, 1.0f, 1.0f);
+
+		parentMatrix = Matrix4.createIdentity();
+	}
+
+	void update() {
+		changed = (parent != null && parent.hasChanged()) || !position.equals(oldPosition) || !rotation.equals(oldRotation) || !scale.equals(oldScale);
+
+		oldPosition.set(position);
+		oldRotation.set(rotation);
+		oldScale.set(scale);
+	}
+
+	public boolean hasChanged() {
+		return changed;
 	}
 
 	public void translate(Vector3 translation) {
@@ -155,18 +176,19 @@ public class Transform {
 	}
 
 	public Matrix4 getLocalToWorldMatrix() {
-		this.setPosition(position);
 		Matrix4 t = Matrix4.createTranslation(position);
 		Matrix4 r = rotation.toMatrix();
 		Matrix4 s = Matrix4.createScale(scale);
 
-		Matrix4 result = t.mul(r.mul(s));
+		return getParentMatrix().mul(t.mul(r.mul(s)));
+	}
 
-		if (parent != null) {
-			result = parent.getLocalToWorldMatrix().mul(result);
+	private Matrix4 getParentMatrix() {
+		if (parent != null && parent.hasChanged()) {
+			parentMatrix = parent.getLocalToWorldMatrix();
 		}
 
-		return result;
+		return parentMatrix;
 	}
 
 	public Vector3 forward() {

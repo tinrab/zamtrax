@@ -1,11 +1,9 @@
 package zamtrax.components;
 
-import zamtrax.Matrix4;
-import zamtrax.Renderer;
-import zamtrax.Transform;
+import zamtrax.*;
 import zamtrax.resources.Material;
 
-public class MeshRenderer extends Renderer {
+public class MeshRenderer extends SceneComponent implements Renderer {
 
 	private MeshFilter meshFilter;
 	private Material material;

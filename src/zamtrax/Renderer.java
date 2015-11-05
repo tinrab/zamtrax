@@ -1,7 +1,7 @@
 package zamtrax;
 
-public abstract class Renderer extends SceneComponent {
+public interface Renderer {
 
-	public abstract void render(Matrix4 viewProjection);
+	void render(Matrix4 viewProjection);
 
 }
