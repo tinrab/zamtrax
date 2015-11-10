@@ -1,9 +1,8 @@
-package zamtrax.components;
+package zamtrax;
 
-import zamtrax.*;
 import zamtrax.resources.Material;
 
-public class MeshRenderer extends SceneComponent implements Renderer {
+public class MeshRenderer extends Renderer {
 
 	private MeshFilter meshFilter;
 	private Material material;
@@ -11,6 +10,8 @@ public class MeshRenderer extends SceneComponent implements Renderer {
 
 	@Override
 	public void onAdd() {
+		super.onAdd();
+
 		transform = getTransform();
 		meshFilter = getObject().getComponent(MeshFilter.class);
 	}

@@ -25,7 +25,7 @@ public interface Mesh {
 		private List<Vertex> vertices;
 		private List<Integer> indices;
 		private boolean dynamic;
-		private AttributeScheme attributeScheme;
+		private BindingInfo bindingInfo;
 
 		public Builder() {
 			vertices = new ArrayList<>();
@@ -75,8 +75,8 @@ public interface Mesh {
 			return this;
 		}
 
-		public Builder setAttributeScheme(AttributeScheme attributeScheme) {
-			this.attributeScheme = attributeScheme;
+		public Builder setBindingInfo(BindingInfo bindingInfo) {
+			this.bindingInfo = bindingInfo;
 
 			return this;
 		}
@@ -88,7 +88,7 @@ public interface Mesh {
 		}
 
 		public Mesh build() {
-			Mesh mesh = new IndexedMesh(id++, vertices, indices, attributeScheme, dynamic);
+			Mesh mesh = new IndexedMesh(id++, vertices, indices, bindingInfo, dynamic);
 
 			mesh.build();
 
@@ -98,7 +98,7 @@ public interface Mesh {
 
 	class Factory {
 
-		public static Mesh fromModel(Model model, AttributeScheme attributeScheme) {
+		public static Mesh fromModel(Model model, BindingInfo bindingInfo) {
 			List<Vertex> vertices = new ArrayList<>();
 
 			/*
@@ -110,7 +110,7 @@ public interface Mesh {
 			return new Builder()
 					.setVertices(model.getVertices())
 					.setIndices(model.getIndices())
-					.setAttributeScheme(attributeScheme)
+					.setBindingInfo(bindingInfo)
 					.build();
 		}
 

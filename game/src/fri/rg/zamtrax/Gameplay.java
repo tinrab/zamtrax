@@ -1,9 +1,6 @@
 package fri.rg.zamtrax;
 
 import zamtrax.*;
-import zamtrax.components.Camera;
-import zamtrax.components.MeshFilter;
-import zamtrax.components.MeshRenderer;
 import zamtrax.resources.*;
 
 public class Gameplay extends Scene {
@@ -18,57 +15,75 @@ public class Gameplay extends Scene {
 			Camera camera = cameraObject.addComponent(Camera.class);
 			camera.setProjection(Matrix4.createPerspective(60.0f, Game.getScreenWidth() / (float) Game.getScreenHeight(), 0.01f, 500.0f));
 
-			cameraObject.getTransform().translate(0.0f, 0.0f, -1.0f);
+			Transform t = cameraObject.getTransform();
+
+			t.translate(0.0f, 4.0f, -10.0f);
+			t.rotate(Mathf.PI / 10.0f, 0.0f, 0.0f);
 		}
 
-		String[] texNames = {"brick_grey.png", "dirt.png", "leaves.png", "stone_diamond.png"};
-
-		AttributeScheme attributeScheme = new AttributeScheme.Builder()
-				.addPointer(AttributeType.POSITION, 0, "position")
-				.addPointer(AttributeType.UV, 1, "uv")
-				.addPointer(AttributeType.NORMAL, 2, "normal")
+		BindingInfo bindingInfo = new BindingInfo.Builder()
+				.bind(AttributeType.POSITION, 0, "position")
+				.bind(AttributeType.UV, 1, "uv")
+				.bind(AttributeType.NORMAL, 2, "normal")
 				.build();
 
 		Shader shader = new Shader.Builder()
 				.setVertexShaderSource(Resources.loadText("shaders/textured.vs"))
 				.setFragmentShaderSource(Resources.loadText("shaders/textured.fs"))
-				.setAttributeScheme(attributeScheme)
+				.setBindingInfo(bindingInfo)
 				.addUniform("mvp")
 				.build();
 
 		Model cubeModel = Resources.loadModel("models/cube.obj");
-		Mesh mesh = Mesh.Factory.fromModel(cubeModel, attributeScheme);
+		Mesh mesh = Mesh.Factory.fromModel(cubeModel, bindingInfo);
+		Material dirtMaterial = new Material.Builder()
+				.setShader(shader)
+				.setTexture(Resources.loadTexture("textures/dirt.png",
+						Texture.Format.ARGB,
+						Texture.WrapMode.REPEAT,
+						Texture.FilterMode.LINEAR))
+				.build();
+		Material brickMaterial = new Material.Builder()
+				.setShader(shader)
+				.setTexture(Resources.loadTexture("textures/brick_grey.png",
+						Texture.Format.ARGB,
+						Texture.WrapMode.REPEAT,
+						Texture.FilterMode.LINEAR))
+				.build();
+		Material diamondMaterial = new Material.Builder()
+				.setShader(shader)
+				.setTexture(Resources.loadTexture("textures/stone_diamond.png",
+						Texture.Format.ARGB,
+						Texture.WrapMode.REPEAT,
+						Texture.FilterMode.LINEAR))
+				.build();
 
-		Material[] materials = new Material[texNames.length];
+		SceneObject floor = SceneObject.create();
 
-		for (int i = 0; i < texNames.length; i++) {
-			materials[i] = new Material.Builder()
-					.setShader(shader)
-					.setTexture(Resources.loadTexture("textures/" + texNames[i],
-							Texture.Format.ARGB,
-							Texture.WrapMode.REPEAT,
-							Texture.FilterMode.LINEAR))
-					.build();
-		}
+		MeshFilter mf = floor.addComponent(MeshFilter.class);
+		MeshRenderer mr = floor.addComponent(MeshRenderer.class);
 
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				for (int k = 0; k < 8; k++) {
-					SceneObject test = SceneObject.create();
+		mr.setMaterial(dirtMaterial);
+		mf.setMesh(mesh);
 
-					MeshFilter mf = test.addComponent(MeshFilter.class);
-					MeshRenderer mr = test.addComponent(MeshRenderer.class);
+		floor.getTransform().setScale(new Vector3(8.0f, 0.25f, 8.0f));
 
-					mr.setMaterial(materials[Random.randomInteger(materials.length)]);
-					mf.setMesh(mesh);
+		floor.addComponent(BoxCollider.class);
+		floor.addComponent(RigidBody.class).setMass(0.0f);
 
-					Rotate r = test.addComponent(Rotate.class);
-					r.setAxis(Random.direction());
+		floor.addComponent(ObjectSpawner.class).setResources(mesh, brickMaterial);
 
-					test.getTransform().setPosition(new Vector3(i, j, k).mul(3.0f));
-				}
-			}
-		}
+		SceneObject spinner = SceneObject.create();
+		spinner.addComponent(MeshFilter.class).setMesh(mesh);
+		spinner.addComponent(MeshRenderer.class).setMaterial(diamondMaterial);
+		spinner.getTransform().setScale(new Vector3(16.0f, 1.0f, 1.0f));
+		spinner.getTransform().translate(4.0f, 1.0f, 0.0f);
+		spinner.addComponent(BoxCollider.class);
+		spinner.addComponent(RigidBody.class).setMass(0.0f);
+
+		Rotate r = spinner.addComponent(Rotate.class);
+		r.setAxis(Vector3.UP);
+		r.setSpeed(-1.0f);
 	}
 
 	@Override

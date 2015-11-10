@@ -24,11 +24,15 @@ public abstract class SceneComponent {
 		return sceneObject;
 	}
 
+	void setObject(SceneObject sceneObject) {
+		this.sceneObject = sceneObject;
+	}
+
 	public final Transform getTransform() {
 		return sceneObject.getTransform();
 	}
 
-	public final <T extends SceneComponent> SceneComponent getComponent(Class<T> componentClass) {
+	public final <T extends SceneComponent> T getComponent(Class<T> componentClass) {
 		return sceneObject.getComponent(componentClass);
 	}
 

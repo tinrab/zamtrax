@@ -12,14 +12,14 @@ class ShaderProgram implements Shader {
 	private ShaderResource resource;
 	private int program;
 
-	public ShaderProgram(CharSequence vertexShaderSource, CharSequence fragmentShaderSource, AttributeScheme attributeScheme, List<Uniform> uniforms) {
+	public ShaderProgram(CharSequence vertexShaderSource, CharSequence fragmentShaderSource, BindingInfo bindingInfo, List<Uniform> uniforms) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(vertexShaderSource);
 		sb.append(fragmentShaderSource);
 
 		resource = ShaderResource.create(sb.toString().hashCode());
 
-		resource.setAttributeScheme(attributeScheme);
+		resource.setBindingInfo(bindingInfo);
 		resource.setUniforms(uniforms);
 
 		program = resource.getProgram();
@@ -52,9 +52,9 @@ class ShaderProgram implements Shader {
 	}
 
 	private void bindAttributes() {
-		AttributeScheme attributeScheme = resource.getAttributeScheme();
+		BindingInfo bindingInfo = resource.getBindingInfo();
 
-		attributeScheme.getAttributePointers().forEach(ap -> glBindAttribLocation(program, ap.getLocation(), ap.getName()));
+		bindingInfo.getAttributePointers().forEach(ap -> glBindAttribLocation(program, ap.getLocation(), ap.getName()));
 	}
 
 	private void link() {

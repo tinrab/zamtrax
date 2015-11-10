@@ -1,8 +1,6 @@
 package zamtrax.resources;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.LWJGLUtil;
-import zamtrax.Disposable;
 import zamtrax.Vector3;
 import zamtrax.Vertex;
 
@@ -20,13 +18,13 @@ final class IndexedMesh implements Mesh {
 	private MeshResource resource;
 	private List<Vertex> vertices;
 	private List<Integer> indices;
-	private AttributeScheme attributeScheme;
+	private BindingInfo bindingInfo;
 	private int drawType;
 
-	IndexedMesh(int id, List<Vertex> vertices, List<Integer> indices, AttributeScheme attributeScheme, boolean dynamic) {
+	IndexedMesh(int id, List<Vertex> vertices, List<Integer> indices, BindingInfo bindingInfo, boolean dynamic) {
 		this.vertices = vertices;
 		this.indices = indices;
-		this.attributeScheme = attributeScheme;
+		this.bindingInfo = bindingInfo;
 		drawType = dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
 
 		resource = MeshResource.create(id);
@@ -36,7 +34,7 @@ final class IndexedMesh implements Mesh {
 	public void build() {
 		IntBuffer ib = createIndexBuffer();
 		FloatBuffer vb = createVertexBuffer();
-		int vertexSize = attributeScheme.getSize();
+		int vertexSize = bindingInfo.getSize();
 
 		glBindVertexArray(resource.getVaoId());
 
@@ -45,14 +43,11 @@ final class IndexedMesh implements Mesh {
 
 		int offset = 0, i = 0;
 
-		for (AttributePointer ap : attributeScheme.getAttributePointers()) {
+		for (AttributePointer ap : bindingInfo.getAttributePointers()) {
 			glVertexAttribPointer(ap.getLocation(), ap.getAttributeType().getSize(), GL_FLOAT, false, vertexSize * 4, offset);
 
 			offset += ap.getAttributeType().getSize() * 4;
 		}
-
-		//glVertexAttribPointer(0, 3, GL_FLOAT, false, vertexSize * 4, 0);
-		//glVertexAttribPointer(1, 4, GL_FLOAT, false, vertexSize * 4, 12);
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
@@ -73,10 +68,10 @@ final class IndexedMesh implements Mesh {
 	}
 
 	private FloatBuffer createVertexBuffer() {
-		FloatBuffer vb = BufferUtils.createFloatBuffer(vertices.size() * attributeScheme.getSize());
+		FloatBuffer vb = BufferUtils.createFloatBuffer(vertices.size() * bindingInfo.getSize());
 
 		for (Vertex v : vertices) {
-			attributeScheme.getAttributePointers().forEach(ap -> {
+			bindingInfo.getAttributePointers().forEach(ap -> {
 				switch (ap.getAttributeType()) {
 					case POSITION:
 						vb.put(v.position.toArray());
@@ -102,13 +97,13 @@ final class IndexedMesh implements Mesh {
 	@Override
 	public void render() {
 		glBindVertexArray(resource.getVaoId());
-		attributeScheme.getAttributePointers().forEach(ap -> glEnableVertexAttribArray(ap.getLocation()));
+		bindingInfo.getAttributePointers().forEach(ap -> glEnableVertexAttribArray(ap.getLocation()));
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, resource.getIboId());
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		attributeScheme.getAttributePointers().forEach(ap -> glDisableVertexAttribArray(ap.getLocation()));
+		bindingInfo.getAttributePointers().forEach(ap -> glDisableVertexAttribArray(ap.getLocation()));
 		glBindVertexArray(0);
 	}
 

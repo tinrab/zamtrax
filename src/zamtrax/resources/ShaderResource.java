@@ -12,7 +12,7 @@ final class ShaderResource extends ReferencedResource {
 
 	private final int id;
 	private final int program;
-	private AttributeScheme attributeScheme;
+	private BindingInfo bindingInfo;
 	private Map<CharSequence, Uniform> uniforms;
 
 	private ShaderResource(int id) {
@@ -30,16 +30,16 @@ final class ShaderResource extends ReferencedResource {
 		return program;
 	}
 
-	public AttributeScheme getAttributeScheme() {
-		return attributeScheme;
+	public BindingInfo getBindingInfo() {
+		return bindingInfo;
 	}
 
 	public Map<CharSequence, Uniform> getUniforms() {
 		return uniforms;
 	}
 
-	public void setAttributeScheme(AttributeScheme attributeScheme) {
-		this.attributeScheme = attributeScheme;
+	public void setBindingInfo(BindingInfo bindingInfo) {
+		this.bindingInfo = bindingInfo;
 	}
 
 	public void setUniforms(List<Uniform> uniforms) {

@@ -1,17 +1,15 @@
 package zamtrax;
 
-import zamtrax.components.Camera;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public final class RenderModule extends Module {
+final class RenderModule extends Module {
 
 	private List<Renderer> renderers;
 
-	public RenderModule(Scene scene) {
+	RenderModule(Scene scene) {
 		super(scene);
 
 		renderers = new ArrayList<>();

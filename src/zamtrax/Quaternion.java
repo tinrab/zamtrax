@@ -23,6 +23,13 @@ public class Quaternion {
 		this.w = q.w;
 	}
 
+	public void set(javax.vecmath.Quat4f q) {
+		x = q.x;
+		y = q.y;
+		z = q.z;
+		w = q.w;
+	}
+
 	public Quaternion(Matrix4 m) {
 		float trace = m.get(0, 0) + m.get(1, 1) + m.get(2, 2);
 

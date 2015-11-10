@@ -1,9 +1,8 @@
-package zamtrax.components;
+package zamtrax;
 
 import org.lwjgl.opengl.GL11;
-import zamtrax.*;
 
-public class Camera extends SceneComponent {
+public final class Camera extends SceneComponent {
 
 	private static Camera mainCamera;
 

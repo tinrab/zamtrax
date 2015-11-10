@@ -1,8 +1,6 @@
 package zamtrax;
 
 import org.lwjgl.BufferUtils;
-import zamtrax.resources.AttributeScheme;
-import zamtrax.resources.Mesh;
 import zamtrax.resources.Model;
 import zamtrax.resources.Texture;
 
@@ -15,10 +13,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_RGBA;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 
 public final class Resources {
 

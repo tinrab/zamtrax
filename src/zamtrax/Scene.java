@@ -35,15 +35,12 @@ public class Scene implements Disposable {
 		physicsModule.update();
 		renderModule.update();
 
-		// TODO make this better
+		destroyObjects();
+	}
+
+	private void destroyObjects() {
 		destroyedObjects.forEach(sceneObject -> {
 			sceneObject.getComponents().forEach(SceneComponent::onRemove);
-
-			sceneObject.getComponents().stream().filter(component -> component instanceof Renderer).forEach(component -> {
-				Renderer renderer = (Renderer) component;
-
-				Game.getInstance().getCurrentScene().getRenderModule().removeRenderer(renderer);
-			});
 		});
 		destroyedObjects.forEach(sceneObject -> {
 			SceneObject parent = sceneObject.getParent();

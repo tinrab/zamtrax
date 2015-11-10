@@ -1,9 +1,9 @@
-package zamtrax.components;
+package zamtrax;
 
 import zamtrax.SceneComponent;
 import zamtrax.resources.Mesh;
 
-public class MeshFilter extends SceneComponent {
+public final class MeshFilter extends SceneComponent {
 
 	private Mesh mesh;
 

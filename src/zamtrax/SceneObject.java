@@ -18,6 +18,16 @@ public final class SceneObject {
 	}
 
 	public <T extends SceneComponent> T addComponent(Class<T> componentClass) {
+		RequireComponent requireComponent = componentClass.getAnnotation(RequireComponent.class);
+
+		if (requireComponent != null) {
+			for (Class requiredClass : requireComponent.components()) {
+				if (components.stream().noneMatch(component -> requiredClass.isAssignableFrom(component.getClass()))) {
+					throw new RuntimeException(componentClass.getSimpleName() + " requires " + requiredClass.getSimpleName() + " to be present");
+				}
+			}
+		}
+
 		T component = SceneComponent.create(componentClass, this);
 
 		if (component == null) {
@@ -25,11 +35,6 @@ public final class SceneObject {
 		}
 
 		components.add(component);
-
-		if (component instanceof Renderer) {
-			Game.getInstance().getCurrentScene().getRenderModule().addRenderer((Renderer) component);
-		}
-
 		component.onAdd();
 
 		return component;
@@ -62,11 +67,11 @@ public final class SceneObject {
 	}
 
 	public void setActive(boolean active) {
-		if(this.active && !active) {
+		if (this.active && !active) {
 			this.active = false;
 
 			components.forEach(SceneComponent::onDisable);
-		} else if(!this.active && active) {
+		} else if (!this.active && active) {
 			this.active = true;
 
 			components.forEach(SceneComponent::onEnable);
@@ -99,7 +104,7 @@ public final class SceneObject {
 	}
 
 	public static SceneObject create(SceneObject parent) {
-		if(parent == null) {
+		if (parent == null) {
 			parent = Game.getInstance().getCurrentScene().getRoot();
 		}
 

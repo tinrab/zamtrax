@@ -21,7 +21,7 @@ public interface Shader {
 
 		private CharSequence vertexShaderSource;
 		private CharSequence fragmentShaderSource;
-		private AttributeScheme attributeScheme;
+		private BindingInfo bindingInfo;
 		private List<Uniform> uniforms;
 
 		public Builder() {
@@ -40,8 +40,8 @@ public interface Shader {
 			return this;
 		}
 
-		public Builder setAttributeScheme(AttributeScheme attributeScheme) {
-			this.attributeScheme = attributeScheme;
+		public Builder setBindingInfo(BindingInfo bindingInfo) {
+			this.bindingInfo = bindingInfo;
 
 			return this;
 		}
@@ -53,7 +53,7 @@ public interface Shader {
 		}
 
 		public Shader build() {
-			Shader shader = new ShaderProgram(vertexShaderSource, fragmentShaderSource, attributeScheme, uniforms);
+			Shader shader = new ShaderProgram(vertexShaderSource, fragmentShaderSource, bindingInfo, uniforms);
 
 			return shader;
 		}

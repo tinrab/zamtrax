@@ -1,6 +1,6 @@
 package zamtrax;
 
-public class Transform {
+public final class Transform implements Cloneable {
 
 	private Transform parent;
 	private Matrix4 parentMatrix;
@@ -92,7 +92,7 @@ public class Transform {
 	}
 
 	public void lookAt(Vector3 point, Vector3 up) {
-		rotation = getLookAtRotation(point, up);
+		setRotation(getLookAtRotation(point, up));
 	}
 
 	public Quaternion getLookAtRotation(Vector3 point, Vector3 up) {
@@ -213,6 +213,18 @@ public class Transform {
 
 	public Vector3 down() {
 		return getRotation().rotatePoint(Vector3.DOWN);
+	}
+
+	public Object clone() {
+		try {
+			Object clone = super.clone();
+
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 }

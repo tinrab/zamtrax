@@ -2,7 +2,7 @@ package zamtrax;
 
 public class Vector3 {
 
-	public static final Vector3 ZERO = new Vector3();
+	public static final Vector3 ZERO = new Vector3(0.0f, 0.0f, 0.0f);
 	public static final Vector3 LEFT = new Vector3(-1.0f, 0.0f, 0.0f);
 	public static final Vector3 RIGHT = new Vector3(1.0f, 0.0f, 0.0f);
 	public static final Vector3 UP = new Vector3(0.0f, 1.0f, 0.0f);
@@ -31,6 +31,12 @@ public class Vector3 {
 	}
 
 	public Vector3(Vector3 v) {
+		x = v.x;
+		y = v.y;
+		z = v.z;
+	}
+
+	public void set(javax.vecmath.Vector3f v) {
 		x = v.x;
 		y = v.y;
 		z = v.z;

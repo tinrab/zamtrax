@@ -1,8 +1,10 @@
 package zamtrax;
 
-public class LogicModule extends Module {
+import java.util.List;
 
-	protected LogicModule(Scene scene) {
+class LogicModule extends Module {
+
+	LogicModule(Scene scene) {
 		super(scene);
 	}
 
@@ -15,7 +17,15 @@ public class LogicModule extends Module {
 		sceneObject.getComponents().forEach(SceneComponent::update);
 
 		sceneObject.getTransform().update();
-		sceneObject.getChildren().forEach(this::update);
+
+		//sceneObject.getChildren().forEach(this::update);
+		List<SceneObject> children = sceneObject.getChildren();
+
+		for (int i = 0; i < children.size(); i++) {
+			SceneObject child = children.get(i);
+
+			update(child);
+		}
 	}
 
 	@Override
