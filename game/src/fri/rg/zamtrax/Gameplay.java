@@ -34,9 +34,9 @@ public class Gameplay extends Scene {
 				.addUniform("projectionMatrix")
 				.addUniform("modelViewMatrix")
 				//.addUniform("normalMatrix")
-				.addUniform("ambientColor")
-				.addUniform("lightingDirection")
-				.addUniform("directionalColor")
+				//.addUniform("ambientColor")
+				//.addUniform("lightingDirection")
+				//.addUniform("directionalColor")
 				.build();
 
 		Model cubeModel = Resources.loadModel("models/cube.obj");

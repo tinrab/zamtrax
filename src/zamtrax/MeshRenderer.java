@@ -31,10 +31,6 @@ public class MeshRenderer extends Renderer {
 		//Matrix3 normalMatrix = modelView.toMatrix3().inverted().transposed();
 		//shader.setUniform("normalMatrix", normalMatrix);
 
-		shader.setUniform("ambientColor", new Vector3(0.1f, 0.1f, 0.1f));
-		shader.setUniform("lightingDirection", new Vector3(0.0f, 1.0f, 1.0f).normalized());
-		shader.setUniform("directionalColor", new Vector3(1.0f, 1.0f, 1.0f));
-
 		meshFilter.getMesh().render();
 
 		material.unbind();
