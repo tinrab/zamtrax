@@ -1,6 +1,7 @@
 package zamtrax;
 
 import zamtrax.resources.Material;
+import zamtrax.resources.Shader;
 
 public class MeshRenderer extends Renderer {
 
@@ -18,11 +19,21 @@ public class MeshRenderer extends Renderer {
 
 	@Override
 	public void render(Matrix4 viewProjection) {
-		Matrix4 model = transform.getLocalToWorldMatrix();
-		Matrix4 mvp = viewProjection.mul(model);
+		Matrix4 modelView = transform.getLocalToWorldMatrix();
 
 		material.bind();
-		material.getShader().setUniform("mvp", mvp);
+
+		Shader shader = material.getShader();
+
+		shader.setUniform("projectionMatrix", viewProjection);
+		shader.setUniform("modelViewMatrix", modelView);
+
+		//Matrix3 normalMatrix = modelView.toMatrix3().inverted().transposed();
+		//shader.setUniform("normalMatrix", normalMatrix);
+
+		shader.setUniform("ambientColor", new Vector3(0.1f, 0.1f, 0.1f));
+		shader.setUniform("lightingDirection", new Vector3(0.0f, 1.0f, 1.0f).normalized());
+		shader.setUniform("directionalColor", new Vector3(1.0f, 1.0f, 1.0f));
 
 		meshFilter.getMesh().render();
 

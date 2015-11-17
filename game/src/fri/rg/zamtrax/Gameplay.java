@@ -31,7 +31,12 @@ public class Gameplay extends Scene {
 				.setVertexShaderSource(Resources.loadText("shaders/textured.vs"))
 				.setFragmentShaderSource(Resources.loadText("shaders/textured.fs"))
 				.setBindingInfo(bindingInfo)
-				.addUniform("mvp")
+				.addUniform("projectionMatrix")
+				.addUniform("modelViewMatrix")
+				//.addUniform("normalMatrix")
+				.addUniform("ambientColor")
+				.addUniform("lightingDirection")
+				.addUniform("directionalColor")
 				.build();
 
 		Model cubeModel = Resources.loadModel("models/cube.obj");
@@ -73,12 +78,13 @@ public class Gameplay extends Scene {
 
 		floor.addComponent(ObjectSpawner.class).setResources(mesh, brickMaterial);
 
+		Mesh longCube = Mesh.Factory.fromModel(Resources.loadModel("models/tall_cube.obj"), bindingInfo);
+
 		SceneObject spinner = SceneObject.create();
-		spinner.addComponent(MeshFilter.class).setMesh(mesh);
+		spinner.addComponent(MeshFilter.class).setMesh(longCube);
 		spinner.addComponent(MeshRenderer.class).setMaterial(diamondMaterial);
-		spinner.getTransform().setScale(new Vector3(16.0f, 1.0f, 1.0f));
 		spinner.getTransform().translate(4.0f, 1.0f, 0.0f);
-		spinner.addComponent(BoxCollider.class);
+		spinner.addComponent(BoxCollider.class).setSize(16.0f, 1.0f, 1.0f);
 		spinner.addComponent(RigidBody.class).setMass(0.0f);
 
 		Rotate r = spinner.addComponent(Rotate.class);

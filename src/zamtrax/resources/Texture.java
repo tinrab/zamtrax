@@ -2,57 +2,24 @@ package zamtrax.resources;
 
 import zamtrax.Disposable;
 
-import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL30.*;
 
 public final class Texture implements Disposable {
 
 	public enum WrapMode {
-		CLAMP(GL_CLAMP), REPEAT(GL_REPEAT);
-
-		private final int value;
-
-		WrapMode(int value) {
-			this.value = value;
-		}
-
-		public int getValue() {
-			return value;
-		}
-
+		CLAMP, REPEAT
 	}
 
 	public enum FilterMode {
-		NEAREST(GL_NEAREST), LINEAR(GL_LINEAR);
-
-		private final int value;
-
-		FilterMode(int value) {
-			this.value = value;
-		}
-
-		public int getValue() {
-			return value;
-		}
-
+		NEAREST, LINEAR, MIPMAP
 	}
 
 	public enum Format {
-		ARGB(BufferedImage.TYPE_INT_ARGB);
-
-		private final int value;
-
-		Format(int value) {
-			this.value = value;
-		}
-
-		public int getValue() {
-			return value;
-		}
-
+		ARGB
 	}
 
 	private TextureResource resource;
@@ -72,11 +39,38 @@ public final class Texture implements Disposable {
 
 		bind();
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode.getValue());
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode.getValue());
+		int wm = -1, fm = -1;
 
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterMode.getValue());
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterMode.getValue());
+		switch (wrapMode) {
+			case CLAMP:
+				wm = GL_CLAMP;
+				break;
+			case REPEAT:
+				wm = GL_REPEAT;
+				break;
+		}
+
+		switch (filterMode) {
+			case LINEAR:
+				fm = GL_LINEAR;
+				break;
+			case NEAREST:
+				fm = GL_NEAREST;
+				break;
+		}
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wm);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wm);
+
+		if (filterMode == FilterMode.MIPMAP) {
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+
+			glGenerateMipmap(GL_TEXTURE_2D);
+		} else {
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, fm);
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, fm);
+		}
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, glFormat, GL_UNSIGNED_BYTE, buffer);
 

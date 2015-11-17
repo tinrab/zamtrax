@@ -1,6 +1,8 @@
 package zamtrax.resources;
 
+import zamtrax.Matrix3;
 import zamtrax.Matrix4;
+import zamtrax.Vector3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,10 @@ public interface Shader {
 	void setUniform(CharSequence name, float value);
 
 	void setUniform(CharSequence name, Matrix4 value);
+
+	void setUniform(CharSequence name, Matrix3 value);
+
+	void setUniform(CharSequence name, Vector3 value);
 
 	void release();
 

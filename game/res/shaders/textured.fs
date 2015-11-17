@@ -1,6 +1,8 @@
 #version 330
+precision mediump float;
 
-in vec2 vertexUV;
+in highp vec2 vertexUV;
+in vec3 lightWeighting;
 
 out vec4 fragColor;
 
@@ -8,5 +10,7 @@ uniform sampler2D textureSampler;
 
 void main()
 {
-  fragColor = vec4(texture(textureSampler, vertexUV).rgb, 1.0);
+  vec4 textureColor = texture2D(textureSampler, vec2(vertexUV.s, vertexUV.t));
+	
+  fragColor = vec4(textureColor.rgb * lightWeighting, textureColor.a);
 }

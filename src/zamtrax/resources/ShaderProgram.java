@@ -1,6 +1,8 @@
 package zamtrax.resources;
 
+import zamtrax.Matrix3;
 import zamtrax.Matrix4;
+import zamtrax.Vector3;
 
 import java.util.List;
 
@@ -91,6 +93,20 @@ class ShaderProgram implements Shader {
 		Uniform uniform = resource.getUniforms().get(name);
 
 		glUniformMatrix4fv(uniform.getLocation(), true, value.toBuffer());
+	}
+
+	@Override
+	public void setUniform(CharSequence name, Vector3 value) {
+		Uniform uniform = resource.getUniforms().get(name);
+
+		glUniform3f(uniform.getLocation(), value.x, value.y, value.z);
+	}
+
+	@Override
+	public void setUniform(CharSequence name, Matrix3 value) {
+		Uniform uniform = resource.getUniforms().get(name);
+
+		glUniformMatrix3fv(uniform.getLocation(), true, value.toBuffer());
 	}
 
 	@Override

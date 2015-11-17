@@ -322,6 +322,22 @@ public class Matrix4 {
 		return new javax.vecmath.Matrix4f(floats);
 	}
 
+	public Matrix3 toMatrix3() {
+		Matrix3 m = new Matrix3();
+
+		m.elements[0][0] = elements[0][0];
+		m.elements[0][1] = elements[0][1];
+		m.elements[0][2] = elements[0][2];
+		m.elements[1][0] = elements[1][0];
+		m.elements[1][1] = elements[1][1];
+		m.elements[1][2] = elements[1][2];
+		m.elements[2][0] = elements[2][0];
+		m.elements[2][1] = elements[2][1];
+		m.elements[2][2] = elements[2][2];
+
+		return m;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
