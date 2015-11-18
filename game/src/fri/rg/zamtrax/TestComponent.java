@@ -1,8 +1,8 @@
 package fri.rg.zamtrax;
 
-import zamtrax.SceneComponent;
+import zamtrax.Component;
 
-public class TestComponent extends SceneComponent {
+public class TestComponent extends Component {
 
 	@Override
 	public void update() {

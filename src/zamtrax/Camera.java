@@ -1,8 +1,12 @@
 package zamtrax;
 
-import org.lwjgl.opengl.GL11;
+public final class Camera extends Component {
 
-public final class Camera extends SceneComponent {
+	public enum ClearFlags {
+
+		SOLID_COLOR, DEPTH, NOTHING
+
+	}
 
 	private static Camera mainCamera;
 
@@ -14,27 +18,9 @@ public final class Camera extends SceneComponent {
 		return mainCamera;
 	}
 
-	public enum ClearFlag {
-		COLOR(GL11.GL_COLOR_BUFFER_BIT),
-		DEPTH(GL11.GL_DEPTH_BUFFER_BIT),
-		COLOR_AND_DEPTH(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT),
-		NOTHING(GL11.GL_NONE);
-
-		private final int value;
-
-		ClearFlag(int value) {
-			this.value = value;
-		}
-
-		public int getValue() {
-			return value;
-		}
-
-	}
-
 	private Matrix4 projection;
 	private Transform transform;
-	private ClearFlag clearFlag;
+	private ClearFlags clearFlags;
 	private Color clearColor;
 
 	@Override
@@ -44,7 +30,7 @@ public final class Camera extends SceneComponent {
 		}
 
 		transform = getTransform();
-		clearFlag = ClearFlag.COLOR_AND_DEPTH;
+		clearFlags = ClearFlags.SOLID_COLOR;
 		clearColor = Color.createBlack();
 	}
 
@@ -57,12 +43,12 @@ public final class Camera extends SceneComponent {
 		return projection.mul(r.mul(cameraTranslation));
 	}
 
-	public ClearFlag getClearFlag() {
-		return clearFlag;
+	public ClearFlags getClearFlags() {
+		return clearFlags;
 	}
 
-	public void setClearFlag(ClearFlag clearFlag) {
-		this.clearFlag = clearFlag;
+	public void setClearFlags(ClearFlags clearFlags) {
+		this.clearFlags = clearFlags;
 	}
 
 	public void setClearColor(Color color) {

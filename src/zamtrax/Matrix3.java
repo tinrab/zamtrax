@@ -30,7 +30,7 @@ public class Matrix3 {
 		return this;
 	}
 
-	public Matrix3 inverted() {
+	public Matrix3 invert() {
 		float a00 = elements[0][0];
 		float a01 = elements[0][1];
 		float a02 = elements[0][2];
@@ -67,7 +67,7 @@ public class Matrix3 {
 		return m;
 	}
 
-	public Matrix3 transposed(){
+	public Matrix3 transpose(){
 		Matrix3 m = new Matrix3();
 
 		for (int i = 0; i < 3; i++) {

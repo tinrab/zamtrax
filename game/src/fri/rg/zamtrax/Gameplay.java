@@ -9,7 +9,7 @@ public class Gameplay extends Scene {
 	public void onEnter() {
 		{
 			// FPS
-			SceneObject cameraObject = SceneObject.create();
+			GameObject cameraObject = GameObject.create();
 
 			FPSController fps = cameraObject.addComponent(FPSController.class);
 			Camera camera = cameraObject.addComponent(Camera.class);
@@ -28,15 +28,15 @@ public class Gameplay extends Scene {
 				.build();
 
 		Shader shader = new Shader.Builder()
-				.setVertexShaderSource(Resources.loadText("shaders/textured.vs"))
-				.setFragmentShaderSource(Resources.loadText("shaders/textured.fs"))
+				.setVertexShaderSource(Resources.loadText("shaders/standard.vs"))
+				.setFragmentShaderSource(Resources.loadText("shaders/standard.fs"))
 				.setBindingInfo(bindingInfo)
 				.addUniform("projectionMatrix")
 				.addUniform("modelViewMatrix")
-				//.addUniform("normalMatrix")
-				//.addUniform("ambientColor")
-				//.addUniform("lightingDirection")
-				//.addUniform("directionalColor")
+				.addUniform("normalMatrix")
+						//.addUniform("ambientColor")
+						//.addUniform("lightingDirection")
+						//.addUniform("directionalColor")
 				.build();
 
 		Model cubeModel = Resources.loadModel("models/cube.obj");
@@ -63,7 +63,7 @@ public class Gameplay extends Scene {
 						Texture.FilterMode.LINEAR))
 				.build();
 
-		SceneObject floor = SceneObject.create();
+		GameObject floor = GameObject.create();
 
 		MeshFilter mf = floor.addComponent(MeshFilter.class);
 		MeshRenderer mr = floor.addComponent(MeshRenderer.class);
@@ -80,7 +80,7 @@ public class Gameplay extends Scene {
 
 		Mesh longCube = Mesh.Factory.fromModel(Resources.loadModel("models/tall_cube.obj"), bindingInfo);
 
-		SceneObject spinner = SceneObject.create();
+		GameObject spinner = GameObject.create();
 		spinner.addComponent(MeshFilter.class).setMesh(longCube);
 		spinner.addComponent(MeshRenderer.class).setMaterial(diamondMaterial);
 		spinner.getTransform().translate(4.0f, 1.0f, 0.0f);
@@ -90,6 +90,19 @@ public class Gameplay extends Scene {
 		Rotate r = spinner.addComponent(Rotate.class);
 		r.setAxis(Vector3.UP);
 		r.setSpeed(-1.0f);
+
+		// Create light
+		createLight(new Color(1.0f, 0.0f, 0.0f)).setPosition(new Vector3(-3.0f, 3.0f, 0.0f));
+		createLight(new Color(0.0f, 0.0f, 1.0f)).setPosition(new Vector3(3.0f, 3.0f, 0.0f));
+	}
+
+	private Transform createLight(Color color) {
+		GameObject lightObject = GameObject.create();
+		Light light = lightObject.addComponent(Light.class);
+
+		light.setColor(color);
+
+		return lightObject.getTransform();
 	}
 
 	@Override

@@ -7,7 +7,8 @@ public final class BoxCollider extends Collider {
 
 	private Vector3 size;
 
-	BoxCollider() {
+	@Override
+	public void onAdd() {
 		size = new Vector3(1.0f, 1.0f, 1.0f);
 	}
 

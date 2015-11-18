@@ -5,21 +5,23 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 
-final class RenderModule extends Module {
+final class RenderModule extends Module implements Scene.Listener {
 
 	private List<Renderer> renderers;
 
 	RenderModule(Scene scene) {
 		super(scene);
 
+		scene.addSceneListener(this);
+
 		renderers = new ArrayList<>();
 	}
 
-	public void addRenderer(Renderer renderer) {
+	private void addRenderer(Renderer renderer) {
 		renderers.add(renderer);
 	}
 
-	public boolean removeRenderer(Renderer renderer) {
+	private boolean removeRenderer(Renderer renderer) {
 		return renderers.remove(renderer);
 	}
 
@@ -30,13 +32,25 @@ final class RenderModule extends Module {
 		glCullFace(GL_FRONT);
 		glViewport(0, 0, Game.getScreenWidth(), Game.getScreenHeight());
 
+		RenderPipeline renderPipeline = new RenderPipeline();
+
 		Camera camera = Camera.getMainCamera();
-		Camera.ClearFlag clearFlag = camera.getClearFlag();
+		Camera.ClearFlags clearFlag = camera.getClearFlags();
 		Matrix4 viewProjection = camera.getViewProjection();
 
-		glClear(clearFlag.getValue());
+		switch (clearFlag) {
+			case SOLID_COLOR:
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				break;
+			case DEPTH:
+				glClear(GL_DEPTH_BUFFER_BIT);
+				break;
+			case NOTHING:
+				glClear(GL_NONE);
+				break;
+		}
 
-		if (clearFlag == Camera.ClearFlag.COLOR) {
+		if (clearFlag == Camera.ClearFlags.SOLID_COLOR) {
 			Color clearColor = camera.getClearColor();
 
 			glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
@@ -49,6 +63,28 @@ final class RenderModule extends Module {
 
 	@Override
 	public void dispose() {
+	}
+
+	@Override
+	public void onCreateGameObject(GameObject gameObject) {
+	}
+
+	@Override
+	public void onDestroyGameObject(GameObject gameObject) {
+	}
+
+	@Override
+	public void onAddComponent(Component component) {
+		if (component instanceof Renderer) {
+			addRenderer((Renderer) component);
+		}
+	}
+
+	@Override
+	public void onRemoveComponent(Component component) {
+		if (component instanceof Renderer) {
+			removeRenderer((Renderer) component);
+		}
 	}
 
 }

@@ -3,7 +3,7 @@ package zamtrax;
 import zamtrax.resources.Material;
 import zamtrax.resources.Shader;
 
-public class MeshRenderer extends Renderer {
+public final class MeshRenderer extends Renderer {
 
 	private MeshFilter meshFilter;
 	private Material material;
@@ -14,22 +14,22 @@ public class MeshRenderer extends Renderer {
 		super.onAdd();
 
 		transform = getTransform();
-		meshFilter = getObject().getComponent(MeshFilter.class);
+		meshFilter = getGameObject().getComponent(MeshFilter.class);
 	}
 
 	@Override
-	public void render(Matrix4 viewProjection) {
+	void render(Matrix4 viewProjection) {
 		Matrix4 modelView = transform.getLocalToWorldMatrix();
 
 		material.bind();
 
 		Shader shader = material.getShader();
 
+		Matrix3 normalMatrix = modelView.toMatrix3().invert().transpose();
+
 		shader.setUniform("projectionMatrix", viewProjection);
 		shader.setUniform("modelViewMatrix", modelView);
-
-		//Matrix3 normalMatrix = modelView.toMatrix3().inverted().transposed();
-		//shader.setUniform("normalMatrix", normalMatrix);
+		shader.setUniform("normalMatrix", normalMatrix);
 
 		meshFilter.getMesh().render();
 

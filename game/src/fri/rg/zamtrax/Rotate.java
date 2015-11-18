@@ -1,11 +1,11 @@
 package fri.rg.zamtrax;
 
-import zamtrax.SceneComponent;
+import zamtrax.Component;
 import zamtrax.Time;
 import zamtrax.Transform;
 import zamtrax.Vector3;
 
-public class Rotate extends SceneComponent {
+public class Rotate extends Component {
 
 	private Vector3 axis;
 	private float speed;

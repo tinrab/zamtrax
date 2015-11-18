@@ -7,7 +7,7 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
 @RequireComponent(components = {Collider.class})
-public final class RigidBody extends SceneComponent {
+public final class RigidBody extends Component {
 
 	private com.bulletphysics.dynamics.RigidBody bRigidBody;
 	private com.bulletphysics.linearmath.Transform bTransform;
@@ -29,17 +29,9 @@ public final class RigidBody extends SceneComponent {
 		bRotation = new javax.vecmath.Quat4f();
 		bPosition = new javax.vecmath.Vector3f();
 
-		bRigidBody = Game.getInstance().getCurrentScene().getPhysicsModule().addRigidBody(this);
-		bRigidBody.getWorldTransform(bTransform);
-
 		transform = getTransform();
 		rotation = new Quaternion();
 		position = new Vector3();
-	}
-
-	@Override
-	public void onRemove() {
-		Game.getInstance().getCurrentScene().getPhysicsModule().removeRigidBody(this);
 	}
 
 	@Override
@@ -106,6 +98,10 @@ public final class RigidBody extends SceneComponent {
 
 	public boolean isDynamic() {
 		return dynamic;
+	}
+
+	void linkRigidBody(com.bulletphysics.dynamics.RigidBody rigidBody) {
+		bRigidBody = rigidBody;
 	}
 
 }

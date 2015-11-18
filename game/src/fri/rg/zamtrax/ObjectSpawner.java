@@ -4,7 +4,7 @@ import zamtrax.*;
 import zamtrax.resources.Material;
 import zamtrax.resources.Mesh;
 
-public class ObjectSpawner extends SceneComponent {
+public class ObjectSpawner extends Component {
 
 	private Mesh mesh;
 	private Material material;
@@ -25,7 +25,7 @@ public class ObjectSpawner extends SceneComponent {
 	}
 
 	private void spawn() {
-		SceneObject cube = SceneObject.create();
+		GameObject cube = GameObject.create();
 
 		cube.addComponent(MeshFilter.class).setMesh(mesh);
 		cube.addComponent(MeshRenderer.class).setMaterial(material);

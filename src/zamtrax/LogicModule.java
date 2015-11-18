@@ -13,16 +13,16 @@ class LogicModule extends Module {
 		update(scene.getRoot());
 	}
 
-	private void update(SceneObject sceneObject) {
-		sceneObject.getComponents().forEach(SceneComponent::update);
+	private void update(GameObject sceneObject) {
+		sceneObject.getComponents().forEach(Component::update);
 
 		sceneObject.getTransform().update();
 
 		//sceneObject.getChildren().forEach(this::update);
-		List<SceneObject> children = sceneObject.getChildren();
+		List<GameObject> children = sceneObject.getChildren();
 
 		for (int i = 0; i < children.size(); i++) {
-			SceneObject child = children.get(i);
+			GameObject child = children.get(i);
 
 			update(child);
 		}

@@ -1,10 +1,9 @@
 package fri.rg.zamtrax;
 
-import zamtrax.SceneComponent;
-import zamtrax.SceneObject;
+import zamtrax.Component;
 import zamtrax.Time;
 
-public class DestroyOnDelay extends SceneComponent {
+public class DestroyOnDelay extends Component {
 
 	private float delay;
 	private float timer;
@@ -14,7 +13,7 @@ public class DestroyOnDelay extends SceneComponent {
 		timer += Time.getDeltaTime();
 
 		if (timer >= delay) {
-			getObject().destroy();
+			getGameObject().destroy();
 		}
 	}
 

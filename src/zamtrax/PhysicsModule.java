@@ -24,13 +24,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-final class PhysicsModule extends Module {
+final class PhysicsModule extends Module implements Scene.Listener {
 
 	private Map<zamtrax.RigidBody, RigidBody> rigidBodyMap;
 	private DynamicsWorld dynamicsWorld;
 
 	PhysicsModule(Scene scene) {
 		super(scene);
+
+		scene.addSceneListener(this);
 
 		rigidBodyMap = new HashMap<>();
 
@@ -57,7 +59,7 @@ final class PhysicsModule extends Module {
 		dynamicsWorld.destroy();
 	}
 
-	public RigidBody addRigidBody(zamtrax.RigidBody rigidBody) {
+	private void addRigidBody(zamtrax.RigidBody rigidBody) {
 		MotionState ms = new DefaultMotionState(new Transform(new Matrix4f(rigidBody.getTransform().getRotation().toVecmath(),
 				rigidBody.getTransform().getPosition().toVecmath(),
 				1.0f)));
@@ -76,10 +78,10 @@ final class PhysicsModule extends Module {
 		rigidBodyMap.put(rigidBody, rb);
 		dynamicsWorld.addRigidBody(rb);
 
-		return rb;
+		rigidBody.linkRigidBody(rb);
 	}
 
-	public boolean removeRigidBody(zamtrax.RigidBody rigidBody) {
+	private boolean removeRigidBody(zamtrax.RigidBody rigidBody) {
 		RigidBody rb = rigidBodyMap.remove(rigidBody);
 
 		if (rb == null) {
@@ -89,6 +91,28 @@ final class PhysicsModule extends Module {
 		dynamicsWorld.removeRigidBody(rb);
 
 		return true;
+	}
+
+	@Override
+	public void onCreateGameObject(GameObject gameObject) {
+	}
+
+	@Override
+	public void onDestroyGameObject(GameObject gameObject) {
+	}
+
+	@Override
+	public void onAddComponent(Component component) {
+		if (component instanceof zamtrax.RigidBody) {
+			addRigidBody((zamtrax.RigidBody) component);
+		}
+	}
+
+	@Override
+	public void onRemoveComponent(Component component) {
+		if (component instanceof zamtrax.RigidBody) {
+			removeRigidBody((zamtrax.RigidBody) component);
+		}
 	}
 
 }
