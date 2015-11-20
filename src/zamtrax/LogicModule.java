@@ -9,12 +9,12 @@ class LogicModule extends Module {
 	}
 
 	@Override
-	public void update() {
-		update(scene.getRoot());
+	public void update(float delta) {
+		update(delta, scene.getRoot());
 	}
 
-	private void update(GameObject sceneObject) {
-		sceneObject.getComponents().forEach(Component::update);
+	private void update(float delta, GameObject sceneObject) {
+		sceneObject.getComponents().forEach(component -> component.update(delta));
 
 		sceneObject.getTransform().update();
 
@@ -24,7 +24,7 @@ class LogicModule extends Module {
 		for (int i = 0; i < children.size(); i++) {
 			GameObject child = children.get(i);
 
-			update(child);
+			update(delta, child);
 		}
 	}
 

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class Game implements ApplicationListener {
+public final class Game implements Application.Listener {
 
 	private static Game instance;
 
@@ -61,8 +61,8 @@ public final class Game implements ApplicationListener {
 	}
 
 	@Override
-	public void update() {
-		currentScene.update();
+	public void update(float delta) {
+		currentScene.update(delta);
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package zamtrax.resources;
 
+import zamtrax.Resources;
+
 public interface Material {
 
 	void bind();

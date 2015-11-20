@@ -20,7 +20,6 @@ public class Scene implements Disposable {
 	private GameObject root;
 	private List<GameObject> destroyedObjects;
 	private List<Listener> sceneListeners;
-
 	private LogicModule logicModule;
 	private PhysicsModule physicsModule;
 	private RenderModule renderModule;
@@ -44,10 +43,10 @@ public class Scene implements Disposable {
 	public void onExit() {
 	}
 
-	final void update() {
-		logicModule.update();
-		physicsModule.update();
-		renderModule.update();
+	final void update(float delta) {
+		logicModule.update(delta);
+		physicsModule.update(delta);
+		renderModule.update(delta);
 
 		destroyObjects();
 	}

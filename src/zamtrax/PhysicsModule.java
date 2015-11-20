@@ -46,8 +46,8 @@ final class PhysicsModule extends Module implements Scene.Listener {
 	}
 
 	@Override
-	public void update() {
-		dynamicsWorld.stepSimulation(Time.getDeltaTime());
+	public void update(float delta) {
+		dynamicsWorld.stepSimulation(delta);
 	}
 
 	@Override

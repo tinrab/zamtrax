@@ -102,13 +102,11 @@ final class Window implements Disposable {
 		return glfwWindowShouldClose(window) != GL_FALSE;
 	}
 
-	void processEvents() {
-		glfwPollEvents();
-		input.update();
-	}
-
-	void render() {
+	void update() {
 		glfwSwapBuffers(window);
+		glfwPollEvents();
+
+		input.update();
 	}
 
 	int getWidth() {

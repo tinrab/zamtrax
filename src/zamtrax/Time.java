@@ -4,57 +4,61 @@ import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
 public final class Time {
 
-	private static double targetUPS;
-	private static int fps;
+	private static Time instance;
 
-	private static float deltaTime;
-	private static float interpolation;
+	public static Time getInstance() {
+		if (instance == null) {
+			synchronized (Time.class) {
+				if (instance == null) {
+					instance = new Time();
+				}
+			}
+		}
 
-	static void setTargetUPS(double targetUPS) {
-		Time.targetUPS = targetUPS;
+		return instance;
 	}
 
-	static double getTargetUPS() {
+	private double targetUPS;
+	private int fps;
+	private float deltaTime;
+
+	void setTargetUPS(double targetUPS) {
+		this.targetUPS = targetUPS;
+	}
+
+	double getTargetUPS() {
 		return targetUPS;
 	}
 
-	static void setFPS(int fps) {
-		Time.fps = fps;
+	void setFPS(int fps) {
+		this.fps = fps;
 	}
 
-	public static int getFPS() {
+	public int getFPS() {
 		return fps;
 	}
 
-	public static float getDeltaTime() {
+	public float getDeltaTime() {
 		return deltaTime;
 	}
 
-	static void setDeltaTime(float deltaTime) {
-		Time.deltaTime = deltaTime;
+	void setDeltaTime(float deltaTime) {
+		this.deltaTime = deltaTime;
 	}
 
-	public static float getInterpolation() {
-		return interpolation;
-	}
-
-	static void setInterpolation(float interpolation) {
-		Time.interpolation = interpolation;
-	}
-
-	public static double currentNanos() {
+	public double currentNanos() {
 		return glfwGetTime() * 1000000000.0;
 	}
 
-	public static double currentMicros() {
+	public double currentMicros() {
 		return glfwGetTime() * 1000000.0;
 	}
 
-	public static double currentMillis() {
+	public double currentMillis() {
 		return glfwGetTime() * 1000.0;
 	}
 
-	public static double currentSeconds() {
+	public double currentSeconds() {
 		return glfwGetTime();
 	}
 

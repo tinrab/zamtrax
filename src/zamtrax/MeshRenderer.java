@@ -1,24 +1,21 @@
 package zamtrax;
 
-import zamtrax.resources.Material;
-import zamtrax.resources.Shader;
-
+@RequireComponent(components = {MeshFilter.class})
 public final class MeshRenderer extends Renderer {
 
 	private MeshFilter meshFilter;
-	private Material material;
-	private Transform transform;
 
 	@Override
 	public void onAdd() {
 		super.onAdd();
 
-		transform = getTransform();
 		meshFilter = getGameObject().getComponent(MeshFilter.class);
 	}
 
 	@Override
-	void render(Matrix4 viewProjection) {
+	void render() {
+		meshFilter.getMesh().render();
+		/*
 		Matrix4 modelView = transform.getLocalToWorldMatrix();
 
 		material.bind();
@@ -27,21 +24,14 @@ public final class MeshRenderer extends Renderer {
 
 		Matrix3 normalMatrix = modelView.toMatrix3().invert().transpose();
 
-		shader.setUniform("projectionMatrix", viewProjection);
+		shader.setUniform("projectionMatrix", projection);
 		shader.setUniform("modelViewMatrix", modelView);
 		shader.setUniform("normalMatrix", normalMatrix);
 
 		meshFilter.getMesh().render();
 
 		material.unbind();
-	}
-
-	public Material getMaterial() {
-		return material;
-	}
-
-	public void setMaterial(Material material) {
-		this.material = material;
+		*/
 	}
 
 }

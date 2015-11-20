@@ -12,8 +12,8 @@ public class ObjectSpawner extends Component {
 	private float timer;
 
 	@Override
-	public void update() {
-		timer -= Time.getDeltaTime();
+	public void update(float delta) {
+		timer -= delta;
 
 		if (timer <= 0.0f) {
 			timer = Random.randomFloat() * 0.2f;

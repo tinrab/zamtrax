@@ -34,7 +34,7 @@ public final class Camera extends Component {
 		clearColor = Color.createBlack();
 	}
 
-	public Matrix4 getViewProjection() {
+	public Matrix4 getProjectionMatrix() {
 		Matrix4 r = transform.getRotation().conjugate().toMatrix();
 		Vector3 p = transform.getPosition().mul(-1.0f);
 

@@ -1,6 +1,8 @@
 package fri.rg.zamtrax;
 
 import zamtrax.*;
+import zamtrax.lights.PointLight;
+import zamtrax.lights.SpotLight;
 import zamtrax.resources.*;
 
 public class Gameplay extends Scene {
@@ -31,12 +33,8 @@ public class Gameplay extends Scene {
 				.setVertexShaderSource(Resources.loadText("shaders/standard.vs"))
 				.setFragmentShaderSource(Resources.loadText("shaders/standard.fs"))
 				.setBindingInfo(bindingInfo)
-				.addUniform("projectionMatrix")
-				.addUniform("modelViewMatrix")
-				.addUniform("normalMatrix")
-						//.addUniform("ambientColor")
-						//.addUniform("lightingDirection")
-						//.addUniform("directionalColor")
+				.addTransformationUniforms()
+				.addLightsUniforms()
 				.build();
 
 		Model cubeModel = Resources.loadModel("models/cube.obj");
@@ -91,18 +89,31 @@ public class Gameplay extends Scene {
 		r.setAxis(Vector3.UP);
 		r.setSpeed(-1.0f);
 
-		// Create light
-		createLight(new Color(1.0f, 0.0f, 0.0f)).setPosition(new Vector3(-3.0f, 3.0f, 0.0f));
-		createLight(new Color(0.0f, 0.0f, 1.0f)).setPosition(new Vector3(3.0f, 3.0f, 0.0f));
+		// Create lights
+		createPointLight(new Color(1.0f, 0.8f, 0.5f)).getTransform().setPosition(new Vector3(-3.0f, 3.0f, 0.0f));
+		createPointLight(new Color(0.5f, 0.8f, 1.0f)).getTransform().setPosition(new Vector3(3.0f, 3.0f, 0.0f));
+
+		Transform sl = createSpotLight(Color.createWhite()).getTransform();
+		sl.setPosition(new Vector3(0.0f, 4.0f, -3.0f));
+		sl.rotate(-30.0f, 0.0f, 0.0f);
 	}
 
-	private Transform createLight(Color color) {
+	private PointLight createPointLight(Color color) {
 		GameObject lightObject = GameObject.create();
-		Light light = lightObject.addComponent(Light.class);
+		PointLight light = lightObject.addComponent(PointLight.class);
 
 		light.setColor(color);
 
-		return lightObject.getTransform();
+		return light;
+	}
+
+	private SpotLight createSpotLight(Color color) {
+		GameObject lightObject = GameObject.create();
+		SpotLight light = lightObject.addComponent(SpotLight.class);
+
+		light.setColor(color);
+
+		return light;
 	}
 
 	@Override

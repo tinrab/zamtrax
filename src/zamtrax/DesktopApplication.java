@@ -4,18 +4,18 @@ import org.omg.CORBA.TIMEOUT;
 
 final class DesktopApplication implements Application {
 
-	private ApplicationListener applicationListener;
+	private Application.Listener applicationListener;
 	private boolean isRunning;
 	private Window window;
 
 	public DesktopApplication(int windowWidth, int windowHeight, String title, boolean vSync, double targetUPS) {
 		window = new Window(windowWidth, windowHeight, title, vSync);
 
-		Time.setTargetUPS((float) targetUPS);
+		Time.getInstance().setTargetUPS((float) targetUPS);
 	}
 
 	@Override
-	public void setApplicationListener(ApplicationListener applicationListener) {
+	public void setApplicationListener(Application.Listener applicationListener) {
 		this.applicationListener = applicationListener;
 	}
 
@@ -53,48 +53,46 @@ final class DesktopApplication implements Application {
 
 		applicationListener.create();
 
-		final double frameTime = 1.0 / Time.getTargetUPS();
-		final int maxSkippedFrames = 10;
+		Time time = Time.getInstance();
 
-		double currentTime, previousTime, elapsedTime;
+		final double frameTime = 1.0 / time.getTargetUPS();
+
+		time.setDeltaTime((float) frameTime);
+
+		double currentTime;
+		double previousTime;
+		double elapsed;
 
 		double lag = 0.0;
 		double lastFPSUpdate = 0.0;
 
-		int frames = 0;
-		int skippedFrames = 0;
+		int framesProcessed = 0;
 
-		previousTime = Time.currentSeconds();
+		previousTime = time.currentSeconds();
 
 		while (isRunning && !window.isClosed()) {
-			currentTime = Time.currentSeconds();
-			elapsedTime = currentTime - previousTime;
+			currentTime = time.currentSeconds();
+			elapsed = currentTime - previousTime;
 
-			lag += elapsedTime;
-
-			while (lag > frameTime && skippedFrames < maxSkippedFrames) {
-				Time.setDeltaTime((float) frameTime);
-				applicationListener.update();
+			lag += elapsed;
+			while (lag > frameTime) {
+				applicationListener.update(time.getDeltaTime());
 
 				lag -= frameTime;
-				skippedFrames++;
 			}
 
-			Time.setInterpolation((float) (lag / frameTime));
+			float lagOffset = (float) (lag / frameTime);
 			applicationListener.render();
 
-			frames++;
+			framesProcessed++;
 
 			if (currentTime - lastFPSUpdate >= 1.0) {
-				Time.setFPS(frames);
-				frames = 0;
-				lastFPSUpdate = currentTime;
+				time.setFPS(framesProcessed);
+				framesProcessed = 0;
 			}
 
-			window.render();
-			window.processEvents();
+			window.update();
 
-			skippedFrames = 0;
 			previousTime = currentTime;
 		}
 

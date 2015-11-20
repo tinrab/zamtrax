@@ -35,7 +35,7 @@ public final class RigidBody extends Component {
 	}
 
 	@Override
-	public void update() {
+	public void update(float delta) {
 		if (dynamic) {
 			bRigidBody.getWorldTransform(bTransform);
 			bTransform.getRotation(bRotation);

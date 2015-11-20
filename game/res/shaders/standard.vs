@@ -8,17 +8,17 @@ out vec2 vUV;
 out vec3 vNormal;
 out vec4 vPosition;
 
-uniform mat4 modelViewMatrix;
-uniform mat4 projectionMatrix;
-uniform mat3 normalMatrix;
+uniform mat4 MV;
+uniform mat4 P;
+uniform mat3 N;
 
 void main()
 {
-	vec4 mvPosition = modelViewMatrix * position;
+	vec4 mvPosition = MV * position;
 	
 	vUV = uv;
-	vNormal = normalMatrix * normal;
+	vNormal = N * normal;
 	vPosition = mvPosition;
 
-	gl_Position = projectionMatrix * mvPosition;
+	gl_Position = P * mvPosition;
 }

@@ -11,7 +11,7 @@ public abstract class Module implements Disposable {
 	public void onCreate() {
 	}
 
-	public void update() {
+	public void update(float delta) {
 	}
 
 	public void render() {

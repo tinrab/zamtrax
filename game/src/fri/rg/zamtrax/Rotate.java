@@ -27,8 +27,8 @@ public class Rotate extends Component {
 	}
 
 	@Override
-	public void update() {
-		transform.rotate(axis, speed * Time.getDeltaTime());
+	public void update(float delta) {
+		transform.rotate(axis, speed * delta);
 	}
 
 	public void setAxis(Vector3 axis) {

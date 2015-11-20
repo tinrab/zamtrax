@@ -17,7 +17,7 @@ public abstract class Component {
 	public void onDisable() {
 	}
 
-	public void update() {
+	public void update(float delta) {
 	}
 
 	public final GameObject getGameObject() {

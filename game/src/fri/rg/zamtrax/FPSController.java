@@ -1,11 +1,14 @@
 package fri.rg.zamtrax;
 
-import zamtrax.*;
+import zamtrax.Component;
+import zamtrax.Input;
+import zamtrax.Transform;
+import zamtrax.Vector2;
 
 public class FPSController extends Component {
 
 	private final float speed = 10.0f;
-	private final float mouseSensitivity = 1.0f;
+	private final float mouseSensitivity = 0.25f;
 
 	private Transform transform;
 
@@ -23,7 +26,7 @@ public class FPSController extends Component {
 	}
 
 	@Override
-	public void update() {
+	public void update(float delta) {
 		if (!Input.isMouseLocked()) {
 			if (Input.getMouseButton(Input.MOUSE_BUTTON_1)) {
 				Input.setMouseLocked(true);
@@ -35,14 +38,14 @@ public class FPSController extends Component {
 		Vector2 mouseDelta = Input.getMouseDelta();
 
 		if (mouseDelta.x != 0.0f) {
-			transform.rotate(0.0f, mouseDelta.x * mouseSensitivity * Time.getDeltaTime(), 0.0f);
+			transform.rotate(0.0f, mouseDelta.x * mouseSensitivity * delta, 0.0f);
 		}
 
 		if (mouseDelta.y != 0.0f) {
-			transform.rotate(transform.right(), mouseDelta.y * mouseSensitivity * Time.getDeltaTime());
+			transform.rotate(transform.right(), mouseDelta.y * mouseSensitivity * delta);
 		}
 
-		float d = speed * Time.getDeltaTime();
+		float d = speed * delta;
 
 		if (Input.getKey(Input.KEY_W)) {
 			transform.translate(transform.forward().mul(d));
@@ -63,6 +66,7 @@ public class FPSController extends Component {
 		if (Input.getKey(Input.KEY_ESCAPE)) {
 			Input.setMouseLocked(false);
 		}
+
 	}
 
 }

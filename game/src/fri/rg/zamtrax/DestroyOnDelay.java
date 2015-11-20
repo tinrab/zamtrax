@@ -9,8 +9,8 @@ public class DestroyOnDelay extends Component {
 	private float timer;
 
 	@Override
-	public void update() {
-		timer += Time.getDeltaTime();
+	public void update(float delta) {
+		timer += delta;
 
 		if (timer >= delay) {
 			getGameObject().destroy();

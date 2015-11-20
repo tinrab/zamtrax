@@ -1,28 +1,40 @@
 package zamtrax;
 
+import zamtrax.lights.PointLight;
+import zamtrax.lights.SpotLight;
+import zamtrax.resources.Material;
+import zamtrax.resources.Shader;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
 
 final class RenderModule extends Module implements Scene.Listener {
 
-	private List<Renderer> renderers;
+	private static RenderModule instance;
+
+	public static RenderModule getInstance() {
+		return instance;
+	}
+
+	private List<Renderer> zombieRenderers;
+	private Map<Material, List<Renderer>> renderersForMaterial;
+	private List<PointLight> pointLights;
+	private List<SpotLight> spotLights;
 
 	RenderModule(Scene scene) {
 		super(scene);
+		instance = this;
 
 		scene.addSceneListener(this);
 
-		renderers = new ArrayList<>();
-	}
-
-	private void addRenderer(Renderer renderer) {
-		renderers.add(renderer);
-	}
-
-	private boolean removeRenderer(Renderer renderer) {
-		return renderers.remove(renderer);
+		zombieRenderers = new ArrayList<>();
+		renderersForMaterial = new HashMap<>();
+		pointLights = new ArrayList<>();
+		spotLights = new ArrayList<>();
 	}
 
 	@Override
@@ -32,11 +44,9 @@ final class RenderModule extends Module implements Scene.Listener {
 		glCullFace(GL_FRONT);
 		glViewport(0, 0, Game.getScreenWidth(), Game.getScreenHeight());
 
-		RenderPipeline renderPipeline = new RenderPipeline();
-
 		Camera camera = Camera.getMainCamera();
 		Camera.ClearFlags clearFlag = camera.getClearFlags();
-		Matrix4 viewProjection = camera.getViewProjection();
+		Matrix4 projection = camera.getProjectionMatrix();
 
 		switch (clearFlag) {
 			case SOLID_COLOR:
@@ -56,8 +66,28 @@ final class RenderModule extends Module implements Scene.Listener {
 			glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 		}
 
-		for (Renderer renderer : renderers) {
-			renderer.render(viewProjection);
+		for (Map.Entry<Material, List<Renderer>> e : renderersForMaterial.entrySet()) {
+			Material material = e.getKey();
+			Shader shader = material.getShader();
+
+			material.bind();
+
+			for (Renderer renderer : e.getValue()) {
+				Transform transform = renderer.getTransform();
+				Matrix4 modelView = transform.getLocalToWorldMatrix();
+				Matrix3 normalMatrix = modelView.toMatrix3().invert().transpose();
+
+				shader.setUniform("P", projection);
+				shader.setUniform("MV", modelView);
+				shader.setUniform("N", normalMatrix);
+
+				shader.setPointLights(pointLights);
+				shader.setSpotLights(spotLights);
+
+				renderer.render();
+			}
+
+			material.unbind();
 		}
 	}
 
@@ -76,15 +106,49 @@ final class RenderModule extends Module implements Scene.Listener {
 	@Override
 	public void onAddComponent(Component component) {
 		if (component instanceof Renderer) {
-			addRenderer((Renderer) component);
+			zombieRenderers.add((Renderer) component);
+		} else if (component instanceof PointLight) {
+			pointLights.add((PointLight) component);
+		} else if (component instanceof SpotLight) {
+			spotLights.add((SpotLight) component);
 		}
 	}
 
 	@Override
 	public void onRemoveComponent(Component component) {
 		if (component instanceof Renderer) {
-			removeRenderer((Renderer) component);
+			Renderer renderer = (Renderer) component;
+
+			zombieRenderers.remove(renderer);
+
+			List<Renderer> renderers = renderersForMaterial.get(renderer.getMaterial());
+
+			renderers.remove(renderer);
+		} else if (component instanceof PointLight) {
+			pointLights.remove(component);
+		} else if (component instanceof SpotLight) {
+			spotLights.remove(component);
 		}
+	}
+
+	void consolidate() {
+		for (Renderer renderer : zombieRenderers) {
+			Material material = renderer.getMaterial();
+
+			if (renderersForMaterial.containsKey(material)) {
+				List<Renderer> renderers = renderersForMaterial.get(material);
+
+				renderers.add(renderer);
+			} else {
+				List<Renderer> renderers = new ArrayList<>();
+
+				renderers.add(renderer);
+
+				renderersForMaterial.put(material, renderers);
+			}
+		}
+
+		zombieRenderers.clear();
 	}
 
 }
