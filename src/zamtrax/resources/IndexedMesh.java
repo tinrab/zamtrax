@@ -112,6 +112,22 @@ final class IndexedMesh implements Mesh {
 			v.normal = new Vector3();
 		}
 
+		/*
+		for (int i = 0; i < indices.size(); i += 3) {
+			int i1 = indices.get(i + 0);
+			int i2 = indices.get(i + 1);
+			int i3 = indices.get(i + 2);
+
+			Vector3 v1 = vertices.get(i1).position.sub(vertices.get(i2).position);
+			Vector3 v2 = vertices.get(i3).position.sub(vertices.get(i2).position);
+
+			Vector3 normal = Vector3.cross(v1, v2).normalized();
+
+			vertices.get(i1).normal = vertices.get(i1).normal.add(normal);
+			vertices.get(i2).normal = vertices.get(i2).normal.add(normal);
+			vertices.get(i3).normal = vertices.get(i3).normal.add(normal);
+		}
+		*/
 		for (int i = 0; i < indices.size(); i += 3) {
 			int i1 = indices.get(i);
 			int i2 = indices.get(i + 1);
@@ -126,6 +142,10 @@ final class IndexedMesh implements Mesh {
 			vertices.get(i2).normal = vertices.get(i2).normal.add(normal).normalized();
 			vertices.get(i3).normal = vertices.get(i3).normal.add(normal).normalized();
 			vertices.get(i1).normal = vertices.get(i1).normal.add(normal).normalized();
+		}
+
+		for (Vertex v : vertices) {
+			v.normal = v.normal.normalized();
 		}
 	}
 

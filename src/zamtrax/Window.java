@@ -23,6 +23,7 @@ final class Window implements Disposable {
 	private GLFWKeyCallback keyCallback;
 	private GLFWCursorPosCallback cursorPosCallback;
 	private GLFWMouseButtonCallback mouseButtonCallback;
+	private GLFWScrollCallback scrollCallback;
 
 	Window(int width, int height, String title, boolean vSync) {
 		this.width = width;
@@ -58,7 +59,7 @@ final class Window implements Disposable {
 
 			@Override
 			public void invoke(long window, int key, int scancode, int action, int mods) {
-				input.invoke(key, scancode, action, mods);
+				input.invokeKey(key, scancode, action, mods);
 			}
 
 		});
@@ -66,7 +67,7 @@ final class Window implements Disposable {
 
 			@Override
 			public void invoke(long window, double xpos, double ypos) {
-				input.invoke((float) xpos, (float) ypos);
+				input.invokeCursorPosition((float) xpos, (float) ypos);
 			}
 
 		});
@@ -74,10 +75,19 @@ final class Window implements Disposable {
 
 			@Override
 			public void invoke(long window, int button, int action, int mods) {
-				input.invoke(button, action, mods);
+				input.invokeMouseButton(button, action, mods);
 			}
 
 		});
+		glfwSetScrollCallback(window, scrollCallback = new GLFWScrollCallback() {
+
+			@Override
+			public void invoke(long window, double xoffset, double yoffset) {
+				input.invokeScroll((float) xoffset, (float) yoffset);
+			}
+
+		});
+
 
 		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		glfwSetWindowPos(
@@ -122,6 +132,7 @@ final class Window implements Disposable {
 		keyCallback.release();
 		cursorPosCallback.release();
 		mouseButtonCallback.release();
+		scrollCallback.release();
 
 		glfwDestroyWindow(window);
 		glfwTerminate();

@@ -27,13 +27,17 @@ public final class Input {
 		mouseY = BufferUtils.createDoubleBuffer(1);
 	}
 
-	public void invoke(int key, int scancode, int action, int mods) {
+	public void invokeKey(int key, int scancode, int action, int mods) {
 	}
 
-	public void invoke(float xpos, float ypos) {
+	public void invokeCursorPosition(float xpos, float ypos) {
 	}
 
-	public void invoke(int button, int action, int mods) {
+	public void invokeMouseButton(int button, int action, int mods) {
+
+	}
+
+	public void invokeScroll(float xoffset, float yoffset) {
 
 	}
 

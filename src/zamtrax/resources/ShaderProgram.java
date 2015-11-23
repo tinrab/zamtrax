@@ -4,7 +4,6 @@ import zamtrax.Color;
 import zamtrax.Matrix3;
 import zamtrax.Matrix4;
 import zamtrax.Vector3;
-import zamtrax.lights.Attenuation;
 import zamtrax.lights.PointLight;
 import zamtrax.lights.SpotLight;
 
@@ -146,18 +145,14 @@ class ShaderProgram implements Shader {
 		for (int i = 0; i < pointLights.size(); i++) {
 			PointLight pointLight = pointLights.get(i);
 			Color color = pointLight.getColor();
-			float ambientIntensity = pointLight.getAmbientIntensity();
-			float diffuseIntensity = pointLight.getDiffuseIntensity();
+			float intensity = pointLight.getIntensity();
+			float range = pointLight.getRange();
 			Vector3 position = pointLight.getTransform().getPosition();
-			Attenuation attenuation = pointLight.getAttenuation();
 
 			glUniform3f(resource.getUniforms().get(String.format("pointLights[%d].light.color", i)).getLocation(), color.r, color.g, color.b);
-			glUniform1f(resource.getUniforms().get(String.format("pointLights[%d].light.ambientIntensity", i)).getLocation(), ambientIntensity);
-			glUniform1f(resource.getUniforms().get(String.format("pointLights[%d].light.diffuseIntensity", i)).getLocation(), diffuseIntensity);
+			glUniform1f(resource.getUniforms().get(String.format("pointLights[%d].light.intensity", i)).getLocation(), intensity);
+			glUniform1f(resource.getUniforms().get(String.format("pointLights[%d].range", i)).getLocation(), range);
 			glUniform3f(resource.getUniforms().get(String.format("pointLights[%d].position", i)).getLocation(), position.x, position.y, position.z);
-			glUniform1f(resource.getUniforms().get(String.format("pointLights[%d].attenuation.constant", i)).getLocation(), attenuation.getConstant());
-			glUniform1f(resource.getUniforms().get(String.format("pointLights[%d].attenuation.linear", i)).getLocation(), attenuation.getLinear());
-			glUniform1f(resource.getUniforms().get(String.format("pointLights[%d].attenuation.exponential", i)).getLocation(), attenuation.getExponential());
 		}
 	}
 
@@ -169,20 +164,16 @@ class ShaderProgram implements Shader {
 		for (int i = 0; i < spotLights.size(); i++) {
 			SpotLight spotLight = spotLights.get(i);
 			Color color = spotLight.getColor();
-			float ambientIntensity = spotLight.getAmbientIntensity();
-			float diffuseIntensity = spotLight.getDiffuseIntensity();
+			float intensity = spotLight.getIntensity();
+			float range = spotLight.getRange();
 			Vector3 position = spotLight.getTransform().getPosition();
-			Attenuation attenuation = spotLight.getAttenuation();
 			float cutoff = spotLight.getCutoff();
 			Vector3 direction = spotLight.getTransform().forward();
 
 			glUniform3f(resource.getUniforms().get(String.format("spotLights[%d].pointLight.light.color", i)).getLocation(), color.r, color.g, color.b);
-			glUniform1f(resource.getUniforms().get(String.format("spotLights[%d].pointLight.light.ambientIntensity", i)).getLocation(), ambientIntensity);
-			glUniform1f(resource.getUniforms().get(String.format("spotLights[%d].pointLight.light.diffuseIntensity", i)).getLocation(), diffuseIntensity);
+			glUniform1f(resource.getUniforms().get(String.format("spotLights[%d].pointLight.light.intensity", i)).getLocation(), intensity);
 			glUniform3f(resource.getUniforms().get(String.format("spotLights[%d].pointLight.position", i)).getLocation(), position.x, position.y, position.z);
-			glUniform1f(resource.getUniforms().get(String.format("spotLights[%d].pointLight.attenuation.constant", i)).getLocation(), attenuation.getConstant());
-			glUniform1f(resource.getUniforms().get(String.format("spotLights[%d].pointLight.attenuation.linear", i)).getLocation(), attenuation.getLinear());
-			glUniform1f(resource.getUniforms().get(String.format("spotLights[%d].pointLight.attenuation.exponential", i)).getLocation(), attenuation.getExponential());
+			glUniform1f(resource.getUniforms().get(String.format("spotLights[%d].pointLight.range", i)).getLocation(), range);
 			glUniform3f(resource.getUniforms().get(String.format("spotLights[%d].direction", i)).getLocation(), direction.x, direction.y, direction.z);
 			glUniform1f(resource.getUniforms().get(String.format("spotLights[%d].cutoff", i)).getLocation(), cutoff);
 		}

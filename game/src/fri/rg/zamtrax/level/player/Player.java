@@ -2,6 +2,7 @@ package fri.rg.zamtrax.level.player;
 
 import fri.rg.zamtrax.level.Level;
 import zamtrax.*;
+import zamtrax.lights.PointLight;
 
 public class Player extends Component {
 

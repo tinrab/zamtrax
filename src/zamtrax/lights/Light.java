@@ -6,14 +6,12 @@ import zamtrax.Component;
 public abstract class Light extends Component {
 
 	private Color color;
-	private float ambientIntensity;
-	private float diffuseIntensity;
+	private float intensity;
 
 	@Override
 	public void onAdd() {
 		color = Color.createWhite();
-		ambientIntensity = 1.0f;
-		diffuseIntensity = 1.0f;
+		intensity = 1.0f;
 	}
 
 	public Color getColor() {
@@ -24,20 +22,12 @@ public abstract class Light extends Component {
 		this.color = color;
 	}
 
-	public float getAmbientIntensity() {
-		return ambientIntensity;
+	public float getIntensity() {
+		return intensity;
 	}
 
-	public void setAmbientIntensity(float ambientIntensity) {
-		this.ambientIntensity = ambientIntensity;
-	}
-
-	public float getDiffuseIntensity() {
-		return diffuseIntensity;
-	}
-
-	public void setDiffuseIntensity(float diffuseIntensity) {
-		this.diffuseIntensity = diffuseIntensity;
+	public void setIntensity(float intensity) {
+		this.intensity = intensity;
 	}
 
 }

@@ -104,7 +104,7 @@ public class Vector3 {
 	}
 
 	public Vector3 sub(Vector3 v) {
-		return add(v.x, v.y, v.z);
+		return sub(v.x, v.y, v.z);
 	}
 
 	public Vector3 sub(float x, float y, float z) {
@@ -153,14 +153,6 @@ public class Vector3 {
 		return new Vector3(left.y * right.z - right.y * left.z,
 				left.z * right.x - right.z * left.x,
 				left.x * right.y - right.x * left.y);
-	}
-
-	public static Vector3 cross(Vector3 left, Vector3 right, Vector3 result) {
-		result.set(left.y * right.z - right.y * left.z,
-				left.z * right.x - right.z * left.x,
-				left.x * right.y - right.x * left.y);
-
-		return result;
 	}
 
 	public static Vector3 lerp(Vector3 a, Vector3 b, float t) {

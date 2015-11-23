@@ -3,6 +3,7 @@ package fri.rg.zamtrax.level;
 import fri.rg.zamtrax.Engineer;
 import fri.rg.zamtrax.level.player.Player;
 import zamtrax.*;
+import zamtrax.lights.SpotLight;
 import zamtrax.resources.*;
 
 public class Level extends Scene {
@@ -76,14 +77,6 @@ public class Level extends Scene {
 			setupKinematicBox(north);
 			setupKinematicBox(east);
 			setupKinematicBox(west);
-		}
-
-		{
-			GameObject b = Engineer.createBox(1, 1, 1, 1, stdBindingInfo, stdMaterial);
-
-			b.getTransform().setPosition(new Vector3(0.0f, 5.0f, 0.0f));
-
-			b.addComponent(RigidBody.class);
 		}
 	}
 

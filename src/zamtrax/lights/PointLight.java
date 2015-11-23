@@ -2,18 +2,18 @@ package zamtrax.lights;
 
 public class PointLight extends Light {
 
-	private Attenuation attenuation;
+	private float range;
 
 	public PointLight() {
-		attenuation = new Attenuation(0.0f, 0.0f, 1.0f);
+		range = 5.0f;
 	}
 
-	public Attenuation getAttenuation() {
-		return attenuation;
+	public float getRange() {
+		return range;
 	}
 
-	public void setAttenuation(Attenuation attenuation) {
-		this.attenuation = attenuation;
+	public void setRange(float range) {
+		this.range = range;
 	}
 
 }

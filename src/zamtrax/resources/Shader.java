@@ -87,22 +87,16 @@ public interface Shader {
 
 			for (int i = 0; i < ShaderProgram.MAX_POINT_LIGHTS; i++) {
 				addUniform(String.format("pointLights[%d].light.color", i));
-				addUniform(String.format("pointLights[%d].light.ambientIntensity", i));
-				addUniform(String.format("pointLights[%d].light.diffuseIntensity", i));
+				addUniform(String.format("pointLights[%d].light.intensity", i));
 				addUniform(String.format("pointLights[%d].position", i));
-				addUniform(String.format("pointLights[%d].attenuation.constant", i));
-				addUniform(String.format("pointLights[%d].attenuation.linear", i));
-				addUniform(String.format("pointLights[%d].attenuation.exponential", i));
+				addUniform(String.format("pointLights[%d].range", i));
 			}
 
 			for (int i = 0; i < ShaderProgram.MAX_SPOT_LIGHTS; i++) {
 				addUniform(String.format("spotLights[%d].pointLight.light.color", i));
-				addUniform(String.format("spotLights[%d].pointLight.light.ambientIntensity", i));
-				addUniform(String.format("spotLights[%d].pointLight.light.diffuseIntensity", i));
+				addUniform(String.format("spotLights[%d].pointLight.light.intensity", i));
 				addUniform(String.format("spotLights[%d].pointLight.position", i));
-				addUniform(String.format("spotLights[%d].pointLight.attenuation.constant", i));
-				addUniform(String.format("spotLights[%d].pointLight.attenuation.linear", i));
-				addUniform(String.format("spotLights[%d].pointLight.attenuation.exponential", i));
+				addUniform(String.format("spotLights[%d].pointLight.range", i));
 				addUniform(String.format("spotLights[%d].direction", i));
 				addUniform(String.format("spotLights[%d].cutoff", i));
 			}
