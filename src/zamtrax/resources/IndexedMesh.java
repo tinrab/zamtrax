@@ -107,8 +107,7 @@ final class IndexedMesh implements Mesh {
 		glBindVertexArray(0);
 	}
 
-	@Override
-	public void calculateNormals() {
+	void calculateNormals() {
 		for (Vertex v : vertices) {
 			v.normal = new Vector3();
 		}

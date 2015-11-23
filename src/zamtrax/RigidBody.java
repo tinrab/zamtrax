@@ -9,17 +9,25 @@ import javax.vecmath.Vector3f;
 @RequireComponent(components = {Collider.class})
 public final class RigidBody extends Component {
 
+	public static class ActivationStates {
+
+		public static final int ACTIVE_TAG = CollisionObject.ACTIVE_TAG;
+		public static final int ISLAND_SLEEPING = CollisionObject.ISLAND_SLEEPING;
+		public static final int WANTS_DEACTIVATION = CollisionObject.WANTS_DEACTIVATION;
+		public static final int DISABLE_DEACTIVATION = CollisionObject.DISABLE_DEACTIVATION;
+		public static final int DISABLE_SIMULATION = CollisionObject.DISABLE_SIMULATION;
+
+	}
+
 	private com.bulletphysics.dynamics.RigidBody bRigidBody;
 	private com.bulletphysics.linearmath.Transform bTransform;
 	private javax.vecmath.Quat4f bRotation;
 	private javax.vecmath.Vector3f bPosition;
 
 	private Transform transform;
-	private Quaternion rotation;
-	private Vector3 position;
 
 	private float mass;
-	private boolean dynamic;
+	private boolean kinematic;
 
 	@Override
 	public void onAdd() {
@@ -30,28 +38,23 @@ public final class RigidBody extends Component {
 		bPosition = new javax.vecmath.Vector3f();
 
 		transform = getTransform();
-		rotation = new Quaternion();
-		position = new Vector3();
 	}
 
 	@Override
 	public void update(float delta) {
-		if (dynamic) {
+		if (kinematic) {
+			bTransform.set(new Matrix4f(
+					transform.getRotation().toVecmath(),
+					transform.getPosition().toVecmath(),
+					1.0f));
+			bRigidBody.setWorldTransform(bTransform);
+		} else {
 			bRigidBody.getWorldTransform(bTransform);
 			bTransform.getRotation(bRotation);
 			bPosition = bTransform.origin;
 
-			rotation.set(bRotation);
-			position.set(bPosition);
-
-			transform.setPosition(position);
-			transform.setRotation(rotation);
-		} else {
-			bRigidBody.getMotionState().setWorldTransform(new com.bulletphysics.linearmath.Transform(
-					new Matrix4f(
-							transform.getRotation().toVecmath(),
-							transform.getPosition().toVecmath(),
-							1.0f)));
+			transform.setPosition(new Vector3(bPosition));
+			transform.setRotation(new Quaternion(bRotation));
 		}
 	}
 
@@ -79,25 +82,67 @@ public final class RigidBody extends Component {
 	public void setMass(float mass) {
 		this.mass = mass;
 
-		dynamic = mass != 0.0f;
-
 		Vector3f intertia = new Vector3f();
 
 		bRigidBody.getCollisionShape().calculateLocalInertia(mass, intertia);
 		bRigidBody.setMassProps(mass, intertia);
+	}
+
+	public boolean isKinematic() {
+		return kinematic;
+	}
+
+	public void setKinematic(boolean kinematic) {
+		this.kinematic = kinematic;
 
 		int flags = bRigidBody.getCollisionFlags();
 
-		if (!dynamic) {
+		bTransform.set(new Matrix4f(
+				transform.getRotation().toVecmath(),
+				transform.getPosition().toVecmath(),
+				1.0f));
+		bRigidBody.setWorldTransform(bTransform);
+
+		if (kinematic) {
+			Vector3f intertia = new Vector3f();
+
+			bRigidBody.getCollisionShape().calculateLocalInertia(0.0f, intertia);
+			bRigidBody.setMassProps(0.0f, intertia);
+
 			flags |= CollisionFlags.KINEMATIC_OBJECT;
 			bRigidBody.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
+		} else {
+			Vector3f intertia = new Vector3f();
+
+			bRigidBody.getCollisionShape().calculateLocalInertia(mass, intertia);
+			bRigidBody.setMassProps(mass, intertia);
+
+			flags &= ~CollisionFlags.KINEMATIC_OBJECT;
+
+			bRigidBody.setActivationState(CollisionObject.ISLAND_SLEEPING);
 		}
 
 		bRigidBody.setCollisionFlags(flags);
 	}
 
-	public boolean isDynamic() {
-		return dynamic;
+	public void setAngularFactor(float angularFactor) {
+		bRigidBody.setAngularFactor(angularFactor);
+	}
+
+	public void setActivationState(int activationState) {
+		bRigidBody.setActivationState(activationState);
+	}
+
+	public Vector3 getLinearVelocity() {
+		return new Vector3(bRigidBody.getLinearVelocity(new Vector3f()));
+	}
+
+	public void setLinearVelocity(Vector3 velocity) {
+		bRigidBody.setLinearVelocity(velocity.toVecmath());
+	}
+
+	public void setGravity(Vector3 acceleration) {
+		bRigidBody.setGravity(acceleration.toVecmath());
 	}
 
 	void linkRigidBody(com.bulletphysics.dynamics.RigidBody rigidBody) {

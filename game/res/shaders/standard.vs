@@ -16,8 +16,8 @@ void main()
 {
 	vec4 mvPosition = MV * position;
 	
-	vUV = uv;
 	vNormal = N * normal;
+	vUV = uv;
 	vPosition = mvPosition;
 
 	gl_Position = P * mvPosition;

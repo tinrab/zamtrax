@@ -34,6 +34,13 @@ public class Color {
 		this.a = a / 255.0f;
 	}
 
+	public void set(Color color) {
+		this.r = color.r;
+		this.g = color.g;
+		this.b = color.b;
+		this.a = color.a;
+	}
+
 	public void set(float r, float g, float b) {
 		this.r = r;
 		this.g = g;

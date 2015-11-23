@@ -1,5 +1,6 @@
 package zamtrax.resources;
 
+import zamtrax.Color;
 import zamtrax.Matrix3;
 import zamtrax.Matrix4;
 import zamtrax.Vector3;
@@ -25,6 +26,8 @@ public interface Shader {
 	void setUniform(CharSequence name, Matrix3 value);
 
 	void setUniform(CharSequence name, Vector3 value);
+
+	void setUniform(CharSequence name, Color value);
 
 	void setPointLights(List<PointLight> pointLights);
 
@@ -78,6 +81,7 @@ public interface Shader {
 		}
 
 		public Builder addLightsUniforms() {
+			addUniform("ambientLight");
 			addUniform("pointLightCount");
 			addUniform("spotLightCount");
 

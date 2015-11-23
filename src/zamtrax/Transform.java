@@ -1,6 +1,6 @@
 package zamtrax;
 
-public final class Transform implements Cloneable {
+public final class Transform {
 
 	private Transform parent;
 	private Matrix4 parentMatrix;
@@ -213,18 +213,6 @@ public final class Transform implements Cloneable {
 
 	public Vector3 down() {
 		return getRotation().rotatePoint(Vector3.DOWN);
-	}
-
-	public Object clone() {
-		try {
-			Object clone = super.clone();
-
-			return clone;
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-
-		return null;
 	}
 
 }

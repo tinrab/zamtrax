@@ -24,6 +24,7 @@ final class RenderModule extends Module implements Scene.Listener {
 	private Map<Material, List<Renderer>> renderersForMaterial;
 	private List<PointLight> pointLights;
 	private List<SpotLight> spotLights;
+	private Color ambientLight;
 
 	RenderModule(Scene scene) {
 		super(scene);
@@ -35,6 +36,7 @@ final class RenderModule extends Module implements Scene.Listener {
 		renderersForMaterial = new HashMap<>();
 		pointLights = new ArrayList<>();
 		spotLights = new ArrayList<>();
+		ambientLight = new Color(0.5f, 0.5f, 0.5f);
 	}
 
 	@Override
@@ -81,6 +83,7 @@ final class RenderModule extends Module implements Scene.Listener {
 				shader.setUniform("MV", modelView);
 				shader.setUniform("N", normalMatrix);
 
+				shader.setUniform("ambientLight", new Vector3(ambientLight.r, ambientLight.g, ambientLight.b));
 				shader.setPointLights(pointLights);
 				shader.setSpotLights(spotLights);
 
@@ -149,6 +152,14 @@ final class RenderModule extends Module implements Scene.Listener {
 		}
 
 		zombieRenderers.clear();
+	}
+
+	public void setAmbientLight(Color ambientLight) {
+		this.ambientLight = ambientLight;
+	}
+
+	public Color getAmbientLight() {
+		return ambientLight;
 	}
 
 }

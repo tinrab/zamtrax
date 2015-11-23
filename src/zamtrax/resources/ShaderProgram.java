@@ -125,6 +125,13 @@ class ShaderProgram implements Shader {
 	}
 
 	@Override
+	public void setUniform(CharSequence name, Color value) {
+		Uniform uniform = resource.getUniforms().get(name);
+
+		glUniform4f(uniform.getLocation(), value.r, value.g, value.b, value.a);
+	}
+
+	@Override
 	public void setUniform(CharSequence name, Matrix3 value) {
 		Uniform uniform = resource.getUniforms().get(name);
 

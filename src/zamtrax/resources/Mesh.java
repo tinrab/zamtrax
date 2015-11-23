@@ -12,8 +12,6 @@ public interface Mesh {
 
 	void render();
 
-	void calculateNormals();
-
 	void dispose();
 
 	class Builder {
@@ -26,6 +24,7 @@ public interface Mesh {
 		private List<Integer> indices;
 		private boolean dynamic;
 		private BindingInfo bindingInfo;
+		private boolean calculateNormals;
 
 		public Builder() {
 			vertices = new ArrayList<>();
@@ -87,8 +86,18 @@ public interface Mesh {
 			return this;
 		}
 
+		public Builder calculateNormals() {
+			calculateNormals = true;
+
+			return this;
+		}
+
 		public Mesh build() {
-			Mesh mesh = new IndexedMesh(id++, vertices, indices, bindingInfo, dynamic);
+			IndexedMesh mesh = new IndexedMesh(id++, vertices, indices, bindingInfo, dynamic);
+
+			if (calculateNormals) {
+				mesh.calculateNormals();
+			}
 
 			mesh.build();
 
@@ -100,12 +109,6 @@ public interface Mesh {
 
 		public static Mesh fromModel(Model model, BindingInfo bindingInfo) {
 			List<Vertex> vertices = new ArrayList<>();
-
-			/*
-			model.getVertices().forEach(v -> {
-
-			});
-			*/
 
 			return new Builder()
 					.setVertices(model.getVertices())

@@ -28,6 +28,11 @@ public final class Vertex {
 		color = new Color(r, g, b);
 	}
 
+	public Vertex(float x, float y, float z, float u, float v) {
+		this.position = new Vector3(x, y, z);
+		this.uv = new Vector2(u, v);
+	}
+
 	public int getSize() {
 		int size = 4;
 

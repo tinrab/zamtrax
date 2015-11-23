@@ -81,7 +81,7 @@ public final class Game implements Application.Listener {
 		return currentScene;
 	}
 
-	static Game getInstance() {
+	public static Game getInstance() {
 		return instance;
 	}
 

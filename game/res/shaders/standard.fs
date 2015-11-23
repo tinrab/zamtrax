@@ -1,13 +1,18 @@
 #version 330
 
-const int MAX_POINT_LIGHTS = 8;
-const int MAX_SPOT_LIGHTS = 2;
+#ifndef MAX_POINT_LIGHTS
+#define MAX_POINT_LIGHTS 8
+#endif
+
+#ifndef MAX_SPOT_LIGHTS
+#define MAX_SPOT_LIGHTS 2
+#endif
 
 in vec2 vUV;
 in vec3 vNormal;
 in vec4 vPosition;
 
-out vec4 vFragColor;
+out vec4 vDiffuseColor;
 
 uniform sampler2D uSampler;
 
@@ -43,8 +48,8 @@ uniform int pointLightCount;
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
 uniform int spotLightCount;
 uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
+uniform vec3 ambientLight;
 
-const vec3 ambientLight = vec3(0.1, 0.1, 0.1);
 const float shininess = 0.5;
 const float specularIntensity = 1.0;
 
@@ -114,5 +119,5 @@ void main()
 		light += calculateSpotLight(spotLights[i]);
 	}
 	
-	vFragColor = textureColor * light;
+	vDiffuseColor = textureColor * light;
 }

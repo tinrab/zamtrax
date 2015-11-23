@@ -14,7 +14,7 @@ public final class BoxCollider extends Collider {
 
 	@Override
 	CollisionShape getCollisionShape() {
-		Vector3 halfExtents = size.mul(getTransform().getScale()).div(2.0f);
+		Vector3 halfExtents = size.div(2.0f);
 
 		return new BoxShape(halfExtents.toVecmath());
 	}
@@ -25,10 +25,14 @@ public final class BoxCollider extends Collider {
 
 	public void setSize(Vector3 size) {
 		this.size = size;
+
+		updateShape();
 	}
 
 	public void setSize(float x, float y, float z) {
 		size.set(x, y, z);
+
+		updateShape();
 	}
 
 }

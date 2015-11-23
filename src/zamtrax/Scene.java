@@ -154,6 +154,14 @@ public class Scene implements Disposable {
 		return root;
 	}
 
+	public Color getAmbientLight() {
+		return renderModule.getAmbientLight();
+	}
+
+	public void setAmbientLight(Color ambientLight) {
+		renderModule.setAmbientLight(ambientLight);
+	}
+
 	@Override
 	public final void dispose() {
 		logicModule.dispose();

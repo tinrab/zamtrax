@@ -1,5 +1,7 @@
 package zamtrax;
 
+import javax.vecmath.Vector3f;
+
 public class Vector3 {
 
 	public static final Vector3 ZERO = new Vector3(0.0f, 0.0f, 0.0f);
@@ -31,6 +33,12 @@ public class Vector3 {
 	}
 
 	public Vector3(Vector3 v) {
+		x = v.x;
+		y = v.y;
+		z = v.z;
+	}
+
+	public Vector3(Vector3f v) {
 		x = v.x;
 		y = v.y;
 		z = v.z;
@@ -157,6 +165,14 @@ public class Vector3 {
 
 	public static Vector3 lerp(Vector3 a, Vector3 b, float t) {
 		return new Vector3(a.x + (b.x - a.x) / t, a.y + (b.y - a.y) / t, a.z + (b.z - a.z) / t);
+	}
+
+	public static float distance(Vector3 a, Vector3 b) {
+		float dx = b.x - a.x;
+		float dy = b.y - a.y;
+		float dz = b.z - a.z;
+
+		return Mathf.sqrt(dx * dx + dy * dy + dz * dz);
 	}
 
 	public float[] toArray() {

@@ -1,5 +1,7 @@
 package zamtrax;
 
+import javax.vecmath.Quat4f;
+
 public class Quaternion {
 
 	public static final Quaternion IDENTITY = new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
@@ -21,6 +23,13 @@ public class Quaternion {
 		this.y = q.y;
 		this.z = q.z;
 		this.w = q.w;
+	}
+
+	public Quaternion(Quat4f q) {
+		x = q.x;
+		y = q.y;
+		z = q.z;
+		w = q.w;
 	}
 
 	public void set(javax.vecmath.Quat4f q) {

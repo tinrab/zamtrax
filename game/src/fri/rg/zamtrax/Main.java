@@ -1,5 +1,6 @@
 package fri.rg.zamtrax;
 
+import fri.rg.zamtrax.level.Level;
 import zamtrax.Game;
 
 public class Main {
@@ -8,7 +9,7 @@ public class Main {
 		new Game.Starter()
 				.setWindowSize(1280, 720)
 				.setVSync(true)
-				.addScene(new Gameplay())
+				.addScene(new Level())
 				.setClassLoader(ClassLoader.getSystemClassLoader())
 				.start();
 	}
