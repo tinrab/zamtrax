@@ -1,6 +1,9 @@
 package fri.rg.zamtrax.level.player;
 
 import zamtrax.*;
+import zamtrax.components.Camera;
+import zamtrax.components.CharacterController;
+import zamtrax.components.Transform;
 
 public class PlayerController extends Component {
 

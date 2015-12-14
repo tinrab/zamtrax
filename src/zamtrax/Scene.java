@@ -23,6 +23,7 @@ public class Scene implements Disposable {
 	private LogicModule logicModule;
 	private PhysicsModule physicsModule;
 	private RenderModule renderModule;
+	private UIModule uiModule;
 
 	protected Scene() {
 		root = new GameObject();
@@ -32,12 +33,14 @@ public class Scene implements Disposable {
 		logicModule = new LogicModule(this);
 		physicsModule = new PhysicsModule(this);
 		renderModule = new RenderModule(this);
+		uiModule = new UIModule(this);
 	}
 
 	public void onEnter() {
 		logicModule.onCreate();
 		physicsModule.onCreate();
 		renderModule.onCreate();
+		uiModule.onCreate();
 	}
 
 	public void onExit() {
@@ -47,6 +50,7 @@ public class Scene implements Disposable {
 		logicModule.update(delta);
 		physicsModule.update(delta);
 		renderModule.update(delta);
+		uiModule.update(delta);
 
 		destroyObjects();
 	}
@@ -71,7 +75,8 @@ public class Scene implements Disposable {
 	}
 
 	final void render() {
-		renderModule.render();
+		//renderModule.render();
+		uiModule.render();
 	}
 
 	final void destroyGameObject(GameObject sceneObject) {

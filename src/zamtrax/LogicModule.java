@@ -16,8 +16,6 @@ class LogicModule extends Module {
 	private void update(float delta, GameObject sceneObject) {
 		sceneObject.getComponents().forEach(component -> component.update(delta));
 
-		sceneObject.getTransform().update();
-
 		//sceneObject.getChildren().forEach(this::update);
 		List<GameObject> children = sceneObject.getChildren();
 

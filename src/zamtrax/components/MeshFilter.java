@@ -1,5 +1,6 @@
-package zamtrax;
+package zamtrax.components;
 
+import zamtrax.Component;
 import zamtrax.resources.Mesh;
 
 public final class MeshFilter extends Component {

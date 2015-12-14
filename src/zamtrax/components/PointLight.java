@@ -1,4 +1,4 @@
-package zamtrax.lights;
+package zamtrax.components;
 
 public class PointLight extends Light {
 

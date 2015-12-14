@@ -1,6 +1,9 @@
 package fri.rg.zamtrax;
 
 import zamtrax.*;
+import zamtrax.components.BoxCollider;
+import zamtrax.components.MeshFilter;
+import zamtrax.components.MeshRenderer;
 import zamtrax.resources.BindingInfo;
 import zamtrax.resources.Material;
 import zamtrax.resources.Mesh;

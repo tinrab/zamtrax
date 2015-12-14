@@ -1,5 +1,7 @@
 package zamtrax;
 
+import zamtrax.components.Transform;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +17,8 @@ public final class GameObject {
 		transform = new Transform();
 		components = new ArrayList<>();
 		children = new ArrayList<>();
+
+		components.add(transform);
 	}
 
 	public <T extends Component> T addComponent(Class<T> componentClass) {

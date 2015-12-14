@@ -1,4 +1,9 @@
-package zamtrax;
+package zamtrax.components;
+
+import zamtrax.Color;
+import zamtrax.Component;
+import zamtrax.Matrix4;
+import zamtrax.Vector3;
 
 public final class Camera extends Component {
 

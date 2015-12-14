@@ -1,8 +1,9 @@
-package zamtrax;
+package zamtrax.components;
 
 import com.bulletphysics.collision.shapes.CapsuleShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.dynamics.RigidBody;
+import zamtrax.Collider;
 
 public final class CapsuleCollider extends Collider {
 
@@ -16,7 +17,7 @@ public final class CapsuleCollider extends Collider {
 	}
 
 	@Override
-	CollisionShape getCollisionShape() {
+	public CollisionShape getCollisionShape() {
 		return new CapsuleShape(radius, height);
 	}
 
@@ -40,7 +41,7 @@ public final class CapsuleCollider extends Collider {
 		updateShape();
 	}
 
-	void linkRigidBody(RigidBody rigidBody) {
+	public void linkRigidBody(RigidBody rigidBody) {
 		this.rigidBody = rigidBody;
 	}
 

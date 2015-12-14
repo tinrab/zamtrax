@@ -4,8 +4,8 @@ import zamtrax.Color;
 import zamtrax.Matrix3;
 import zamtrax.Matrix4;
 import zamtrax.Vector3;
-import zamtrax.lights.PointLight;
-import zamtrax.lights.SpotLight;
+import zamtrax.components.PointLight;
+import zamtrax.components.SpotLight;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -21,9 +21,9 @@ public interface Shader {
 
 	void setUniform(CharSequence name, int value);
 
-	void setUniform(CharSequence name, Matrix4 value);
+	void setUniform(CharSequence name, boolean normalize, Matrix4 value);
 
-	void setUniform(CharSequence name, Matrix3 value);
+	void setUniform(CharSequence name, boolean normalize, Matrix3 value);
 
 	void setUniform(CharSequence name, Vector3 value);
 

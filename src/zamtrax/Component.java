@@ -1,5 +1,7 @@
 package zamtrax;
 
+import zamtrax.components.Transform;
+
 public abstract class Component {
 
 	private GameObject gameObject;

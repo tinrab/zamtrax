@@ -298,6 +298,17 @@ public class Matrix4 {
 		return r;
 	}
 
+	public Matrix4 transpose() {
+		Matrix4 m = new Matrix4();
+
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				m.elements[i][j] = elements[j][i];
+			}
+		}
+		return m;
+	}
+
 	public FloatBuffer toBuffer() {
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
 

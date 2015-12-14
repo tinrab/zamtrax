@@ -1,7 +1,5 @@
 package zamtrax;
 
-import org.omg.CORBA.TIMEOUT;
-
 final class DesktopApplication implements Application {
 
 	private Application.Listener applicationListener;

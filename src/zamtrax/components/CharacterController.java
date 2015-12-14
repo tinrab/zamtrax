@@ -1,13 +1,13 @@
-package zamtrax;
+package zamtrax.components;
 
 import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
-import com.bulletphysics.collision.shapes.CapsuleShape;
-import com.bulletphysics.collision.shapes.ConvexShape;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.character.KinematicCharacterController;
 import com.bulletphysics.linearmath.Transform;
+import zamtrax.Component;
+import zamtrax.Quaternion;
+import zamtrax.Vector3;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 
@@ -20,7 +20,7 @@ public final class CharacterController extends Component {
 	public KinematicCharacterController kinematicCharacterController;
 	public PairCachingGhostObject ghostObject;
 
-	private zamtrax.Transform transform;
+	private zamtrax.components.Transform transform;
 	private float radius;
 	private float height;
 	private float stepHeight;
@@ -89,15 +89,15 @@ public final class CharacterController extends Component {
 		this.stepHeight = stepHeight;
 	}
 
-	void setRigidBody(RigidBody rigidBody) {
+	public void setRigidBody(RigidBody rigidBody) {
 		bRigidBody = rigidBody;
 	}
 
-	void setGhostObject(PairCachingGhostObject ghostObject) {
+	public void setGhostObject(PairCachingGhostObject ghostObject) {
 		this.ghostObject = ghostObject;
 	}
 
-	void setKinematicCharacterController(KinematicCharacterController kinematicCharacterController) {
+	public void setKinematicCharacterController(KinematicCharacterController kinematicCharacterController) {
 		this.kinematicCharacterController = kinematicCharacterController;
 	}
 

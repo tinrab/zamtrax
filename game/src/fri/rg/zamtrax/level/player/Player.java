@@ -2,7 +2,8 @@ package fri.rg.zamtrax.level.player;
 
 import fri.rg.zamtrax.level.Level;
 import zamtrax.*;
-import zamtrax.lights.PointLight;
+import zamtrax.components.Camera;
+import zamtrax.components.CharacterController;
 
 public class Player extends Component {
 

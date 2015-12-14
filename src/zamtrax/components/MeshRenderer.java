@@ -1,4 +1,6 @@
-package zamtrax;
+package zamtrax.components;
+
+import zamtrax.RequireComponent;
 
 @RequireComponent(components = {MeshFilter.class})
 public final class MeshRenderer extends Renderer {
@@ -13,7 +15,7 @@ public final class MeshRenderer extends Renderer {
 	}
 
 	@Override
-	void render() {
+	public void render() {
 		meshFilter.getMesh().render();
 		/*
 		Matrix4 modelView = transform.getLocalToWorldMatrix();

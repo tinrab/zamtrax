@@ -1,6 +1,8 @@
-package zamtrax;
+package zamtrax.components;
 
-public final class Transform {
+import zamtrax.*;
+
+public final class Transform extends Component {
 
 	private Transform parent;
 	private Matrix4 parentMatrix;
@@ -10,7 +12,7 @@ public final class Transform {
 
 	private boolean changed;
 
-	Transform() {
+	public Transform() {
 		position = new Vector3();
 		rotation = Quaternion.createIdentity();
 		scale = new Vector3(1.0f, 1.0f, 1.0f);
@@ -22,7 +24,7 @@ public final class Transform {
 		parentMatrix = Matrix4.createIdentity();
 	}
 
-	void update() {
+	public void update() {
 		changed = (parent != null && parent.hasChanged()) || !position.equals(oldPosition) || !rotation.equals(oldRotation) || !scale.equals(oldScale);
 
 		oldPosition.set(position);
@@ -103,7 +105,7 @@ public final class Transform {
 		return parent;
 	}
 
-	void setParent(Transform parent) {
+	public void setParent(Transform parent) {
 		this.parent = parent;
 	}
 

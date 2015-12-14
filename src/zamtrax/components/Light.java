@@ -1,4 +1,4 @@
-package zamtrax.lights;
+package zamtrax.components;
 
 import zamtrax.Color;
 import zamtrax.Component;

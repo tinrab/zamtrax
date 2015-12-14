@@ -1,10 +1,14 @@
 package zamtrax;
 
 import org.lwjgl.BufferUtils;
+import zamtrax.resources.bmfont.BMFont;
+import zamtrax.resources.bmfont.BMFontParser;
 import zamtrax.resources.Model;
 import zamtrax.resources.Texture;
 
 import javax.imageio.ImageIO;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,7 +27,11 @@ public final class Resources {
 	}
 
 	public static String loadText(String pathname) {
-		pathname = getResourcePath(pathname);
+		return loadText(pathname, classLoader);
+	}
+
+	public static String loadText(String pathname, ClassLoader classLoader) {
+		pathname = getResourcePath(pathname, classLoader);
 
 		try (FileReader fr = new FileReader(new File(pathname))) {
 
@@ -43,7 +51,7 @@ public final class Resources {
 	}
 
 	public static Model loadModel(String pathname) {
-		pathname = getResourcePath(pathname);
+		pathname = getResourcePath(pathname, classLoader);
 
 		List<Vector3> normals = new ArrayList<>();
 		List<Vector2> texCoords = new ArrayList<>();
@@ -109,7 +117,7 @@ public final class Resources {
 	}
 
 	public static Texture loadTexture(String pathname, Texture.Format format, Texture.WrapMode wrapMode, Texture.FilterMode filterMode) {
-		pathname = getResourcePath(pathname);
+		pathname = getResourcePath(pathname, classLoader);
 
 		try {
 			BufferedImage image = ImageIO.read(new File(pathname));
@@ -126,11 +134,14 @@ public final class Resources {
 					buffer.put((byte) ((rgb >> 8) & 0xFF));
 					buffer.put((byte) ((rgb) & 0xFF));
 
+					/*
 					if (hasAlpha) {
 						buffer.put((byte) ((rgb >> 24) & 0xFF));
 					} else {
 						buffer.put((byte) (0xFF));
 					}
+					*/
+					buffer.put((byte)0xFF);
 				}
 			}
 
@@ -142,7 +153,27 @@ public final class Resources {
 		}
 	}
 
-	private static String getResourcePath(String pathname) {
+	public static BMFont loadFont(String pathname) {
+		return loadFont(pathname, classLoader);
+	}
+
+	public static BMFont loadFont(String pathname, ClassLoader classLoader) {
+		File file = new File(getResourcePath(pathname, classLoader));
+
+		try {
+			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+			SAXParser parser = parserFactory.newSAXParser();
+			BMFontParser handler = new BMFontParser(file);
+
+			parser.parse(file, handler);
+
+			return handler.getResult();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static String getResourcePath(String pathname, ClassLoader classLoader) {
 		try {
 			return classLoader.getResource(pathname).getFile();
 		} catch (Exception e) {

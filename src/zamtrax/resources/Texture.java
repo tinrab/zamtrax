@@ -23,11 +23,13 @@ public final class Texture implements Disposable {
 	}
 
 	private TextureResource resource;
+	private int width, height;
 
 	public Texture(int id, int width, int height, ByteBuffer buffer, Format format, WrapMode wrapMode, FilterMode filterMode) {
 		resource = TextureResource.create(id);
 
-		// TODO fix this mess
+		this.width = width;
+		this.height = height;
 
 		int glFormat = -1;
 
@@ -92,6 +94,14 @@ public final class Texture implements Disposable {
 
 	public void dispose() {
 		resource.removeReference();
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
 	}
 
 }

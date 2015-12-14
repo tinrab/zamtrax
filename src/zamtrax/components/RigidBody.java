@@ -1,7 +1,8 @@
-package zamtrax;
+package zamtrax.components;
 
 import com.bulletphysics.collision.dispatch.CollisionFlags;
 import com.bulletphysics.collision.dispatch.CollisionObject;
+import zamtrax.*;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
@@ -145,7 +146,7 @@ public final class RigidBody extends Component {
 		bRigidBody.setGravity(acceleration.toVecmath());
 	}
 
-	void linkRigidBody(com.bulletphysics.dynamics.RigidBody rigidBody) {
+	public void linkRigidBody(com.bulletphysics.dynamics.RigidBody rigidBody) {
 		bRigidBody = rigidBody;
 	}
 

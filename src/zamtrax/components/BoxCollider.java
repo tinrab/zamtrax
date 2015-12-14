@@ -1,7 +1,9 @@
-package zamtrax;
+package zamtrax.components;
 
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
+import zamtrax.Collider;
+import zamtrax.Vector3;
 
 public final class BoxCollider extends Collider {
 
@@ -13,7 +15,7 @@ public final class BoxCollider extends Collider {
 	}
 
 	@Override
-	CollisionShape getCollisionShape() {
+	public CollisionShape getCollisionShape() {
 		Vector3 halfExtents = size.div(2.0f);
 
 		return new BoxShape(halfExtents.toVecmath());

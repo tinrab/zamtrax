@@ -1,7 +1,6 @@
 package zamtrax;
 
-import zamtrax.lights.PointLight;
-import zamtrax.lights.SpotLight;
+import zamtrax.components.*;
 import zamtrax.resources.Material;
 import zamtrax.resources.Shader;
 
@@ -12,7 +11,7 @@ import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
 
-final class RenderModule extends Module implements Scene.Listener {
+public final class RenderModule extends Module implements Scene.Listener {
 
 	private static RenderModule instance;
 
@@ -79,9 +78,9 @@ final class RenderModule extends Module implements Scene.Listener {
 				Matrix4 modelView = transform.getLocalToWorldMatrix();
 				Matrix3 normalMatrix = modelView.toMatrix3().invert().transpose();
 
-				shader.setUniform("P", projection);
-				shader.setUniform("MV", modelView);
-				shader.setUniform("N", normalMatrix);
+				shader.setUniform("P", true, projection);
+				shader.setUniform("MV", true, modelView);
+				shader.setUniform("N", true, normalMatrix);
 
 				shader.setUniform("ambientLight", new Vector3(ambientLight.r, ambientLight.g, ambientLight.b));
 				shader.setPointLights(pointLights);
@@ -134,7 +133,7 @@ final class RenderModule extends Module implements Scene.Listener {
 		}
 	}
 
-	void consolidate() {
+	public void consolidate() {
 		for (Renderer renderer : zombieRenderers) {
 			Material material = renderer.getMaterial();
 

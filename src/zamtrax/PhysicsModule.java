@@ -12,18 +12,16 @@ import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.*;
 import com.bulletphysics.linearmath.Transform;
+import zamtrax.components.CharacterController;
 
 import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 final class PhysicsModule extends Module implements Scene.Listener {
 
-	private Map<zamtrax.RigidBody, RigidBody> rigidBodyMap;
+	private Map<zamtrax.components.RigidBody, RigidBody> rigidBodyMap;
 	private BroadphaseInterface broadphase;
 	private CollisionDispatcher dispatcher;
 	private ConstraintSolver constraintSolver;
@@ -93,7 +91,7 @@ final class PhysicsModule extends Module implements Scene.Listener {
 		dynamicsWorld.destroy();
 	}
 
-	private void addRigidBody(zamtrax.RigidBody rigidBody) {
+	private void addRigidBody(zamtrax.components.RigidBody rigidBody) {
 		MotionState ms = new DefaultMotionState(new Transform(new Matrix4f(rigidBody.getTransform().getRotation().toVecmath(),
 				rigidBody.getTransform().getPosition().toVecmath(),
 				1.0f)));
@@ -136,7 +134,7 @@ final class PhysicsModule extends Module implements Scene.Listener {
 		characterController.setKinematicCharacterController(kcc);
 	}
 
-	private boolean removeRigidBody(zamtrax.RigidBody rigidBody) {
+	private boolean removeRigidBody(zamtrax.components.RigidBody rigidBody) {
 		RigidBody rb = rigidBodyMap.remove(rigidBody);
 
 		if (rb == null) {
@@ -158,8 +156,8 @@ final class PhysicsModule extends Module implements Scene.Listener {
 
 	@Override
 	public void onAddComponent(Component component) {
-		if (component instanceof zamtrax.RigidBody) {
-			addRigidBody((zamtrax.RigidBody) component);
+		if (component instanceof zamtrax.components.RigidBody) {
+			addRigidBody((zamtrax.components.RigidBody) component);
 		} else if (component instanceof CharacterController) {
 			addCharacterController((CharacterController) component);
 		}
@@ -167,8 +165,8 @@ final class PhysicsModule extends Module implements Scene.Listener {
 
 	@Override
 	public void onRemoveComponent(Component component) {
-		if (component instanceof zamtrax.RigidBody) {
-			removeRigidBody((zamtrax.RigidBody) component);
+		if (component instanceof zamtrax.components.RigidBody) {
+			removeRigidBody((zamtrax.components.RigidBody) component);
 		}
 	}
 

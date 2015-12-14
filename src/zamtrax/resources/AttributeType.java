@@ -1,7 +1,7 @@
 package zamtrax.resources;
 
 public enum AttributeType {
-	POSITION(3), COLOR(4), NORMAL(3), UV(2);
+	POSITION(4), COLOR(4), NORMAL(3), UV(2);
 
 	private final int size;
 

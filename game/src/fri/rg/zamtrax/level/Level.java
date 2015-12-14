@@ -3,8 +3,11 @@ package fri.rg.zamtrax.level;
 import fri.rg.zamtrax.Engineer;
 import fri.rg.zamtrax.level.player.Player;
 import zamtrax.*;
-import zamtrax.lights.SpotLight;
+import zamtrax.components.RigidBody;
 import zamtrax.resources.*;
+import zamtrax.ui.Canvas;
+import zamtrax.ui.Image;
+import zamtrax.ui.Text;
 
 public class Level extends Scene {
 
@@ -22,6 +25,8 @@ public class Level extends Scene {
 
 	@Override
 	public void onEnter() {
+		super.onEnter();
+
 		instance = this;
 
 		arena = new Arena();
@@ -77,6 +82,19 @@ public class Level extends Scene {
 			setupKinematicBox(north);
 			setupKinematicBox(east);
 			setupKinematicBox(west);
+		}
+
+		{
+			Texture uiTexture = Resources.loadTexture("textures/ui.png", Texture.Format.ARGB, Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
+
+			Canvas canvas = GameObject.create().addComponent(Canvas.class);
+
+			Image testImage = GameObject.create(canvas.getGameObject()).addComponent(Image.class);
+			testImage.setSprite(Sprite.fromTexture(uiTexture, 0, 0, 32, 32));
+
+			Text text = GameObject.create(canvas.getGameObject()).addComponent(Text.class);
+			text.setText("Hello World!");
+			text.setFont(Resources.loadFont("fonts/font.fnt"));
 		}
 	}
 

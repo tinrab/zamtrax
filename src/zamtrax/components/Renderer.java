@@ -1,5 +1,7 @@
-package zamtrax;
+package zamtrax.components;
 
+import zamtrax.Component;
+import zamtrax.RenderModule;
 import zamtrax.resources.Material;
 
 public abstract class Renderer extends Component {
@@ -16,6 +18,6 @@ public abstract class Renderer extends Component {
 		RenderModule.getInstance().consolidate();
 	}
 
-	abstract void render();
+	public abstract void render();
 
 }

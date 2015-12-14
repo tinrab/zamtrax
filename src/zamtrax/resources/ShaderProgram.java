@@ -4,8 +4,8 @@ import zamtrax.Color;
 import zamtrax.Matrix3;
 import zamtrax.Matrix4;
 import zamtrax.Vector3;
-import zamtrax.lights.PointLight;
-import zamtrax.lights.SpotLight;
+import zamtrax.components.PointLight;
+import zamtrax.components.SpotLight;
 
 import java.nio.FloatBuffer;
 import java.util.List;
@@ -110,10 +110,10 @@ class ShaderProgram implements Shader {
 	}
 
 	@Override
-	public void setUniform(CharSequence name, Matrix4 value) {
+	public void setUniform(CharSequence name, boolean normalize, Matrix4 value) {
 		Uniform uniform = resource.getUniforms().get(name);
 
-		glUniformMatrix4fv(uniform.getLocation(), true, value.toBuffer());
+		glUniformMatrix4fv(uniform.getLocation(), normalize, value.toBuffer());
 	}
 
 	@Override
@@ -131,10 +131,10 @@ class ShaderProgram implements Shader {
 	}
 
 	@Override
-	public void setUniform(CharSequence name, Matrix3 value) {
+	public void setUniform(CharSequence name, boolean normalize, Matrix3 value) {
 		Uniform uniform = resource.getUniforms().get(name);
 
-		glUniformMatrix3fv(uniform.getLocation(), true, value.toBuffer());
+		glUniformMatrix3fv(uniform.getLocation(), normalize, value.toBuffer());
 	}
 
 	@Override

@@ -41,7 +41,7 @@ final class IndexedMesh implements Mesh {
 		glBindBuffer(GL_ARRAY_BUFFER, resource.getVboId());
 		glBufferData(GL_ARRAY_BUFFER, vb, drawType);
 
-		int offset = 0, i = 0;
+		int offset = 0;
 
 		for (AttributePointer ap : bindingInfo.getAttributePointers()) {
 			glVertexAttribPointer(ap.getLocation(), ap.getAttributeType().getSize(), GL_FLOAT, false, vertexSize * 4, offset);
@@ -75,6 +75,11 @@ final class IndexedMesh implements Mesh {
 				switch (ap.getAttributeType()) {
 					case POSITION:
 						vb.put(v.position.toArray());
+
+						if (AttributeType.POSITION.getSize() == 4) {
+							vb.put(1.0f);
+						}
+
 						break;
 					case UV:
 						vb.put(v.uv.toArray());
