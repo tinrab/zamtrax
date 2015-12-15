@@ -52,16 +52,20 @@ final class ShaderResource extends ReferencedResource {
 		resourceMap.remove(id);
 	}
 
-	public static ShaderResource create(int id) {
+	public static ShaderResource retain(int id) {
 		ShaderResource resource = resourceMap.get(id);
 
-		if (resource == null) {
-			resource = new ShaderResource(id);
-
-			resourceMap.put(id, resource);
-		} else {
+		if (resource != null) {
 			resource.addReference();
 		}
+
+		return resource;
+	}
+
+	public static ShaderResource alloc(int id) {
+		ShaderResource resource = new ShaderResource(id);
+
+		resourceMap.put(id, resource);
 
 		return resource;
 	}

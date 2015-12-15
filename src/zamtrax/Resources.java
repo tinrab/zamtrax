@@ -141,6 +141,7 @@ public final class Resources {
 						buffer.put((byte) (0xFF));
 					}
 					*/
+
 					buffer.put((byte)0xFF);
 				}
 			}

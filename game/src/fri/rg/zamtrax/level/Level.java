@@ -54,36 +54,9 @@ public class Level extends Scene {
 				.setTexture(Resources.loadTexture("textures/grid.png", Texture.Format.ARGB, Texture.WrapMode.REPEAT, Texture.FilterMode.NEAREST))
 				.build();
 
-		{
+		Engineer.createArena(arena, stdBindingInfo, stdMaterial);
 
-			GameObject floor = Engineer.createBox(Arena.SIZE, 1, Arena.SIZE, 1.0f, stdBindingInfo, stdMaterial);
-			GameObject roof = Engineer.createBox(Arena.SIZE, 1, Arena.SIZE, 1.0f, stdBindingInfo, stdMaterial);
-
-			GameObject south = Engineer.createBox(Arena.SIZE, Arena.HEIGHT, 1, 1.0f, stdBindingInfo, stdMaterial);
-			GameObject north = Engineer.createBox(Arena.SIZE, Arena.HEIGHT, 1, 1.0f, stdBindingInfo, stdMaterial);
-
-			GameObject east = Engineer.createBox(1, Arena.HEIGHT, Arena.SIZE, 1.0f, stdBindingInfo, stdMaterial);
-			GameObject west = Engineer.createBox(1, Arena.HEIGHT, Arena.SIZE, 1.0f, stdBindingInfo, stdMaterial);
-
-			floor.getTransform().translate(0.0f, -0.5f, 0.0f);
-
-			roof.getTransform().translate(0.0f, Arena.HEIGHT + 0.5f, 0.0f);
-
-			south.getTransform().translate(0.0f, Arena.HEIGHT / 2.0f, -Arena.SIZE / 2.0f - 0.5f);
-			north.getTransform().translate(0.0f, Arena.HEIGHT / 2.0f, Arena.SIZE / 2.0f + 0.5f);
-
-			east.getTransform().translate(-Arena.SIZE / 2.0f - 0.5f, Arena.HEIGHT / 2.0f, 0.0f);
-			west.getTransform().translate(Arena.SIZE / 2.0f + 0.5f, Arena.HEIGHT / 2.0f, 0.0f);
-
-
-			setupKinematicBox(floor);
-			setupKinematicBox(roof);
-			setupKinematicBox(south);
-			setupKinematicBox(north);
-			setupKinematicBox(east);
-			setupKinematicBox(west);
-		}
-
+		/*
 		{
 			Texture uiTexture = Resources.loadTexture("textures/ui.png", Texture.Format.ARGB, Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
 
@@ -96,10 +69,7 @@ public class Level extends Scene {
 			text.setText("Hello World!");
 			text.setFont(Resources.loadFont("fonts/font.fnt"));
 		}
-	}
-
-	private void setupKinematicBox(GameObject gameObject) {
-		gameObject.addComponent(RigidBody.class).setKinematic(true);
+		*/
 	}
 
 	public Arena getArena() {

@@ -26,12 +26,17 @@ class ShaderProgram implements Shader {
 		sb.append(vertexShaderSource);
 		sb.append(fragmentShaderSource);
 
-		resource = ShaderResource.create(sb.toString().hashCode());
+		int id = sb.toString().hashCode();
+		resource = ShaderResource.retain(id);
+
+		if (resource == null) {
+			resource = ShaderResource.alloc(id);
+		}
+
+		program = resource.getProgram();
 
 		resource.setBindingInfo(bindingInfo);
 		resource.setUniforms(uniforms);
-
-		program = resource.getProgram();
 
 		compile(vertexShaderSource, GL_VERTEX_SHADER);
 		compile(fragmentShaderSource, GL_FRAGMENT_SHADER);

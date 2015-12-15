@@ -75,8 +75,8 @@ public class Scene implements Disposable {
 	}
 
 	final void render() {
-		//renderModule.render();
-		uiModule.render();
+		renderModule.render();
+		//uiModule.render();
 	}
 
 	final void destroyGameObject(GameObject sceneObject) {

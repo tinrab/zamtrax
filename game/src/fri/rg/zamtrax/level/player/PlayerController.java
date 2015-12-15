@@ -22,6 +22,8 @@ public class PlayerController extends Component {
 
 		characterController = getGameObject().getComponent(CharacterController.class);
 		characterController.warp(new Vector3(0.0f, 5.0f, 0.0f));
+
+		Input.setMouseLocked(true);
 	}
 
 	@Override
@@ -61,6 +63,10 @@ public class PlayerController extends Component {
 		}
 
 		characterController.move(motion);
+
+		if (Input.getKey(Input.KEY_ESCAPE)) {
+			Input.setMouseLocked(!Input.isMouseLocked());
+		}
 	}
 
 }

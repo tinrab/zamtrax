@@ -1,8 +1,11 @@
 package zamtrax;
 
 import zamtrax.components.*;
+import zamtrax.resources.FrameBuffer;
 import zamtrax.resources.Material;
 import zamtrax.resources.Shader;
+import zamtrax.resources.Sprite;
+import zamtrax.ui.SpriteBatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL14.glBlendFuncSeparate;
 
 public final class RenderModule extends Module implements Scene.Listener {
 

@@ -16,8 +16,8 @@ public class Text extends Graphic {
 
 	@Override
 	public void render(SpriteBatch spriteBatch) {
-		spriteBatch.setColor(color);
-		spriteBatch.draw(font, text, 100, 100, 0.4f, 0.4f);
+		//spriteBatch.setColor(color);
+		//spriteBatch.draw(font, text, 100, 100, 0.4f, 0.4f);
 	}
 
 	public BMFont getFont() {

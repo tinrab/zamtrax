@@ -1,9 +1,8 @@
 package zamtrax.components;
 
-import zamtrax.Color;
-import zamtrax.Component;
-import zamtrax.Matrix4;
-import zamtrax.Vector3;
+import zamtrax.*;
+import zamtrax.resources.FrameBuffer;
+import zamtrax.resources.Texture;
 
 public final class Camera extends Component {
 
@@ -27,6 +26,7 @@ public final class Camera extends Component {
 	private Transform transform;
 	private ClearFlags clearFlags;
 	private Color clearColor;
+	private FrameBuffer frameBuffer;
 
 	@Override
 	public void onAdd() {
@@ -37,6 +37,7 @@ public final class Camera extends Component {
 		transform = getTransform();
 		clearFlags = ClearFlags.SOLID_COLOR;
 		clearColor = Color.createBlack();
+		//frameBuffer = new FrameBuffer(Game.getScreenWidth(), Game.getScreenHeight(), Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
 	}
 
 	public Matrix4 getProjectionMatrix() {
@@ -66,6 +67,10 @@ public final class Camera extends Component {
 
 	public void setProjection(Matrix4 projection) {
 		this.projection = projection;
+	}
+
+	public FrameBuffer getFrameBuffer() {
+		return frameBuffer;
 	}
 
 }

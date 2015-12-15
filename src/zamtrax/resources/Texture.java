@@ -104,4 +104,8 @@ public final class Texture implements Disposable {
 		return height;
 	}
 
+	TextureResource getResource() {
+		return resource;
+	}
+
 }

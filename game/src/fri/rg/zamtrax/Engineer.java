@@ -1,9 +1,11 @@
 package fri.rg.zamtrax;
 
+import fri.rg.zamtrax.level.Arena;
 import zamtrax.*;
 import zamtrax.components.BoxCollider;
 import zamtrax.components.MeshFilter;
 import zamtrax.components.MeshRenderer;
+import zamtrax.components.RigidBody;
 import zamtrax.resources.BindingInfo;
 import zamtrax.resources.Material;
 import zamtrax.resources.Mesh;
@@ -103,6 +105,20 @@ public final class Engineer {
 		box.addComponent(BoxCollider.class).setSize(width, height, depth);
 
 		return box;
+	}
+
+	public static void createArena(Arena arena, BindingInfo bindingInfo, Material material) {
+		for (int x = 0; x < Arena.SIZE; x++) {
+			for (int y = 0; y < Arena.SIZE; y++) {
+				int tile = arena.getTile(x, y);
+
+				GameObject box = createBox(Arena.TILE_SIZE, tile, Arena.TILE_SIZE, Arena.TILE_SIZE, bindingInfo, material);
+
+				box.getTransform().setPosition(new Vector3(x, 0.0f, y).mul(Arena.TILE_SIZE));
+
+				box.addComponent(RigidBody.class).setKinematic(true);
+			}
+		}
 	}
 
 }
