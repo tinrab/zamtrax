@@ -31,9 +31,9 @@ public class Arena {
 
 	}
 
-	public static final int SIZE = 4 * 2 + 1;
+	public static final int SIZE = 3 * 2 + 1;
 	public static final int TILE_SIZE = 6;
-	public static final int HEIGHT = 16;
+	public static final int HEIGHT = 3;
 
 	private int[][] tiles;
 	private Vector3 spawnPoint;
@@ -48,7 +48,7 @@ public class Arena {
 	public void generate() {
 		for (int i = 0; i < SIZE; i++) {
 			for (int j = 0; j < SIZE; j++) {
-				tiles[i][j] = Random.randomInteger(2, Arena.HEIGHT);
+				tiles[i][j] = Random.randomInteger(1, Arena.HEIGHT + 1);
 			}
 		}
 

@@ -22,8 +22,8 @@ public class VertexArray {
 		buffer.clear();
 	}
 
-	public VertexArray put(float f) {
-		buffer.put(f);
+	public VertexArray put(float... floats) {
+		buffer.put(floats);
 
 		return this;
 	}

@@ -47,6 +47,19 @@ public class Level extends Scene {
 			dl2.setIntensity(0.5f);
 		}
 
+		{
+			SpotLight sl = GameObject.create().addComponent(SpotLight.class);
+
+			sl.setColor(new Color(0, 1, 0));
+			sl.setRange(50);
+			sl.setIntensity(10);
+
+			sl.getTransform().setPosition(new Vector3(3, 5, 3));
+			sl.getTransform().setRotation(Quaternion.fromEuler(new Vector3(30, 30, 30).mul(Mathf.DEG_TO_RAD)));
+
+			sl.getGameObject().addComponent(Rotate.class).setAngle(new Vector3(3, 5, -3));
+		}
+
 		GameObject.create().addComponent(Player.class);
 
 		stdBindingInfo = new BindingInfo.Builder()
@@ -55,10 +68,11 @@ public class Level extends Scene {
 				.bind(AttributeType.NORMAL, 2, "normal")
 				.build();
 
-
 		Material stdMaterial = new Material(Resources.loadTexture("textures/grid.png", Texture.Format.ARGB, Texture.WrapMode.REPEAT, Texture.FilterMode.NEAREST));
 
-		Engineer.createArena(arena, stdBindingInfo, stdMaterial);
+		{
+			Engineer.createArena(arena, stdBindingInfo, stdMaterial);
+		}
 
 		{
 			Canvas canvas = GameObject.create().addComponent(Canvas.class);

@@ -130,11 +130,6 @@ final class Window implements Disposable {
 		return height;
 	}
 
-	void bindAsRenderTarget() {
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-		glViewport(0, 0, width, height);
-	}
-
 	@Override
 	public void dispose() {
 		keyCallback.release();

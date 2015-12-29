@@ -182,7 +182,7 @@ public class SpriteBatch {
 		draw(font.getTexture(), x + ch.getXoffset() * sx, y + ch.getYoffset() * sy, ch.getWidth() * sx, ch.getHeight() * sy, ch.getU1(), ch.getV1(), ch.getU2(), ch.getV2());
 	}
 
-	private void putVertex(float x, float y, float u, float v) {
+	public void putVertex(float x, float y, float u, float v) {
 		data.put(x).put(y).put(0.0f).put(1.0f);
 		data.put(color.r).put(color.g).put(color.b).put(color.a);
 		data.put(u).put(v);

@@ -2,11 +2,16 @@ package zamtrax;
 
 import zamtrax.components.*;
 import zamtrax.resources.*;
+import zamtrax.ui.SpriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE1;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL30.*;
 
 public final class RenderModule extends Module implements Scene.Listener {
 
@@ -20,6 +25,8 @@ public final class RenderModule extends Module implements Scene.Listener {
 
 	private Color ambientLight;
 	private List<DirectionalLight> directionalLights;
+	private List<PointLight> pointLights;
+	private List<SpotLight> spotLights;
 
 	RenderModule(Scene scene) {
 		super(scene);
@@ -30,6 +37,8 @@ public final class RenderModule extends Module implements Scene.Listener {
 		renderers = new ArrayList<>();
 
 		directionalLights = new ArrayList<>();
+		pointLights = new ArrayList<>();
+		spotLights = new ArrayList<>();
 		ambientLight = new Color(0.2f, 0.2f, 0.2f);
 	}
 
@@ -42,7 +51,7 @@ public final class RenderModule extends Module implements Scene.Listener {
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_FRONT);
-		glViewport(0, 0, Game.getScreenWidth(), Game.getScreenHeight());
+		glDisable(GL_ALPHA_TEST);
 
 		switch (clearFlag) {
 			case SOLID_COLOR:
@@ -97,6 +106,40 @@ public final class RenderModule extends Module implements Scene.Listener {
 			forwardDirectional.release();
 		}
 
+		// Point pass
+		{
+			ForwardPointShader forwardPoint = ForwardPointShader.getInstance();
+
+			forwardPoint.bind();
+
+			for (PointLight pointLight : pointLights) {
+				for (Renderer renderer : renderers) {
+					forwardPoint.updateUniforms(renderer.getTransform(), viewProjection, renderer.getMaterial(), pointLight);
+
+					renderer.render();
+				}
+			}
+
+			forwardPoint.release();
+		}
+
+		// Spot pass
+		{
+			ForwardSpotShader forwardSpot = ForwardSpotShader.getInstance();
+
+			forwardSpot.bind();
+
+			for (SpotLight spotLight : spotLights) {
+				for (Renderer renderer : renderers) {
+					forwardSpot.updateUniforms(renderer.getTransform(), viewProjection, renderer.getMaterial(), spotLight);
+
+					renderer.render();
+				}
+			}
+
+			forwardSpot.release();
+		}
+
 		glDepthFunc(GL_LESS);
 		glDepthMask(true);
 		glDisable(GL_BLEND);
@@ -120,6 +163,10 @@ public final class RenderModule extends Module implements Scene.Listener {
 			renderers.add((Renderer) component);
 		} else if (component instanceof DirectionalLight) {
 			directionalLights.add((DirectionalLight) component);
+		} else if (component instanceof PointLight) {
+			pointLights.add((PointLight) component);
+		} else if (component instanceof SpotLight) {
+			spotLights.add((SpotLight) component);
 		}
 	}
 
@@ -129,6 +176,10 @@ public final class RenderModule extends Module implements Scene.Listener {
 			renderers.remove(component);
 		} else if (component instanceof DirectionalLight) {
 			directionalLights.remove(component);
+		} else if (component instanceof PointLight) {
+			pointLights.remove(component);
+		} else if (component instanceof SpotLight) {
+			spotLights.remove(component);
 		}
 	}
 
