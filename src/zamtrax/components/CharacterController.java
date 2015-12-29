@@ -1,6 +1,7 @@
 package zamtrax.components;
 
 import com.bulletphysics.collision.dispatch.PairCachingGhostObject;
+import com.bulletphysics.collision.shapes.CapsuleShape;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.character.KinematicCharacterController;
 import com.bulletphysics.linearmath.Transform;
@@ -71,6 +72,8 @@ public final class CharacterController extends Component {
 
 	public void setRadius(float radius) {
 		this.radius = radius;
+
+		ghostObject.setCollisionShape(new CapsuleShape(radius, height));
 	}
 
 	public float getHeight() {
@@ -79,6 +82,8 @@ public final class CharacterController extends Component {
 
 	public void setHeight(float height) {
 		this.height = height;
+
+		ghostObject.setCollisionShape(new CapsuleShape(radius, height));
 	}
 
 	public float getStepHeight() {
@@ -99,6 +104,14 @@ public final class CharacterController extends Component {
 
 	public void setKinematicCharacterController(KinematicCharacterController kinematicCharacterController) {
 		this.kinematicCharacterController = kinematicCharacterController;
+	}
+
+	public void setGravity(float gravity) {
+		kinematicCharacterController.setGravity(gravity);
+	}
+
+	public void setJumpSpeed(float jumpSpeed) {
+		kinematicCharacterController.setJumpSpeed(jumpSpeed);
 	}
 
 }

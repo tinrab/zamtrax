@@ -17,23 +17,6 @@ public final class MeshRenderer extends Renderer {
 	@Override
 	public void render() {
 		meshFilter.getMesh().render();
-		/*
-		Matrix4 modelView = transform.getLocalToWorldMatrix();
-
-		material.bind();
-
-		Shader shader = material.getShader();
-
-		Matrix3 normalMatrix = modelView.toMatrix3().invert().transpose();
-
-		shader.setUniform("projectionMatrix", projection);
-		shader.setUniform("modelViewMatrix", modelView);
-		shader.setUniform("normalMatrix", normalMatrix);
-
-		meshFilter.getMesh().render();
-
-		material.unbind();
-		*/
 	}
 
 }

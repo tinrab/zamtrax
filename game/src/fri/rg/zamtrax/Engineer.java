@@ -12,7 +12,7 @@ import zamtrax.resources.Mesh;
 
 public final class Engineer {
 
-	public static GameObject createBox(int width, int height, int depth, float uvScale, BindingInfo bindingInfo, Material material) {
+	public static GameObject createBox(float width, float height, float depth, float uvScale, BindingInfo bindingInfo, Material material) {
 		Vertex[] vertices = {
 				new Vertex(-0.5f, 0.5f, -0.5f, 1.0f, 1.0f),
 				new Vertex(-0.5f, -0.5f, -0.5f, 1.0f, 0.0f),
@@ -112,13 +112,21 @@ public final class Engineer {
 			for (int y = 0; y < Arena.SIZE; y++) {
 				int tile = arena.getTile(x, y);
 
-				GameObject box = createBox(Arena.TILE_SIZE, tile, Arena.TILE_SIZE, Arena.TILE_SIZE, bindingInfo, material);
+				GameObject box = createBox(Arena.TILE_SIZE, tile, Arena.TILE_SIZE, 1.0f, bindingInfo, material);
 
-				box.getTransform().setPosition(new Vector3(x, 0.0f, y).mul(Arena.TILE_SIZE));
+				box.getTransform().setPosition(new Vector3(x * Arena.TILE_SIZE, tile / 2.0f, y * Arena.TILE_SIZE));
 
 				box.addComponent(RigidBody.class).setKinematic(true);
 			}
 		}
+
+		/*
+		GameObject box = createBox(Arena.SIZE * Arena.TILE_SIZE, 1.0f, Arena.SIZE * Arena.TILE_SIZE, 1.0f, bindingInfo, material);
+
+		box.getTransform().setPosition(new Vector3((Arena.SIZE * Arena.TILE_SIZE) / 2.0f, Arena.HEIGHT, (Arena.SIZE * Arena.TILE_SIZE) / 2.0f));
+
+		box.addComponent(RigidBody.class).setKinematic(true);
+		*/
 	}
 
 }

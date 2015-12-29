@@ -1,12 +1,12 @@
 package fri.rg.zamtrax.level;
 
 import fri.rg.zamtrax.Engineer;
+import fri.rg.zamtrax.Rotate;
 import fri.rg.zamtrax.level.player.Player;
 import zamtrax.*;
-import zamtrax.components.RigidBody;
+import zamtrax.components.*;
 import zamtrax.resources.*;
 import zamtrax.ui.Canvas;
-import zamtrax.ui.Image;
 import zamtrax.ui.Text;
 
 public class Level extends Scene {
@@ -31,7 +31,21 @@ public class Level extends Scene {
 
 		arena = new Arena();
 
-		setAmbientLight(new Color(0.1f, 0.1f, 0.1f));
+		setAmbientLight(new Color(0.05f, 0.05f, 0.05f));
+
+		{
+			DirectionalLight dl1 = GameObject.create().addComponent(DirectionalLight.class);
+
+			dl1.getTransform().setRotation(Quaternion.fromEuler(new Vector3(30, 30, 30).mul(Mathf.DEG_TO_RAD)));
+			dl1.setColor(new Color(1.0f, 0.8f, 0.5f));
+			dl1.setIntensity(0.5f);
+
+			DirectionalLight dl2 = GameObject.create().addComponent(DirectionalLight.class);
+
+			dl2.getTransform().setRotation(dl1.getTransform().getRotation().inverse());
+			dl2.setColor(new Color(0.5f, 0.8f, 1.0f));
+			dl2.setIntensity(0.5f);
+		}
 
 		GameObject.create().addComponent(Player.class);
 
@@ -41,35 +55,19 @@ public class Level extends Scene {
 				.bind(AttributeType.NORMAL, 2, "normal")
 				.build();
 
-		stdShader = new Shader.Builder()
-				.setVertexShaderSource(Resources.loadText("shaders/standard.vs"))
-				.setFragmentShaderSource(Resources.loadText("shaders/standard.fs"))
-				.setBindingInfo(stdBindingInfo)
-				.addTransformationUniforms()
-				.addLightsUniforms()
-				.build();
 
-		stdMaterial = new Material.Builder()
-				.setShader(stdShader)
-				.setTexture(Resources.loadTexture("textures/grid.png", Texture.Format.ARGB, Texture.WrapMode.REPEAT, Texture.FilterMode.NEAREST))
-				.build();
+		Material stdMaterial = new Material(Resources.loadTexture("textures/grid.png", Texture.Format.ARGB, Texture.WrapMode.REPEAT, Texture.FilterMode.NEAREST));
 
 		Engineer.createArena(arena, stdBindingInfo, stdMaterial);
 
-		/*
 		{
-			Texture uiTexture = Resources.loadTexture("textures/ui.png", Texture.Format.ARGB, Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
-
 			Canvas canvas = GameObject.create().addComponent(Canvas.class);
 
-			Image testImage = GameObject.create(canvas.getGameObject()).addComponent(Image.class);
-			testImage.setSprite(Sprite.fromTexture(uiTexture, 0, 0, 32, 32));
-
 			Text text = GameObject.create(canvas.getGameObject()).addComponent(Text.class);
-			text.setText("Hello World!");
+			text.setText("Hello, World!");
 			text.setFont(Resources.loadFont("fonts/font.fnt"));
+			text.getTransform().setScale(new Vector3(0.5f, 0.5f, 0.5f));
 		}
-		*/
 	}
 
 	public Arena getArena() {

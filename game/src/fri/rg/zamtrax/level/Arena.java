@@ -1,5 +1,6 @@
 package fri.rg.zamtrax.level;
 
+import zamtrax.Random;
 import zamtrax.Vector3;
 
 import java.util.Arrays;
@@ -30,8 +31,8 @@ public class Arena {
 
 	}
 
-	public static final int SIZE = 8 * 2 + 1;
-	public static final int TILE_SIZE = 2;
+	public static final int SIZE = 4 * 2 + 1;
+	public static final int TILE_SIZE = 6;
 	public static final int HEIGHT = 16;
 
 	private int[][] tiles;
@@ -39,7 +40,7 @@ public class Arena {
 
 	public Arena() {
 		tiles = new int[SIZE][SIZE];
-		spawnPoint = new Vector3(0.0f, 5.0f, 0.0f);
+		spawnPoint = new Vector3();
 
 		generate();
 	}
@@ -47,7 +48,7 @@ public class Arena {
 	public void generate() {
 		for (int i = 0; i < SIZE; i++) {
 			for (int j = 0; j < SIZE; j++) {
-				tiles[i][j] = 1;
+				tiles[i][j] = Random.randomInteger(2, Arena.HEIGHT);
 			}
 		}
 
@@ -61,25 +62,48 @@ public class Arena {
 				int ty = j * 2 + 1;
 				int m = maze[i][j];
 
-				tiles[tx][ty] = 0;
+				tiles[tx][ty] = 1;
 
 				if ((m & Direction.NORTH.bit) != 0) {
-					tiles[tx][ty - 1] = 0;
+					tiles[tx][ty - 1] = 1;
 				}
 
 				if ((m & Direction.SOUTH.bit) != 0) {
-					tiles[tx][ty + 1] = 0;
+					tiles[tx][ty + 1] = 1;
 				}
 
 				if ((m & Direction.EAST.bit) != 0) {
-					tiles[tx + 1][ty] = 0;
+					tiles[tx + 1][ty] = 1;
 				}
 
 				if ((m & Direction.WEST.bit) != 0) {
-					tiles[tx - 1][ty] = 0;
+					tiles[tx - 1][ty] = 1;
 				}
 			}
 		}
+
+		// wals
+		for (int i = 0; i < Arena.SIZE; i++) {
+			tiles[i][0] = Arena.HEIGHT;
+			tiles[i][Arena.SIZE - 1] = Arena.HEIGHT;
+			tiles[0][i] = Arena.HEIGHT;
+			tiles[Arena.SIZE - 1][i] = Arena.HEIGHT;
+		}
+
+		// find spawn point
+		/*
+		for (int i = 0; i < Arena.SIZE; i++) {
+			for (int j = 0; j < Arena.SIZE; j++) {
+				if (tiles[i][j] == 1) {
+					spawnPoint = new Vector3(i * Arena.TILE_SIZE, 2.0f, j * Arena.TILE_SIZE);
+
+					i = Arena.SIZE;
+					break;
+				}
+			}
+		}
+		*/
+		spawnPoint = new Vector3(Arena.SIZE * Arena.TILE_SIZE, 10.0f, Arena.SIZE * Arena.TILE_SIZE).div(2.0f);
 	}
 
 	private void generateMaze(int[][] maze, int x, int y) {

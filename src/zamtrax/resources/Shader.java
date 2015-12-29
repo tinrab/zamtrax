@@ -6,6 +6,7 @@ import zamtrax.Matrix4;
 import zamtrax.Vector3;
 import zamtrax.components.PointLight;
 import zamtrax.components.SpotLight;
+import zamtrax.components.Transform;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -68,38 +69,6 @@ public interface Shader {
 
 		public Builder addUniform(CharSequence name) {
 			uniforms.add(new Uniform(name));
-
-			return this;
-		}
-
-		public Builder addTransformationUniforms() {
-			addUniform("P");
-			addUniform("MV");
-			addUniform("N");
-
-			return this;
-		}
-
-		public Builder addLightsUniforms() {
-			addUniform("ambientLight");
-			addUniform("pointLightCount");
-			addUniform("spotLightCount");
-
-			for (int i = 0; i < ShaderProgram.MAX_POINT_LIGHTS; i++) {
-				addUniform(String.format("pointLights[%d].light.color", i));
-				addUniform(String.format("pointLights[%d].light.intensity", i));
-				addUniform(String.format("pointLights[%d].position", i));
-				addUniform(String.format("pointLights[%d].range", i));
-			}
-
-			for (int i = 0; i < ShaderProgram.MAX_SPOT_LIGHTS; i++) {
-				addUniform(String.format("spotLights[%d].pointLight.light.color", i));
-				addUniform(String.format("spotLights[%d].pointLight.light.intensity", i));
-				addUniform(String.format("spotLights[%d].pointLight.position", i));
-				addUniform(String.format("spotLights[%d].pointLight.range", i));
-				addUniform(String.format("spotLights[%d].direction", i));
-				addUniform(String.format("spotLights[%d].cutoff", i));
-			}
 
 			return this;
 		}

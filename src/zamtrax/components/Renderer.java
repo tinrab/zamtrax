@@ -3,6 +3,7 @@ package zamtrax.components;
 import zamtrax.Component;
 import zamtrax.RenderModule;
 import zamtrax.resources.Material;
+import zamtrax.resources.Shader;
 
 public abstract class Renderer extends Component {
 
@@ -14,8 +15,6 @@ public abstract class Renderer extends Component {
 
 	public void setMaterial(Material material) {
 		this.material = material;
-
-		RenderModule.getInstance().consolidate();
 	}
 
 	public abstract void render();

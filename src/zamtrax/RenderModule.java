@@ -1,19 +1,12 @@
 package zamtrax;
 
 import zamtrax.components.*;
-import zamtrax.resources.FrameBuffer;
-import zamtrax.resources.Material;
-import zamtrax.resources.Shader;
-import zamtrax.resources.Sprite;
-import zamtrax.ui.SpriteBatch;
+import zamtrax.resources.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL14.glBlendFuncSeparate;
 
 public final class RenderModule extends Module implements Scene.Listener {
 
@@ -23,11 +16,10 @@ public final class RenderModule extends Module implements Scene.Listener {
 		return instance;
 	}
 
-	private List<Renderer> zombieRenderers;
-	private Map<Material, List<Renderer>> renderersForMaterial;
-	private List<PointLight> pointLights;
-	private List<SpotLight> spotLights;
+	private List<Renderer> renderers;
+
 	private Color ambientLight;
+	private List<DirectionalLight> directionalLights;
 
 	RenderModule(Scene scene) {
 		super(scene);
@@ -35,27 +27,30 @@ public final class RenderModule extends Module implements Scene.Listener {
 
 		scene.addSceneListener(this);
 
-		zombieRenderers = new ArrayList<>();
-		renderersForMaterial = new HashMap<>();
-		pointLights = new ArrayList<>();
-		spotLights = new ArrayList<>();
-		ambientLight = new Color(0.5f, 0.5f, 0.5f);
+		renderers = new ArrayList<>();
+
+		directionalLights = new ArrayList<>();
+		ambientLight = new Color(0.2f, 0.2f, 0.2f);
 	}
 
 	@Override
 	public void render() {
+		Camera camera = Camera.getMainCamera();
+		Camera.ClearFlags clearFlag = camera.getClearFlags();
+		Matrix4 viewProjection = camera.getViewProjection();
+
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_FRONT);
 		glViewport(0, 0, Game.getScreenWidth(), Game.getScreenHeight());
 
-		Camera camera = Camera.getMainCamera();
-		Camera.ClearFlags clearFlag = camera.getClearFlags();
-		Matrix4 projection = camera.getProjectionMatrix();
-
 		switch (clearFlag) {
 			case SOLID_COLOR:
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+				Color clearColor = camera.getClearColor();
+
+				glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 				break;
 			case DEPTH:
 				glClear(GL_DEPTH_BUFFER_BIT);
@@ -65,36 +60,46 @@ public final class RenderModule extends Module implements Scene.Listener {
 				break;
 		}
 
-		if (clearFlag == Camera.ClearFlags.SOLID_COLOR) {
-			Color clearColor = camera.getClearColor();
+		// Ambient pass
+		{
+			ForwardAmbientShader forwardAmbient = ForwardAmbientShader.getInstance();
 
-			glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
-		}
+			forwardAmbient.bind();
 
-		for (Map.Entry<Material, List<Renderer>> e : renderersForMaterial.entrySet()) {
-			Material material = e.getKey();
-			Shader shader = material.getShader();
-
-			material.bind();
-
-			for (Renderer renderer : e.getValue()) {
-				Transform transform = renderer.getTransform();
-				Matrix4 modelView = transform.getLocalToWorldMatrix();
-				Matrix3 normalMatrix = modelView.toMatrix3().invert().transpose();
-
-				shader.setUniform("P", true, projection);
-				shader.setUniform("MV", true, modelView);
-				shader.setUniform("N", true, normalMatrix);
-
-				shader.setUniform("ambientLight", new Vector3(ambientLight.r, ambientLight.g, ambientLight.b));
-				shader.setPointLights(pointLights);
-				shader.setSpotLights(spotLights);
+			for (Renderer renderer : renderers) {
+				forwardAmbient.updateUniforms(renderer.getTransform(), viewProjection, renderer.getMaterial(), ambientLight);
 
 				renderer.render();
 			}
 
-			material.unbind();
+			forwardAmbient.release();
 		}
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE);
+		glDepthMask(false);
+		glDepthFunc(GL_EQUAL);
+
+		// Directional pass
+		{
+			ForwardDirectionalShader forwardDirectional = ForwardDirectionalShader.getInstance();
+
+			forwardDirectional.bind();
+
+			for (DirectionalLight directionalLight : directionalLights) {
+				for (Renderer renderer : renderers) {
+					forwardDirectional.updateUniforms(renderer.getTransform(), viewProjection, renderer.getMaterial(), directionalLight);
+
+					renderer.render();
+				}
+			}
+
+			forwardDirectional.release();
+		}
+
+		glDepthFunc(GL_LESS);
+		glDepthMask(true);
+		glDisable(GL_BLEND);
 	}
 
 	@Override
@@ -112,49 +117,19 @@ public final class RenderModule extends Module implements Scene.Listener {
 	@Override
 	public void onAddComponent(Component component) {
 		if (component instanceof Renderer) {
-			zombieRenderers.add((Renderer) component);
-		} else if (component instanceof PointLight) {
-			pointLights.add((PointLight) component);
-		} else if (component instanceof SpotLight) {
-			spotLights.add((SpotLight) component);
+			renderers.add((Renderer) component);
+		} else if (component instanceof DirectionalLight) {
+			directionalLights.add((DirectionalLight) component);
 		}
 	}
 
 	@Override
 	public void onRemoveComponent(Component component) {
 		if (component instanceof Renderer) {
-			Renderer renderer = (Renderer) component;
-
-			zombieRenderers.remove(renderer);
-
-			List<Renderer> renderers = renderersForMaterial.get(renderer.getMaterial());
-
-			renderers.remove(renderer);
-		} else if (component instanceof PointLight) {
-			pointLights.remove(component);
-		} else if (component instanceof SpotLight) {
-			spotLights.remove(component);
+			renderers.remove(component);
+		} else if (component instanceof DirectionalLight) {
+			directionalLights.remove(component);
 		}
-	}
-
-	public void consolidate() {
-		for (Renderer renderer : zombieRenderers) {
-			Material material = renderer.getMaterial();
-
-			if (renderersForMaterial.containsKey(material)) {
-				List<Renderer> renderers = renderersForMaterial.get(material);
-
-				renderers.add(renderer);
-			} else {
-				List<Renderer> renderers = new ArrayList<>();
-
-				renderers.add(renderer);
-
-				renderersForMaterial.put(material, renderers);
-			}
-		}
-
-		zombieRenderers.clear();
 	}
 
 	public void setAmbientLight(Color ambientLight) {

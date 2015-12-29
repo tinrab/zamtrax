@@ -16,7 +16,7 @@ import static org.lwjgl.opengl.GL20.*;
 class ShaderProgram implements Shader {
 
 	public static final int MAX_POINT_LIGHTS = 8;
-	public static final int MAX_SPOT_LIGHTS = 2;
+	public static final int MAX_SPOT_LIGHTS = 8;
 
 	private ShaderResource resource;
 	private int program;
@@ -31,21 +31,22 @@ class ShaderProgram implements Shader {
 
 		if (resource == null) {
 			resource = ShaderResource.alloc(id);
+			program = resource.getProgram();
+
+			resource.setBindingInfo(bindingInfo);
+			resource.setUniforms(uniforms);
+
+			compile(vertexShaderSource, GL_VERTEX_SHADER);
+			compile(fragmentShaderSource, GL_FRAGMENT_SHADER);
+
+			bindAttributes();
+
+			link();
+
+			bindUniforms();
+		} else {
+			program = resource.getProgram();
 		}
-
-		program = resource.getProgram();
-
-		resource.setBindingInfo(bindingInfo);
-		resource.setUniforms(uniforms);
-
-		compile(vertexShaderSource, GL_VERTEX_SHADER);
-		compile(fragmentShaderSource, GL_FRAGMENT_SHADER);
-
-		bindAttributes();
-
-		link();
-
-		bindUniforms();
 	}
 
 	private void compile(CharSequence source, int type) {

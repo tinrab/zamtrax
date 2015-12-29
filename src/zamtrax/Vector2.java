@@ -43,6 +43,10 @@ public class Vector2 {
 	public Vector2 normalized() {
 		float len = length();
 
+		if (len == 0.0f) {
+			return new Vector2(0.0f, 0.0f);
+		}
+
 		return new Vector2(x / len, y / len);
 	}
 
@@ -51,6 +55,10 @@ public class Vector2 {
 	}
 
 	public Vector2 add(Vector2 v) {
+		return add(v.x, v.y);
+	}
+
+	public Vector2 add(Vector3 v) {
 		return add(v.x, v.y);
 	}
 

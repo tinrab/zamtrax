@@ -9,6 +9,9 @@ import static org.lwjgl.glfw.GLFW.glfwShowWindow;
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.EXTFramebufferObject.*;
 
 final class Window implements Disposable {
 
@@ -125,6 +128,11 @@ final class Window implements Disposable {
 
 	int getHeight() {
 		return height;
+	}
+
+	void bindAsRenderTarget() {
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glViewport(0, 0, width, height);
 	}
 
 	@Override

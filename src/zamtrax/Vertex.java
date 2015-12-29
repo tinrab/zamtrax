@@ -8,6 +8,9 @@ public final class Vertex {
 	public Vector2 uv;
 
 	public Vertex() {
+		// TODO include colors in obj
+
+		color = new Color(1.0f, 0.0f, 0.0f);
 	}
 
 	public Vertex(Vector3 position) {

@@ -5,16 +5,14 @@
 #endif
 
 #ifndef MAX_SPOT_LIGHTS
-#define MAX_SPOT_LIGHTS 8
+#define MAX_SPOT_LIGHTS 2
 #endif
 
-in vec2 vUV;
+in vec4 vColor;
 in vec3 vNormal;
 in vec4 vPosition;
 
 out vec4 vDiffuseColor;
-
-uniform sampler2D uSampler;
 
 struct Light
 {
@@ -101,7 +99,6 @@ vec3 calculateSpotLight(SpotLight spotLight)
 
 void main()
 {
-	vec4 textureColor = texture2D(uSampler, vUV);
 	vec3 light = ambientLight;
 	
 	for(int i = 0; i < pointLightCount; i++) {
@@ -116,5 +113,5 @@ void main()
 		}
 	}
 
-	vDiffuseColor = textureColor * vec4(light, 1.0);
+	vDiffuseColor = vColor * vec4(light, 1.0);
 }

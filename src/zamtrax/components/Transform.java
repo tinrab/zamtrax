@@ -62,28 +62,28 @@ public final class Transform extends Component {
 		rotate(x, y, z, Space.SELF);
 	}
 
-	public void rotate(float x, float y, float z, Space relativeTo) {
-		rotate(new Vector3(x, y, z), relativeTo);
+	public void rotate(float x, float y, float z, Space space) {
+		rotate(new Vector3(x, y, z), space);
 	}
 
 	public void rotate(Vector3 eulerAngles) {
 		rotate(eulerAngles, Space.SELF);
 	}
 
-	public void rotate(Vector3 eulerAngles, Space relativeTo) {
-		rotate(Quaternion.fromEuler(eulerAngles), relativeTo);
+	public void rotate(Vector3 eulerAngles, Space space) {
+		rotate(Quaternion.fromEuler(eulerAngles), space);
 	}
 
 	public void rotate(Vector3 axis, float angle) {
 		rotate(axis, angle, Space.SELF);
 	}
 
-	public void rotate(Vector3 axis, float angle, Space relativeTo) {
-		rotate(Quaternion.fromAxisAngle(axis, angle), relativeTo);
+	public void rotate(Vector3 axis, float angle, Space space) {
+		rotate(Quaternion.fromAxisAngle(axis, angle), space);
 	}
 
-	public void rotate(Quaternion rotation, Space relativeTo) {
-		switch (relativeTo) {
+	public void rotate(Quaternion rotation, Space space) {
+		switch (space) {
 			case WORLD:
 				//TODO
 				break;

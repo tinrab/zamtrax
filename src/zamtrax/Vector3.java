@@ -88,6 +88,10 @@ public class Vector3 {
 	public Vector3 normalized() {
 		float len = length();
 
+		if (len == 0.0f) {
+			return new Vector3();
+		}
+
 		return new Vector3(x / len, y / len, z / len);
 	}
 

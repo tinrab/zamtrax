@@ -37,10 +37,10 @@ public final class Camera extends Component {
 		transform = getTransform();
 		clearFlags = ClearFlags.SOLID_COLOR;
 		clearColor = Color.createBlack();
-		//frameBuffer = new FrameBuffer(Game.getScreenWidth(), Game.getScreenHeight(), Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
+		frameBuffer = new FrameBuffer(Game.getScreenWidth(), Game.getScreenHeight(), Texture.WrapMode.CLAMP, Texture.FilterMode.NEAREST);
 	}
 
-	public Matrix4 getProjectionMatrix() {
+	public Matrix4 getViewProjection() {
 		Matrix4 r = transform.getRotation().conjugate().toMatrix();
 		Vector3 p = transform.getPosition().mul(-1.0f);
 

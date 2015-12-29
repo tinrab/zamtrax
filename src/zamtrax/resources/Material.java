@@ -1,42 +1,19 @@
 package zamtrax.resources;
 
-import zamtrax.Resources;
+public class Material {
 
-public interface Material {
+	private Texture diffuse;
 
-	void bind();
+	public Material(Texture diffuse) {
+		this.diffuse = diffuse;
+	}
 
-	void unbind();
+	public Texture getDiffuse() {
+		return diffuse;
+	}
 
-	Shader getShader();
-
-	Texture getTexture();
-
-	class Builder {
-
-		private Shader shader;
-		private Texture texture;
-
-		public Builder setShader(Shader shader) {
-			this.shader = shader;
-
-			return this;
-		}
-
-		public Builder setTexture(Texture texture) {
-			this.texture = texture;
-
-			return this;
-		}
-
-		public Material build() {
-			if (texture == null) {
-				return new ShadedMaterial(shader);
-			} else {
-				return new BasicMaterial(shader, texture);
-			}
-		}
-
+	public void setDiffuse(Texture diffuse) {
+		this.diffuse = diffuse;
 	}
 
 }

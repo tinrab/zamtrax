@@ -20,8 +20,12 @@ public final class Random {
 		return random.nextInt();
 	}
 
-	public static int randomInteger(int bound) {
-		return random.nextInt(bound);
+	public static int randomInteger(int max) {
+		return random.nextInt(max);
+	}
+
+	public static int randomInteger(int min, int max) {
+		return min + random.nextInt(max - min);
 	}
 
 }

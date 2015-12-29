@@ -1,23 +1,31 @@
 package zamtrax.ui;
 
 import zamtrax.Color;
+import zamtrax.components.Transform;
 import zamtrax.resources.bmfont.BMFont;
 
 public class Text extends Graphic {
 
+	private Transform transform;
 	private BMFont font;
 	private Color color;
 	private String text;
 
 	@Override
 	public void onAdd() {
+		transform = getTransform();
 		color = Color.createWhite();
 	}
 
 	@Override
 	public void render(SpriteBatch spriteBatch) {
-		//spriteBatch.setColor(color);
-		//spriteBatch.draw(font, text, 100, 100, 0.4f, 0.4f);
+		float x = transform.getPosition().x;
+		float y = transform.getPosition().y;
+		float sx = transform.getScale().x;
+		float sy = transform.getScale().y;
+
+		spriteBatch.setColor(color);
+		spriteBatch.draw(font, text, x, y, sx, sy);
 	}
 
 	public BMFont getFont() {

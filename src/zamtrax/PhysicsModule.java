@@ -35,8 +35,8 @@ final class PhysicsModule extends Module implements Scene.Listener {
 
 		rigidBodyMap = new HashMap<>();
 
-		Vector3f worldMin = new Vector3f(-1000f, -1000f, -1000f);
-		Vector3f worldMax = new Vector3f(1000f, 1000f, 1000f);
+		Vector3f worldMin = new Vector3f(-100f, -100f, -100f);
+		Vector3f worldMax = new Vector3f(100f, 100f, 100f);
 		AxisSweep3 sweepBP = new AxisSweep3(worldMin, worldMax);
 		broadphase = sweepBP;
 
