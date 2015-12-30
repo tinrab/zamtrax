@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL12.*;
 
 public final class Texture implements Disposable {
 

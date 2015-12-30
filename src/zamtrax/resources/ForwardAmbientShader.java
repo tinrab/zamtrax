@@ -12,14 +12,14 @@ public class ForwardAmbientShader extends ShaderProgram {
 
 	private static ForwardAmbientShader instance;
 
-	public ForwardAmbientShader(CharSequence vertexShaderSource, CharSequence fragmentShaderSource, BindingInfo bindingInfo, List<Uniform> uniforms) {
+	public ForwardAmbientShader(String vertexShaderSource, String fragmentShaderSource, BindingInfo bindingInfo, List<Uniform> uniforms) {
 		super(vertexShaderSource, fragmentShaderSource, bindingInfo, uniforms);
 	}
 
 	public static ForwardAmbientShader getInstance() {
 		if (instance == null) {
-			String vs = Resources.loadText("shaders/forward-ambient.vs", ForwardAmbientShader.class.getClassLoader());
-			String fs = Resources.loadText("shaders/forward-ambient.fs", ForwardAmbientShader.class.getClassLoader());
+			String vs = Resources.loadText("shaders/forwardAmbient.vs", ForwardAmbientShader.class.getClassLoader());
+			String fs = Resources.loadText("shaders/forwardAmbient.fs", ForwardAmbientShader.class.getClassLoader());
 
 			BindingInfo bindingInfo = new BindingInfo.Builder()
 					.bind(AttributeType.POSITION, 0, "position")
@@ -44,7 +44,7 @@ public class ForwardAmbientShader extends ShaderProgram {
 		Matrix4 modelView = transform.getLocalToWorldMatrix();
 		Matrix4 mvp = viewProjection.mul(modelView);
 
-		setUniform("MVP", true, mvp);
+		setUniform("MVP", mvp);
 		setUniform("ambientIntensity", ambientIntensity);
 	}
 

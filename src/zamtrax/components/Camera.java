@@ -64,7 +64,7 @@ public final class Camera extends Component {
 	}
 
 	public void setProjection(Matrix4 projection) {
-		this.projection = projection;
+		this.projection = new Matrix4(projection);
 	}
 
 }

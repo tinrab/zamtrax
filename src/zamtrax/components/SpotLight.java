@@ -7,7 +7,10 @@ public final class SpotLight extends Light {
 	private float cutoff;
 	private float range;
 
-	public SpotLight() {
+	@Override
+	public void onAdd() {
+		super.onAdd();
+
 		setSpotAngle(30.0f);
 		range = 5.0f;
 	}

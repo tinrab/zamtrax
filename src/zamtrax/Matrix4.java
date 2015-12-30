@@ -12,6 +12,16 @@ public class Matrix4 {
 		elements = new float[4][4];
 	}
 
+	public Matrix4(Matrix4 m) {
+		this();
+
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				elements[i][j] = m.elements[i][j];
+			}
+		}
+	}
+
 	public float get(int i, int j) {
 		return elements[i][j];
 	}
@@ -309,18 +319,20 @@ public class Matrix4 {
 		return m;
 	}
 
+	private final static FloatBuffer direct = BufferUtils.createFloatBuffer(16);
+
 	public FloatBuffer toBuffer() {
-		FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+		direct.clear();
 
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
-				buffer.put(get(i, j));
+				direct.put(elements[j][i]);
 			}
 		}
 
-		buffer.flip();
+		direct.flip();
 
-		return buffer;
+		return direct;
 	}
 
 	javax.vecmath.Matrix4f toVecmath() {

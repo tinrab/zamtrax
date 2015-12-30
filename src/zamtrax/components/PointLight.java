@@ -4,7 +4,10 @@ public class PointLight extends Light {
 
 	private float range;
 
-	public PointLight() {
+	@Override
+	public void onAdd() {
+		super.onAdd();
+
 		range = 5.0f;
 	}
 

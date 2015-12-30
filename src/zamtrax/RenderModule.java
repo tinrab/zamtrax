@@ -8,10 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE1;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
-import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL32.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL14.*;
+import static org.lwjgl.opengl.EXTFramebufferObject.*;
 
 public final class RenderModule extends Module implements Scene.Listener {
 
@@ -28,6 +32,13 @@ public final class RenderModule extends Module implements Scene.Listener {
 	private List<PointLight> pointLights;
 	private List<SpotLight> spotLights;
 
+	private ForwardAmbientShader forwardAmbient;
+	private ForwardDirectionalShader forwardDirectional;
+
+	private FrameBuffer shadowMap;
+	private ShadowMapGeneratorShader shadowMapGenerator;
+	private Matrix4 biasMatrix;
+
 	RenderModule(Scene scene) {
 		super(scene);
 		instance = this;
@@ -43,15 +54,26 @@ public final class RenderModule extends Module implements Scene.Listener {
 	}
 
 	@Override
+	public void onCreate() {
+		glFrontFace(GL_CW);
+		glCullFace(GL_BACK);
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_DEPTH_CLAMP);
+
+		forwardDirectional = ForwardDirectionalShader.getInstance();
+		forwardAmbient = ForwardAmbientShader.getInstance();
+
+		shadowMap = new FrameBuffer(GL_TEXTURE_2D, 1024, 1024, GL_NEAREST, true, GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT_EXT);
+		shadowMapGenerator = ShadowMapGeneratorShader.getInstance();
+		biasMatrix = Matrix4.createScale(0.5f, 0.5f, 0.5f).mul(Matrix4.createTranslation(1.0f, 1.0f, 1.0f));
+	}
+
+	@Override
 	public void render() {
 		Camera camera = Camera.getMainCamera();
 		Camera.ClearFlags clearFlag = camera.getClearFlags();
 		Matrix4 viewProjection = camera.getViewProjection();
-
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_FRONT);
-		glDisable(GL_ALPHA_TEST);
 
 		switch (clearFlag) {
 			case SOLID_COLOR:
@@ -69,84 +91,83 @@ public final class RenderModule extends Module implements Scene.Listener {
 				break;
 		}
 
-		// Ambient pass
-		{
-			ForwardAmbientShader forwardAmbient = ForwardAmbientShader.getInstance();
+		ambientPass(viewProjection);
 
-			forwardAmbient.bind();
+		directionalPass(viewProjection);
+	}
 
-			for (Renderer renderer : renderers) {
-				forwardAmbient.updateUniforms(renderer.getTransform(), viewProjection, renderer.getMaterial(), ambientLight);
+	private void ambientPass(Matrix4 viewProjection) {
+		forwardAmbient.bind();
 
-				renderer.render();
-			}
+		for (Renderer renderer : renderers) {
+			forwardAmbient.updateUniforms(renderer.getTransform(), viewProjection, renderer.getMaterial(), ambientLight);
 
-			forwardAmbient.release();
+			renderer.render();
 		}
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE);
-		glDepthMask(false);
-		glDepthFunc(GL_EQUAL);
+		forwardAmbient.release();
+	}
 
-		// Directional pass
-		{
-			ForwardDirectionalShader forwardDirectional = ForwardDirectionalShader.getInstance();
+	private void directionalPass(Matrix4 viewProjection) {
+		for (DirectionalLight directionalLight : directionalLights) {
+			shadowMap.bindAsRenderTarget();
+			glClear(GL_DEPTH_BUFFER_BIT);
+
+			Matrix4 lightViewProjection = null;
+
+			if (directionalLight.getShadows() == Light.Shadows.HARD) {
+				Matrix4 shadowProjection = directionalLight.getShadowProjection();
+				Matrix4 r = directionalLight.getTransform().getRotation().conjugate().toMatrix();
+				Vector3 p = directionalLight.getTransform().getPosition().mul(-1.0f);
+
+				lightViewProjection = shadowProjection.mul(r.mul(Matrix4.createTranslation(p)));
+
+				shadowMapGenerator.bind();
+				for (Renderer renderer : renderers) {
+					shadowMapGenerator.updateUniforms(renderer.getTransform(), lightViewProjection);
+
+					renderer.render();
+				}
+				shadowMapGenerator.release();
+			}
+
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+			glViewport(0, 0, Game.getScreenWidth(), Game.getScreenHeight());
+
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_ONE, GL_ONE);
+			glDepthMask(false);
+			glDepthFunc(GL_EQUAL);
+
+			lightViewProjection = biasMatrix.mul(lightViewProjection);
 
 			forwardDirectional.bind();
+			for (Renderer renderer : renderers) {
+				forwardDirectional.updateUniforms(renderer, viewProjection, directionalLight, lightViewProjection);
 
-			for (DirectionalLight directionalLight : directionalLights) {
-				for (Renderer renderer : renderers) {
-					forwardDirectional.updateUniforms(renderer.getTransform(), viewProjection, renderer.getMaterial(), directionalLight);
+				renderer.getMaterial().getDiffuse().bind(0);
+				shadowMap.bind(0, 1);
 
-					renderer.render();
-				}
+				renderer.render();
+
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, 0);
 			}
-
+			glBindTexture(GL_TEXTURE_2D, 0);
 			forwardDirectional.release();
+
+			glDepthFunc(GL_LESS);
+			glDepthMask(true);
+			glDisable(GL_BLEND);
 		}
-
-		// Point pass
-		{
-			ForwardPointShader forwardPoint = ForwardPointShader.getInstance();
-
-			forwardPoint.bind();
-
-			for (PointLight pointLight : pointLights) {
-				for (Renderer renderer : renderers) {
-					forwardPoint.updateUniforms(renderer.getTransform(), viewProjection, renderer.getMaterial(), pointLight);
-
-					renderer.render();
-				}
-			}
-
-			forwardPoint.release();
-		}
-
-		// Spot pass
-		{
-			ForwardSpotShader forwardSpot = ForwardSpotShader.getInstance();
-
-			forwardSpot.bind();
-
-			for (SpotLight spotLight : spotLights) {
-				for (Renderer renderer : renderers) {
-					forwardSpot.updateUniforms(renderer.getTransform(), viewProjection, renderer.getMaterial(), spotLight);
-
-					renderer.render();
-				}
-			}
-
-			forwardSpot.release();
-		}
-
-		glDepthFunc(GL_LESS);
-		glDepthMask(true);
-		glDisable(GL_BLEND);
 	}
 
 	@Override
 	public void dispose() {
+		shadowMap.dispose();
+		forwardAmbient.dispose();
+		forwardDirectional.dispose();
+		shadowMapGenerator.dispose();
 	}
 
 	@Override

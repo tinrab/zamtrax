@@ -31,8 +31,8 @@ public class Arena {
 
 	}
 
-	public static final int SIZE = 3 * 2 + 1;
-	public static final int TILE_SIZE = 6;
+	public static final int SIZE = 4 * 2 + 1;
+	public static final int TILE_SIZE = 4;
 	public static final int HEIGHT = 3;
 
 	private int[][] tiles;
@@ -103,7 +103,7 @@ public class Arena {
 			}
 		}
 		*/
-		spawnPoint = new Vector3(Arena.SIZE * Arena.TILE_SIZE, 10.0f, Arena.SIZE * Arena.TILE_SIZE).div(2.0f);
+		//spawnPoint = new Vector3(Arena.SIZE * Arena.TILE_SIZE, 10.0f, Arena.SIZE * Arena.TILE_SIZE).div(2.0f);
 	}
 
 	private void generateMaze(int[][] maze, int x, int y) {

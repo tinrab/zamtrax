@@ -1,32 +1,26 @@
 package zamtrax.resources;
 
-import zamtrax.Color;
-import zamtrax.Matrix3;
-import zamtrax.Matrix4;
-import zamtrax.Vector3;
+import zamtrax.*;
 import zamtrax.components.PointLight;
 import zamtrax.components.SpotLight;
 
+import java.io.StringReader;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL20.*;
 
 class ShaderProgram implements Shader {
 
-	public static final int MAX_POINT_LIGHTS = 8;
-	public static final int MAX_SPOT_LIGHTS = 8;
-
 	private ShaderResource resource;
 	private int program;
 
-	public ShaderProgram(CharSequence vertexShaderSource, CharSequence fragmentShaderSource, BindingInfo bindingInfo, List<Uniform> uniforms) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(vertexShaderSource);
-		sb.append(fragmentShaderSource);
-
-		int id = sb.toString().hashCode();
+	public ShaderProgram(String vertexShaderSource, String fragmentShaderSource, BindingInfo bindingInfo, List<Uniform> uniforms) {
+		int id = (vertexShaderSource + fragmentShaderSource).hashCode();
 		resource = ShaderResource.retain(id);
 
 		if (resource == null) {
@@ -35,6 +29,9 @@ class ShaderProgram implements Shader {
 
 			resource.setBindingInfo(bindingInfo);
 			resource.setUniforms(uniforms);
+
+			vertexShaderSource = resolveIncludes(vertexShaderSource);
+			fragmentShaderSource = resolveIncludes(fragmentShaderSource);
 
 			compile(vertexShaderSource, GL_VERTEX_SHADER);
 			compile(fragmentShaderSource, GL_FRAGMENT_SHADER);
@@ -116,10 +113,10 @@ class ShaderProgram implements Shader {
 	}
 
 	@Override
-	public void setUniform(CharSequence name, boolean normalize, Matrix4 value) {
+	public void setUniform(CharSequence name, Matrix4 value) {
 		Uniform uniform = resource.getUniforms().get(name);
 
-		glUniformMatrix4fv(uniform.getLocation(), normalize, value.toBuffer());
+		glUniformMatrix4fv(uniform.getLocation(), false, value.toBuffer());
 	}
 
 	@Override
@@ -137,52 +134,10 @@ class ShaderProgram implements Shader {
 	}
 
 	@Override
-	public void setUniform(CharSequence name, boolean normalize, Matrix3 value) {
+	public void setUniform(CharSequence name, Matrix3 value) {
 		Uniform uniform = resource.getUniforms().get(name);
 
-		glUniformMatrix3fv(uniform.getLocation(), normalize, value.toBuffer());
-	}
-
-	@Override
-	public void setPointLights(List<PointLight> pointLights) {
-		glUniform1i(resource.getUniforms().get("pointLightCount").getLocation(), pointLights.size());
-
-		// this is pretty bad
-		for (int i = 0; i < pointLights.size(); i++) {
-			PointLight pointLight = pointLights.get(i);
-			Color color = pointLight.getColor();
-			float intensity = pointLight.getIntensity();
-			float range = pointLight.getRange();
-			Vector3 position = pointLight.getTransform().getPosition();
-
-			glUniform3f(resource.getUniforms().get(String.format("pointLights[%d].light.color", i)).getLocation(), color.r, color.g, color.b);
-			glUniform1f(resource.getUniforms().get(String.format("pointLights[%d].light.intensity", i)).getLocation(), intensity);
-			glUniform1f(resource.getUniforms().get(String.format("pointLights[%d].range", i)).getLocation(), range);
-			glUniform3f(resource.getUniforms().get(String.format("pointLights[%d].position", i)).getLocation(), position.x, position.y, position.z);
-		}
-	}
-
-	@Override
-	public void setSpotLights(List<SpotLight> spotLights) {
-		glUniform1i(resource.getUniforms().get("spotLightCount").getLocation(), spotLights.size());
-
-		// this is bad aswell
-		for (int i = 0; i < spotLights.size(); i++) {
-			SpotLight spotLight = spotLights.get(i);
-			Color color = spotLight.getColor();
-			float intensity = spotLight.getIntensity();
-			float range = spotLight.getRange();
-			Vector3 position = spotLight.getTransform().getPosition();
-			float cutoff = spotLight.getCutoff();
-			Vector3 direction = spotLight.getTransform().forward();
-
-			glUniform3f(resource.getUniforms().get(String.format("spotLights[%d].pointLight.light.color", i)).getLocation(), color.r, color.g, color.b);
-			glUniform1f(resource.getUniforms().get(String.format("spotLights[%d].pointLight.light.intensity", i)).getLocation(), intensity);
-			glUniform3f(resource.getUniforms().get(String.format("spotLights[%d].pointLight.position", i)).getLocation(), position.x, position.y, position.z);
-			glUniform1f(resource.getUniforms().get(String.format("spotLights[%d].pointLight.range", i)).getLocation(), range);
-			glUniform3f(resource.getUniforms().get(String.format("spotLights[%d].direction", i)).getLocation(), direction.x, direction.y, direction.z);
-			glUniform1f(resource.getUniforms().get(String.format("spotLights[%d].cutoff", i)).getLocation(), cutoff);
-		}
+		glUniformMatrix3fv(uniform.getLocation(), false, value.toBuffer());
 	}
 
 	@Override
@@ -198,6 +153,26 @@ class ShaderProgram implements Shader {
 	@Override
 	public void dispose() {
 		resource.removeReference();
+	}
+
+	private static String resolveIncludes(String source) {
+		List<String> lines = Arrays.asList(source.split("\n"));
+
+		for (int i = 0; i < lines.size(); i++) {
+			String line = lines.get(i).trim();
+
+			if (line.startsWith("#include")) {
+				String file = line.substring(line.indexOf('"') + 1, line.lastIndexOf('"'));
+				String included = Resources.loadText(file, ShaderProgram.class.getClassLoader());
+
+				lines.set(i, included);
+
+				lines = Arrays.asList(String.join("\n", lines));
+				i = 0;
+			}
+		}
+
+		return String.join("\n", lines);
 	}
 
 }

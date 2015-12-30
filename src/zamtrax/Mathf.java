@@ -31,6 +31,10 @@ public final class Mathf {
 		return x < 0.0f ? -x : x;
 	}
 
+	public static float clamp(float x, float min, float max) {
+		return x < min ? min : x > max ? max : x;
+	}
+
 	// Credits http://www.java-gaming.org/index.php?topic=24191.0
 	public static float sin(float x) {
 		return sin[(int) (x * radToIndex) & SIN_MASK];

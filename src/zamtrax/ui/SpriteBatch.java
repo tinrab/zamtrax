@@ -58,7 +58,7 @@ public class SpriteBatch {
 
 		shader.bind();
 
-		shader.setUniform("P", true, projection);
+		shader.setUniform("P", projection);
 	}
 
 	public void end() {

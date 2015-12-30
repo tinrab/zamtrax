@@ -12,6 +12,8 @@ public class Player extends Component {
 		getTransform().setPosition(Level.getInstance().getArena().getSpawnPoint());
 
 		Camera camera = GameObject.create(getGameObject()).addComponent(Camera.class);
+		Camera.setMainCamera(camera);
+
 		camera.setProjection(Matrix4.createPerspective(60.0f, Game.getScreenWidth() / (float) Game.getScreenHeight(), 0.01f, 500.0f));
 
 		getGameObject().addComponent(CharacterController.class);

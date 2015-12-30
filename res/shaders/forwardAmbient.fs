@@ -5,9 +5,9 @@ in vec2 vUV;
 out vec4 vDiffuseColor;
 
 uniform vec4 ambientIntensity;
-uniform sampler2D sampler;
+uniform sampler2D diffuse;
 
 void main()
 {
-    vDiffuseColor = texture2D(sampler, vUV) * ambientIntensity;
+    vDiffuseColor = texture2D(diffuse, vUV) * ambientIntensity;
 }

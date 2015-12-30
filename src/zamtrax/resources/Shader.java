@@ -22,17 +22,13 @@ public interface Shader {
 
 	void setUniform(CharSequence name, int value);
 
-	void setUniform(CharSequence name, boolean normalize, Matrix4 value);
+	void setUniform(CharSequence name, Matrix4 value);
 
-	void setUniform(CharSequence name, boolean normalize, Matrix3 value);
+	void setUniform(CharSequence name, Matrix3 value);
 
 	void setUniform(CharSequence name, Vector3 value);
 
 	void setUniform(CharSequence name, Color value);
-
-	void setPointLights(List<PointLight> pointLights);
-
-	void setSpotLights(List<SpotLight> spotLights);
 
 	void release();
 
@@ -40,8 +36,8 @@ public interface Shader {
 
 	class Builder {
 
-		private CharSequence vertexShaderSource;
-		private CharSequence fragmentShaderSource;
+		private String vertexShaderSource;
+		private String fragmentShaderSource;
 		private BindingInfo bindingInfo;
 		private List<Uniform> uniforms;
 
@@ -49,13 +45,13 @@ public interface Shader {
 			uniforms = new ArrayList<>();
 		}
 
-		public Builder setVertexShaderSource(CharSequence vertexShaderSource) {
+		public Builder setVertexShaderSource(String vertexShaderSource) {
 			this.vertexShaderSource = vertexShaderSource;
 
 			return this;
 		}
 
-		public Builder setFragmentShaderSource(CharSequence fragmentShaderSource) {
+		public Builder setFragmentShaderSource(String fragmentShaderSource) {
 			this.fragmentShaderSource = fragmentShaderSource;
 
 			return this;
