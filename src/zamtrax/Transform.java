@@ -1,6 +1,4 @@
-package zamtrax.components;
-
-import zamtrax.*;
+package zamtrax;
 
 public final class Transform extends Component {
 
@@ -22,6 +20,7 @@ public final class Transform extends Component {
 		oldScale = new Vector3(1.0f, 1.0f, 1.0f);
 
 		parentMatrix = Matrix4.createIdentity();
+		changed = true;
 	}
 
 	public void update() {
@@ -51,15 +50,16 @@ public final class Transform extends Component {
 	public void translate(float x, float y, float z, Space space) {
 		switch (space) {
 			case WORLD:
+				position.set(position.add(x, y, z));
 				break;
 			case SELF:
-				position = position.add(x, y, z);
+				position.set(position.add(rotation.rotatePoint(new Vector3(x, y, z))));
 				break;
 		}
 	}
 
 	public void rotate(float x, float y, float z) {
-		rotate(x, y, z, Space.SELF);
+		rotate(x, y, z, Space.WORLD);
 	}
 
 	public void rotate(float x, float y, float z, Space space) {
@@ -67,7 +67,7 @@ public final class Transform extends Component {
 	}
 
 	public void rotate(Vector3 eulerAngles) {
-		rotate(eulerAngles, Space.SELF);
+		rotate(eulerAngles, Space.WORLD);
 	}
 
 	public void rotate(Vector3 eulerAngles, Space space) {
@@ -75,7 +75,7 @@ public final class Transform extends Component {
 	}
 
 	public void rotate(Vector3 axis, float angle) {
-		rotate(axis, angle, Space.SELF);
+		rotate(axis, angle, Space.WORLD);
 	}
 
 	public void rotate(Vector3 axis, float angle, Space space) {
@@ -85,41 +85,38 @@ public final class Transform extends Component {
 	public void rotate(Quaternion rotation, Space space) {
 		switch (space) {
 			case WORLD:
-				//TODO
+				this.rotation.set(rotation.mul(this.rotation).normalized());
 				break;
 			case SELF:
-				this.rotation.set(rotation.mul(this.rotation).normalized());
+				this.rotation.set(this.rotation.mul(rotation).normalized());
 				break;
 		}
 	}
 
-	public void lookAt(Vector3 point, Vector3 up) {
-		setRotation(getLookAtRotation(point, up));
-	}
-
-	public Quaternion getLookAtRotation(Vector3 point, Vector3 up) {
-		return new Quaternion(Matrix4.createRotation(point.sub(position).normalized(), up));
-	}
-
-	public Transform getParent() {
+	Transform getParent() {
 		return parent;
 	}
 
-	public void setParent(Transform parent) {
+	void setParent(Transform parent) {
+		setParent(parent, false);
+	}
+
+	void setParent(Transform parent, boolean worldPositionStays) {
+		if (worldPositionStays) {
+			position = parent.getLocalToWorldMatrix().inverse().transformPoint(position);
+			rotation = parent.getRotation().inverse().mul(rotation);
+			scale = scale.div(parent.getScale());
+		}
+
 		this.parent = parent;
 	}
 
 	public Vector3 getPosition() {
-		if (parent != null) {
-			return parent.getLocalToWorldMatrix().transformPoint(position);
-		}
-
-		return new Vector3(position);
+		return getParentMatrix().transformPoint(position);
 	}
 
 	public void setPosition(Vector3 position) {
-		// TODO
-		this.position = position;
+		this.position.set(getParentMatrix().inverse().transformPoint(position));
 	}
 
 	public Vector3 getLocalPosition() {
@@ -139,8 +136,7 @@ public final class Transform extends Component {
 	}
 
 	public void setRotation(Quaternion rotation) {
-		// TODO
-		this.rotation = rotation;
+		this.rotation.set(parent.getRotation().inverse().mul(rotation));
 	}
 
 	public Quaternion getLocalRotation() {
@@ -160,8 +156,7 @@ public final class Transform extends Component {
 	}
 
 	public void setScale(Vector3 scale) {
-		// TODO
-		this.scale = scale;
+		this.scale.set(scale.div(parent.getScale()));
 	}
 
 	public Vector3 getLocalScale() {

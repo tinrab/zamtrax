@@ -6,7 +6,7 @@ import zamtrax.Vector2;
 import zamtrax.Vector3;
 import zamtrax.components.Camera;
 import zamtrax.components.CharacterController;
-import zamtrax.components.Transform;
+import zamtrax.Transform;
 
 public class PlayerController extends Component {
 

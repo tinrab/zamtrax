@@ -2,14 +2,16 @@ package fri.rg.zamtrax.level.player;
 
 import zamtrax.*;
 import zamtrax.components.Camera;
-import zamtrax.components.Transform;
+import zamtrax.Transform;
 
 public class FreeLook extends Component {
 
-	private static final float MOUSE_SENSITIVITY = 0.25f;
-	private static final float SPEED = 10.0f;
+	private static final float MOUSE_SENSITIVITY = 8.0f;
+	private static final float SPEED = 50.0f;
+	private static final float SMOOTHING = 0.2f;
 
 	private Transform transform;
+	private Vector3 motion;
 
 	@Override
 	public void onAdd() {
@@ -19,6 +21,7 @@ public class FreeLook extends Component {
 		camera.setProjection(Matrix4.createPerspective(60.0f, Game.getScreenWidth() / (float) Game.getScreenHeight(), 0.01f, 500.0f));
 
 		transform = getTransform();
+		motion = new Vector3();
 
 		Input.setMouseLocked(true);
 	}
@@ -38,20 +41,23 @@ public class FreeLook extends Component {
 		}
 
 		if (Input.getKey(Input.KEY_W)) {
-			transform.translate(transform.forward().mul(delta * SPEED));
+			motion = motion.add(transform.forward().mul(delta));
 		}
 
 		if (Input.getKey(Input.KEY_S)) {
-			transform.translate(transform.back().mul(delta * SPEED));
+			motion = motion.add(transform.back().mul(delta));
 		}
 
 		if (Input.getKey(Input.KEY_A)) {
-			transform.translate(transform.left().mul(delta * SPEED));
+			motion = motion.add(transform.left().mul(delta));
 		}
 
 		if (Input.getKey(Input.KEY_D)) {
-			transform.translate(transform.right().mul(delta * SPEED));
+			motion = motion.add(transform.right().mul(delta));
 		}
+
+		transform.translate(motion.mul(delta * SPEED), Space.WORLD);
+		motion = Vector3.lerp(motion, Vector3.ZERO, delta / SMOOTHING);
 
 		if (Input.getKey(Input.KEY_ESCAPE)) {
 			Input.setMouseLocked(!Input.isMouseLocked());

@@ -227,16 +227,20 @@ public class Quaternion {
 	}
 
 	public static Quaternion fromAxisAngle(Vector3 axis, float angle) {
-		float a = angle / 2.0f;
+		float a = (angle * Mathf.DEG_TO_RAD) / 2.0f;
 		float s = Mathf.sin(a);
 
 		return new Quaternion(axis.x * s, axis.y * s, axis.z * s, Mathf.cos(a));
 	}
 
 	public static Quaternion fromEuler(Vector3 eulerAngles) {
-		Quaternion rx = fromAxisAngle(Vector3.RIGHT, eulerAngles.x);
-		Quaternion ry = fromAxisAngle(Vector3.UP, eulerAngles.y);
-		Quaternion rz = fromAxisAngle(Vector3.BACK, eulerAngles.z);
+		return fromEuler(eulerAngles.x, eulerAngles.y, eulerAngles.z);
+	}
+
+	public static Quaternion fromEuler(float x, float y, float z) {
+		Quaternion rx = fromAxisAngle(Vector3.RIGHT, x);
+		Quaternion ry = fromAxisAngle(Vector3.UP, y);
+		Quaternion rz = fromAxisAngle(Vector3.BACK, z);
 
 		return rz.mul(ry.mul(rx));
 	}

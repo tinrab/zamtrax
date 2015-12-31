@@ -1,15 +1,15 @@
 package zamtrax.resources;
 
-class Uniform {
+public class Uniform {
 
-	private CharSequence name;
+	private String name;
 	private int location;
 
-	public Uniform(CharSequence name) {
+	public Uniform(String name) {
 		this.name = name;
 	}
 
-	public CharSequence getName() {
+	public String getName() {
 		return name;
 	}
 

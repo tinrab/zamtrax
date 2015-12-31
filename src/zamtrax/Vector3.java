@@ -160,7 +160,7 @@ public class Vector3 {
 	}
 
 	public static Vector3 lerp(Vector3 a, Vector3 b, float t) {
-		return new Vector3(a.x + (b.x - a.x) / t, a.y + (b.y - a.y) / t, a.z + (b.z - a.z) / t);
+		return new Vector3(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t);
 	}
 
 	public static float distance(Vector3 a, Vector3 b) {

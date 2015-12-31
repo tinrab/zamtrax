@@ -1,8 +1,6 @@
 package zamtrax.components;
 
 import zamtrax.*;
-import zamtrax.resources.FrameBuffer;
-import zamtrax.resources.Texture;
 
 public final class Camera extends Component {
 
@@ -42,9 +40,7 @@ public final class Camera extends Component {
 		Matrix4 r = transform.getRotation().conjugate().toMatrix();
 		Vector3 p = transform.getPosition().mul(-1.0f);
 
-		Matrix4 cameraTranslation = Matrix4.createTranslation(p.x, p.y, p.z);
-
-		return projection.mul(r.mul(cameraTranslation));
+		return projection.mul(r.mul(Matrix4.createTranslation(p)));
 	}
 
 	public ClearFlags getClearFlags() {

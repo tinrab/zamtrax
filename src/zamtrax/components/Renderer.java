@@ -1,9 +1,7 @@
 package zamtrax.components;
 
 import zamtrax.Component;
-import zamtrax.RenderModule;
 import zamtrax.resources.Material;
-import zamtrax.resources.Shader;
 
 public abstract class Renderer extends Component {
 

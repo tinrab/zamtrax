@@ -142,13 +142,13 @@ public final class Resources {
 					}
 					*/
 
-					buffer.put((byte)0xFF);
+					buffer.put((byte) 0xFF);
 				}
 			}
 
 			buffer.flip();
 
-			return new Texture(pathname.hashCode(), image.getWidth(), image.getHeight(), buffer, format, wrapMode, filterMode);
+			return new Texture(image.getWidth(), image.getHeight(), buffer, format, wrapMode, filterMode);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

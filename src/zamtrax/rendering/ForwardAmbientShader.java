@@ -1,19 +1,19 @@
-package zamtrax.resources;
+package zamtrax.rendering;
 
 import zamtrax.Color;
 import zamtrax.Matrix4;
 import zamtrax.Resources;
-import zamtrax.components.Transform;
+import zamtrax.components.Renderer;
+import zamtrax.resources.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ForwardAmbientShader extends ShaderProgram {
+public class ForwardAmbientShader extends Shader {
 
 	private static ForwardAmbientShader instance;
 
-	public ForwardAmbientShader(String vertexShaderSource, String fragmentShaderSource, BindingInfo bindingInfo, List<Uniform> uniforms) {
-		super(vertexShaderSource, fragmentShaderSource, bindingInfo, uniforms);
+	private ForwardAmbientShader() {
 	}
 
 	public static ForwardAmbientShader getInstance() {
@@ -32,17 +32,23 @@ public class ForwardAmbientShader extends ShaderProgram {
 			uniforms.add(new Uniform("MVP"));
 			uniforms.add(new Uniform("ambientIntensity"));
 
-			instance = new ForwardAmbientShader(vs, fs, bindingInfo, uniforms);
+			instance = new ForwardAmbientShader();
+			instance.init(vs, fs, bindingInfo, uniforms);
 		}
 
 		return instance;
 	}
 
-	public void updateUniforms(Transform transform, Matrix4 viewProjection, Material material, Color ambientIntensity) {
-		material.getDiffuse().bind();
+	@Override
+	public void updateUniforms(RenderState renderState) {
+		Matrix4 viewProjection = renderState.getViewProjection();
+		Renderer renderer = renderState.getRenderer();
+		Material material = renderer.getMaterial();
+		Color ambientIntensity = renderState.getAmbientIntenstiy();
 
-		Matrix4 modelView = transform.getLocalToWorldMatrix();
-		Matrix4 mvp = viewProjection.mul(modelView);
+		Matrix4 mvp = viewProjection.mul(renderer.getTransform().getLocalToWorldMatrix());
+
+		material.getDiffuse().bind();
 
 		setUniform("MVP", mvp);
 		setUniform("ambientIntensity", ambientIntensity);

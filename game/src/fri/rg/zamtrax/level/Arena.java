@@ -31,9 +31,9 @@ public class Arena {
 
 	}
 
-	public static final int SIZE = 4 * 2 + 1;
-	public static final int TILE_SIZE = 4;
-	public static final int HEIGHT = 3;
+	public static final int SIZE = 6 * 2 + 1;
+	public static final int TILE_SIZE = 2;
+	public static final int HEIGHT = 2;
 
 	private int[][] tiles;
 	private Vector3 spawnPoint;

@@ -66,4 +66,16 @@ public class Color {
 		return new Color(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
+	public static Color createRed() {
+		return new Color(1.0f, 0.0f, 0.0f);
+	}
+
+	public static Color createGreen() {
+		return new Color(0.0f, 1.0f, 0.0f);
+	}
+
+	public static Color createBlue() {
+		return new Color(0.0f, 0.0f, 1.0f);
+	}
+
 }

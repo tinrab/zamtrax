@@ -8,8 +8,7 @@ public class DirectionalLight extends Light {
 	public void onAdd() {
 		super.onAdd();
 
-		setShadows(Shadows.HARD);
-		setShadowProjection(Matrix4.createOrthographic(-40, 40, -40, 40, -40, 40));
+		setShadowProjection(Matrix4.createOrthographic(-50, 50, -50, 50, -50, 50));
 	}
 
 }

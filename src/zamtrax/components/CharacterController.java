@@ -21,7 +21,7 @@ public final class CharacterController extends Component {
 	public KinematicCharacterController kinematicCharacterController;
 	public PairCachingGhostObject ghostObject;
 
-	private zamtrax.components.Transform transform;
+	private zamtrax.Transform transform;
 	private float radius;
 	private float height;
 	private float stepHeight;

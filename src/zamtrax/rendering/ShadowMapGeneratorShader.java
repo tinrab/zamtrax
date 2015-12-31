@@ -1,19 +1,21 @@
-package zamtrax.resources;
+package zamtrax.rendering;
 
 import zamtrax.Matrix4;
 import zamtrax.Resources;
-import zamtrax.components.DirectionalLight;
-import zamtrax.components.Transform;
+import zamtrax.components.Renderer;
+import zamtrax.resources.AttributeType;
+import zamtrax.resources.BindingInfo;
+import zamtrax.resources.Shader;
+import zamtrax.resources.Uniform;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShadowMapGeneratorShader extends ShaderProgram {
+public class ShadowMapGeneratorShader extends Shader {
 
 	private static ShadowMapGeneratorShader instance;
 
-	public ShadowMapGeneratorShader(String vertexShaderSource, String fragmentShaderSource, BindingInfo bindingInfo, List<Uniform> uniforms) {
-		super(vertexShaderSource, fragmentShaderSource, bindingInfo, uniforms);
+	private ShadowMapGeneratorShader() {
 	}
 
 	public static ShadowMapGeneratorShader getInstance() {
@@ -29,14 +31,19 @@ public class ShadowMapGeneratorShader extends ShaderProgram {
 
 			uniforms.add(new Uniform("MVP"));
 
-			instance = new ShadowMapGeneratorShader(vs, fs, bindingInfo, uniforms);
+			instance = new ShadowMapGeneratorShader();
+			instance.init(vs, fs, bindingInfo, uniforms);
 		}
 
 		return instance;
 	}
 
-	public void updateUniforms(Transform transform, Matrix4 viewProjection) {
-		Matrix4 mvp = viewProjection.mul(transform.getLocalToWorldMatrix());
+	@Override
+	public void updateUniforms(RenderState renderState) {
+		Matrix4 viewProjection = renderState.getViewProjection();
+		Renderer renderer = renderState.getRenderer();
+
+		Matrix4 mvp = viewProjection.mul(renderer.getTransform().getLocalToWorldMatrix());
 
 		setUniform("MVP", mvp);
 	}

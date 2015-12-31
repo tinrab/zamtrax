@@ -1,20 +1,19 @@
-package zamtrax.resources;
+package zamtrax.rendering;
 
 import zamtrax.*;
 import zamtrax.components.DirectionalLight;
 import zamtrax.components.Light;
 import zamtrax.components.Renderer;
-import zamtrax.components.Transform;
+import zamtrax.resources.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ForwardDirectionalShader extends ShaderProgram {
+public class ForwardDirectionalShader extends Shader {
 
 	private static ForwardDirectionalShader instance;
 
-	private ForwardDirectionalShader(String vertexShaderSource, String fragmentShaderSource, BindingInfo bindingInfo, List<Uniform> uniforms) {
-		super(vertexShaderSource, fragmentShaderSource, bindingInfo, uniforms);
+	private ForwardDirectionalShader() {
 	}
 
 	public static ForwardDirectionalShader getInstance() {
@@ -36,21 +35,33 @@ public class ForwardDirectionalShader extends ShaderProgram {
 			uniforms.add(new Uniform("material.specularIntensity"));
 			uniforms.add(new Uniform("diffuse"));
 			uniforms.add(new Uniform("shadowMap"));
+			uniforms.add(new Uniform("cookie"));
+			uniforms.add(new Uniform("cookieScale"));
 
 			uniforms.add(new Uniform("directionalLight.base.color"));
 			uniforms.add(new Uniform("directionalLight.base.intensity"));
 			uniforms.add(new Uniform("directionalLight.direction"));
 
-			uniforms.add(new Uniform("MLVP"));
+			uniforms.add(new Uniform("modelLightViewProjection"));
+			uniforms.add(new Uniform("shadowVarianceMin"));
+			uniforms.add(new Uniform("lightBleed"));
 
-			instance = new ForwardDirectionalShader(vs, fs, bindingInfo, uniforms);
+			instance = new ForwardDirectionalShader();
+			instance.init(vs, fs, bindingInfo, uniforms);
 		}
 
 		return instance;
 	}
 
-	public void updateUniforms(Renderer renderer, Matrix4 viewProjection, DirectionalLight directionalLight, Matrix4 lightViewProjection) {
+	@Override
+	public void updateUniforms(RenderState renderState) {
+		Matrix4 viewProjection = renderState.getViewProjection();
+		Renderer renderer = renderState.getRenderer();
 		Material material = renderer.getMaterial();
+		DirectionalLight directionalLight = (DirectionalLight) renderState.getLight();
+		Matrix4 lightViewProjection = renderState.getLightViewProjection();
+		Texture shadowMap = renderState.getShadowMap();
+
 		Matrix4 model = renderer.getTransform().getLocalToWorldMatrix();
 		Matrix4 mvp = viewProjection.mul(model);
 
@@ -60,14 +71,25 @@ public class ForwardDirectionalShader extends ShaderProgram {
 		setUniform("material.specularIntensity", material.getSpecularIntensity());
 
 		setUniform("diffuse", 0);
+		material.getDiffuse().bind(0);
+
+		if (directionalLight.getCookie() != null) {
+			setUniform("cookie", 1);
+			directionalLight.getCookie().bind(1);
+			setUniform("cookieScale", directionalLight.getCookieScale());
+		}
 
 		setUniform("directionalLight.base.color", directionalLight.getColor());
 		setUniform("directionalLight.base.intensity", directionalLight.getIntensity());
 		setUniform("directionalLight.direction", directionalLight.getTransform().forward());
 
 		if (directionalLight.getShadows() == Light.Shadows.HARD) {
-			setUniform("shadowMap", 1);
-			setUniform("MLVP", lightViewProjection.mul(model));
+			setUniform("shadowMap", 2);
+			shadowMap.bind(2);
+
+			setUniform("modelLightViewProjection", lightViewProjection.mul(model));
+			setUniform("shadowVarianceMin", directionalLight.getMinVariance());
+			setUniform("lightBleed", directionalLight.getLightBleed());
 		}
 	}
 

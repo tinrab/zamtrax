@@ -2,7 +2,7 @@ package fri.rg.zamtrax;
 
 import zamtrax.Component;
 import zamtrax.Input;
-import zamtrax.components.Transform;
+import zamtrax.Transform;
 import zamtrax.Vector2;
 
 public class FPSController extends Component {

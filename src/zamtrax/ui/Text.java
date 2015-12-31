@@ -1,7 +1,7 @@
 package zamtrax.ui;
 
 import zamtrax.Color;
-import zamtrax.components.Transform;
+import zamtrax.Transform;
 import zamtrax.resources.bmfont.BMFont;
 
 public class Text extends Graphic {

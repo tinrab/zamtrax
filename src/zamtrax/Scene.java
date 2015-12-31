@@ -1,5 +1,7 @@
 package zamtrax;
 
+import zamtrax.rendering.RenderModule;
+
 import java.util.ArrayList;
 import java.util.List;
 

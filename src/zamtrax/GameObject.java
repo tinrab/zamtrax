@@ -1,7 +1,5 @@
 package zamtrax;
 
-import zamtrax.components.Transform;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,10 +70,16 @@ public final class GameObject {
 		return parent;
 	}
 
-	void setParent(GameObject parent) {
+	public void setParent(GameObject parent) {
 		this.parent = parent;
 
 		transform.setParent(parent.getTransform());
+	}
+
+	public void setParent(GameObject parent, boolean worldPositionStays) {
+		this.parent = parent;
+
+		transform.setParent(parent.getTransform(), worldPositionStays);
 	}
 
 	List<Component> getComponents() {

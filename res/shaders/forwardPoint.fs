@@ -2,11 +2,11 @@
 
 #include "shaders/lights.fs"
 
-uniform DirectionalLight directionalLight;
+uniform PointLight pointLight;
 
 void main()
 {
-	vec4 light = calculateDirectionalLight(directionalLight, material, vNormal, vPosition);
+	vec4 light = calculatePointLight(pointLight, material, vNormal, vPosition);
 	float shadowFactor = calculateShadowFactor(shadowMap, vShadowMapCoords, shadowVarianceMin, lightBleed);
 
 	vDiffuseColor = texture(diffuse, vUV) * light * shadowFactor;
