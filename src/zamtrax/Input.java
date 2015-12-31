@@ -17,6 +17,7 @@ public final class Input {
 
 	private DoubleBuffer mouseX;
 	private DoubleBuffer mouseY;
+	private static float scrollX, scrollY;
 
 	Input(long window) {
 		Input.window = window;
@@ -38,7 +39,8 @@ public final class Input {
 	}
 
 	public void invokeScroll(float xoffset, float yoffset) {
-
+		scrollX = xoffset;
+		scrollY = yoffset;
 	}
 
 	public static boolean getKey(int keyCode) {
@@ -47,6 +49,14 @@ public final class Input {
 
 	public static boolean getMouseButton(int button) {
 		return glfwGetMouseButton(window, button) == GL_TRUE;
+	}
+
+	public static float getScrollX() {
+		return scrollX;
+	}
+
+	public static float getScrollY() {
+		return scrollY;
 	}
 
 	public static Vector2 getMousePosition() {
@@ -85,6 +95,9 @@ public final class Input {
 		if (isMouseLocked) {
 			//glfwSetCursorPos(window, Screen.getWidth() / 2.0f, Screen.getHeight() / 2.0f);
 		}
+
+		scrollX = 0.0f;
+		scrollY = 0.0f;
 	}
 
 	/**

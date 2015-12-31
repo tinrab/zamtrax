@@ -7,23 +7,23 @@ import zamtrax.resources.Uniform;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmptyFilter extends Filter {
+public class FXAAFilter extends Filter {
 
-	private static EmptyFilter instance;
+	private static FXAAFilter instance;
 
-	private EmptyFilter() {
+	private FXAAFilter() {
 	}
 
-	public static EmptyFilter getInstance() {
+	public static FXAAFilter getInstance() {
 		if (instance == null) {
-			String vs = Resources.loadText("shaders/filterEmpty.vs", EmptyFilter.class.getClassLoader());
-			String fs = Resources.loadText("shaders/filterEmpty.fs", EmptyFilter.class.getClassLoader());
+			String vs = Resources.loadText("shaders/filterEmpty.vs", FXAAFilter.class.getClassLoader());
+			String fs = Resources.loadText("shaders/filterFXAA.fs", FXAAFilter.class.getClassLoader());
 
 			List<Uniform> uniforms = new ArrayList<>();
 
 			uniforms.add(new Uniform("depthTexture"));
 
-			instance = new EmptyFilter();
+			instance = new FXAAFilter();
 			instance.init(vs, fs, uniforms);
 		}
 

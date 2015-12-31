@@ -1,8 +1,6 @@
 package zamtrax.components;
 
-import zamtrax.Color;
-import zamtrax.Component;
-import zamtrax.Matrix4;
+import zamtrax.*;
 import zamtrax.resources.Texture;
 
 public abstract class Light extends Component {
@@ -11,15 +9,15 @@ public abstract class Light extends Component {
 		NONE, HARD, SOFT
 	}
 
-	private Color color;
-	private float intensity;
-	private Shadows shadows;
-	private Matrix4 shadowProjection;
-	private float shadowSoftness;
-	private float minVariance;
-	private float lightBleed;
-	private Texture cookie;
-	private float cookieScale;
+	protected Color color;
+	protected float intensity;
+	protected Shadows shadows;
+	protected Matrix4 shadowProjection;
+	protected float shadowSoftness;
+	protected float minVariance;
+	protected float lightBleed;
+	protected Texture cookie;
+	protected float cookieScale;
 
 	@Override
 	public void onAdd() {
@@ -101,6 +99,15 @@ public abstract class Light extends Component {
 
 	public float getCookieScale() {
 		return cookieScale;
+	}
+
+	public Matrix4 getShadowViewProjection(Transform mainCamera) {
+		Transform t = getTransform();
+
+		Matrix4 r = t.getRotation().conjugate().toMatrix();
+		Vector3 p = t.getPosition().mul(-1.0f);
+
+		return shadowProjection.mul(r.mul(Matrix4.createTranslation(p)));
 	}
 
 }

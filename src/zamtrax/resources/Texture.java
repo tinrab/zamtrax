@@ -124,7 +124,6 @@ public final class Texture implements Disposable {
 
 			glTexImage2D(textureTarget, 0, internalFormats[i], width, height, 0, formats[i], GL_UNSIGNED_BYTE, 0);
 
-
 			if (filters[i] == GL_NEAREST_MIPMAP_NEAREST ||
 					filters[i] == GL_NEAREST_MIPMAP_LINEAR ||
 					filters[i] == GL_LINEAR_MIPMAP_NEAREST ||

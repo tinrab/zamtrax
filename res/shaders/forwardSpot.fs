@@ -7,7 +7,16 @@ uniform SpotLight spotLight;
 void main()
 {
 	vec4 light = calculateSpotLight(spotLight, material, vNormal, vPosition);
-	float shadowFactor = calculateShadowFactor(shadowMap, vShadowMapCoords, shadowVarianceMin, lightBleed);
+	vec4 cookieColor = vec4(1.0);
+	float shadowFactor = 1.0;
 
-	vDiffuseColor = texture(diffuse, vUV) * light * shadowFactor;
+    if(castShadows) {
+        shadowFactor = calculateShadowFactor(shadowMap, vShadowMapCoords, shadowVarianceMin, lightBleed);
+    }
+
+	if(useCookie) {
+		cookieColor = calculateCookie(cookie, vShadowMapCoords, cookieScale);
+	}
+
+	vDiffuseColor = texture(diffuse, vUV) * light * cookieColor * shadowFactor;
 }

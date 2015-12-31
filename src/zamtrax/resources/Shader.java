@@ -139,6 +139,12 @@ public class Shader {
 		glUniformMatrix3fv(uniform.getLocation(), false, value.toBuffer());
 	}
 
+	public void setUniform(String name, boolean value) {
+		Uniform uniform = uniformMap.get(name);
+
+		glUniform1i(uniform.getLocation(), value ? 1 : 0);
+	}
+
 	public void updateUniforms(RenderState renderState) {
 	}
 

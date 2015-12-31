@@ -1,13 +1,10 @@
 package zamtrax.rendering;
 
 import zamtrax.Resources;
-import zamtrax.resources.BindingInfo;
-import zamtrax.resources.Shader;
+import zamtrax.resources.*;
 import zamtrax.*;
-import zamtrax.resources.AttributeType;
 import zamtrax.resources.BindingInfo;
 import zamtrax.resources.Shader;
-import zamtrax.resources.Uniform;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +36,8 @@ public class GaussBlur extends Filter {
 	}
 
 	@Override
-	public void updateUniforms(RenderState renderState) {
-		super.updateUniforms(renderState);
+	public void updateUniforms(Texture source, RenderState renderState) {
+		super.updateUniforms(source, renderState);
 
 		setUniform("blurScale", blurScale);
 	}

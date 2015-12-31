@@ -40,6 +40,10 @@ public abstract class Component {
 		return enabled && gameObject.isActive();
 	}
 
+	public final <T extends Component> T findComponentOfType(Class<T> componentClass) {
+		return gameObject.findComponentOfType(componentClass);
+	}
+
 	public final void setEnabled(boolean enabled) {
 		if (enabled && !this.enabled) {
 			this.enabled = true;

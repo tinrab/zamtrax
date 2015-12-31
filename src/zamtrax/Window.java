@@ -118,7 +118,9 @@ final class Window implements Disposable {
 	void update() {
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+	}
 
+	void updateInput() {
 		input.update();
 	}
 

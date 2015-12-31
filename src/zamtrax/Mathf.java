@@ -78,4 +78,8 @@ public final class Mathf {
 		}
 	}
 
+	public static float floor(float x) {
+		return (float) Math.floor(x);
+	}
+
 }

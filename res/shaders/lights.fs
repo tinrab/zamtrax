@@ -96,20 +96,29 @@ float linstep(float x, float low, float high)
     return clamp((x - low) / (high - low), 0.0, 1.0);
 }
 
+bool inRange(float x)
+{
+	return x >= 0.0 && x <= 1.0;
+}
+
 float calculateShadowFactor(sampler2D shadowMap, vec4 shadowMapCoords, float varianceMin, float bleed)
 {
     vec3 coords = shadowMapCoords.xyz / shadowMapCoords.w;
     float compare = coords.z;
 
-    vec2 moments = vec2(1.0) - texture(shadowMap, coords.xy).xy;
+    if(inRange(compare) && inRange(coords.x) && inRange(coords.y)) {
+		vec2 moments = texture(shadowMap, coords.xy).xy;
 
-    float p = step(compare, moments.x);
-    float variance = max(moments.y - moments.x * moments.x, varianceMin);
+		float p = step(compare, moments.x);
+		float variance = max(moments.y - moments.x * moments.x, varianceMin);
 
-    float d = compare - moments.x;
-    float pMax = linstep(variance / (variance + d * d), bleed, 1.0);
+		float d = compare - moments.x;
+		float pMax = linstep(variance / (variance + d * d), bleed, 1.0);
 
-    return min(max(p, pMax), 1.0);
+		return min(max(p, pMax), 1.0);
+    } else {
+    	return 1.0;
+    }
 }
 
 vec4 calculateCookie(sampler2D cookie, vec4 shadowMapCoords, float cookieScale)
@@ -129,8 +138,10 @@ out vec4 vDiffuseColor;
 
 uniform Material material;
 uniform sampler2D diffuse;
+uniform bool castShadows;
 uniform sampler2D shadowMap;
-uniform sampler2D cookie;
 uniform float shadowVarianceMin;
 uniform float lightBleed;
+uniform bool useCookie;
 uniform float cookieScale;
+uniform sampler2D cookie;

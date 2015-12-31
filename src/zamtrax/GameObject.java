@@ -98,4 +98,24 @@ public final class GameObject {
 		return Game.getInstance().getCurrentScene().createGameObject(parent);
 	}
 
+	public final <T extends Component> T findComponentOfType(Class<T> componentClass) {
+		return Game.getInstance().getCurrentScene().getRoot().findComponentInChildrenOfType(componentClass);
+	}
+
+	public final <T extends Component> T findComponentInChildrenOfType(Class<T> componentClass) {
+		T component = getComponent(componentClass);
+
+		if (component == null) {
+			for (GameObject child : children) {
+				T childComponent = child.findComponentInChildrenOfType(componentClass);
+
+				if (childComponent != null) {
+					return childComponent;
+				}
+			}
+		}
+
+		return component;
+	}
+
 }

@@ -19,12 +19,13 @@ public class Filter extends Shader {
 		super.init(vertexShaderSource, fragmentShaderSource, bindingInfo, uniforms);
 	}
 
-	@Override
-	public void updateUniforms(RenderState renderState) {
+	public void updateUniforms(Texture source, RenderState renderState) {
 		Matrix4 mvp = Matrix4.createIdentity();
 
 		setUniform("MVP", mvp);
 		setUniform("filterTexture", 0);
+
+		source.bind(0);
 	}
 
 }

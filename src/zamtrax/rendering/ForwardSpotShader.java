@@ -50,6 +50,8 @@ public class ForwardSpotShader extends Shader {
 			uniforms.add(new Uniform("modelLightViewProjection"));
 			uniforms.add(new Uniform("shadowVarianceMin"));
 			uniforms.add(new Uniform("lightBleed"));
+			uniforms.add(new Uniform("castShadows"));
+			uniforms.add(new Uniform("useCookie"));
 
 			instance = new ForwardSpotShader();
 			instance.init(vs, fs, bindingInfo, uniforms);
@@ -79,6 +81,7 @@ public class ForwardSpotShader extends Shader {
 		material.getDiffuse().bind(0);
 
 		if (spotLight.getCookie() != null) {
+			setUniform("useCookie", true);
 			setUniform("cookie", 1);
 			spotLight.getCookie().bind(1);
 			setUniform("cookieScale", spotLight.getCookieScale());
@@ -91,7 +94,8 @@ public class ForwardSpotShader extends Shader {
 		setUniform("spotLight.direction", spotLight.getTransform().forward());
 		setUniform("spotLight.cutoff", spotLight.getCutoff());
 
-		if (spotLight.getShadows() == Light.Shadows.HARD) {
+		if (spotLight.getShadows() == Light.Shadows.HARD || spotLight.getCookie() != null) {
+			setUniform("castShadows", spotLight.getShadows() == Light.Shadows.HARD);
 			setUniform("shadowMap", 2);
 			shadowMap.bind(2);
 

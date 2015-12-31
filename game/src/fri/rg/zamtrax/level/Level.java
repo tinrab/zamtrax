@@ -32,32 +32,33 @@ public class Level extends Scene {
 
 		arena = new Arena();
 
-		setAmbientLight(new Color(0.2f, 0.2f, 0.2f));
+		setAmbientLight(new Color(0.1f, 0.1f, 0.1f));
 
 		{
 			DirectionalLight dl1 = GameObject.create().addComponent(DirectionalLight.class);
 
-			dl1.getTransform().setRotation(Quaternion.fromEuler(new Vector3(-30, -30, -30)));
-			dl1.getTransform().setPosition(new Vector3(0, 5, 0));
-			dl1.setColor(new Color(1.0f, 0.8f, 0.5f));
-			dl1.setIntensity(1.0f);
+			dl1.getTransform().setRotation(Quaternion.fromEuler(-30, -30, -30));
+			dl1.setColor(new Color(1.0f, 0.7f, 0.3f));
 			dl1.setShadows(Light.Shadows.HARD);
-			dl1.setShadowSoftness(0.5f);
-
 			/*
+			DirectionalLight dl2 = GameObject.create().addComponent(DirectionalLight.class);
+
+			dl2.getTransform().setRotation(Quaternion.fromEuler(-30, 170, -30));
+			dl2.getTransform().setPosition(new Vector3(0, 5, 0));
+			dl2.setColor(new Color(0.3f, 0.7f, 1.f));
+			*/
+
 			SpotLight spotLight = GameObject.create().addComponent(SpotLight.class);
 
-			spotLight.getTransform().setPosition(new Vector3(3, 3, 3));
-			spotLight.getTransform().setRotation(Quaternion.fromEuler(40, 0, 0.0f));
-			spotLight.setRange(10.0f);
+			spotLight.getTransform().setPosition(new Vector3(15, 10, 15));
+			spotLight.getTransform().setRotation(Quaternion.fromEuler(50, 0, 0.0f));
+			spotLight.setRange(70.0f);
 			spotLight.setSpotAngle(80);
 
 			spotLight.setColor(new Color(0.4f, 0.75f, 1));
 			spotLight.getGameObject().addComponent(Rotate.class).setAngle(new Vector3(0, 60, 0));
 
-			spotLight.setShadows(Light.Shadows.HARD);
-			spotLight.setLightBleed(1.0f);
-			*/
+			spotLight.setCookie(Resources.loadTexture("textures/bump.jpg", Texture.Format.ARGB, Texture.WrapMode.REPEAT, Texture.FilterMode.LINEAR));
 		}
 
 		/*

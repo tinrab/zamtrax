@@ -75,6 +75,7 @@ final class DesktopApplication implements Application {
 			lag += elapsed;
 			while (lag > frameTime) {
 				applicationListener.update(time.getDeltaTime());
+				window.updateInput();
 
 				lag -= frameTime;
 			}
