@@ -1,22 +1,20 @@
 package zamtrax;
 
 import org.lwjgl.BufferUtils;
+import zamtrax.resources.Mesh;
+import zamtrax.resources.PlyLoader;
+import zamtrax.resources.Shader;
 import zamtrax.resources.bmfont.BMFont;
 import zamtrax.resources.bmfont.BMFontParser;
-import zamtrax.resources.Model;
 import zamtrax.resources.Texture;
 
 import javax.imageio.ImageIO;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 public final class Resources {
 
@@ -50,70 +48,12 @@ public final class Resources {
 		return null;
 	}
 
-	public static Model loadModel(String pathname) {
-		pathname = getResourcePath(pathname, classLoader);
-
-		List<Vector3> normals = new ArrayList<>();
-		List<Vector2> texCoords = new ArrayList<>();
-		List<Vector3> positions = new ArrayList<>();
-
-		List<Vertex> vertices = new ArrayList<>();
-		List<Integer> indices = new ArrayList<>();
-
-		try (BufferedReader br = new BufferedReader(new FileReader(pathname))) {
-			String line;
-
-			while ((line = br.readLine()) != null) {
-				String[] values = line.trim().split(" +");
-
-				if (values[0].equals("v")) {
-					float x = Float.valueOf(values[1]);
-					float y = Float.valueOf(values[2]);
-					float z = Float.valueOf(values[3]);
-
-					positions.add(new Vector3(x, y, z));
-				} else if (values[0].equals("vt")) {
-					float u = Float.valueOf(values[1]);
-					float v = Float.valueOf(values[2]);
-
-					texCoords.add(new Vector2(u, v));
-				} else if (values[0].equals("vn")) {
-					float x = Float.valueOf(values[1]);
-					float y = Float.valueOf(values[2]);
-					float z = Float.valueOf(values[3]);
-
-					normals.add(new Vector3(x, y, z));
-				} else if (values[0].equals("f")) {
-					for (int i = 1; i <= 3; i++) {
-						String[] v = values[i].split("/");
-
-						int vp = Integer.valueOf(v[0]) - 1;
-						Vector3 position = positions.get(vp);
-						Vertex vertex = new Vertex();
-
-						vertex.position = new Vector3(position);
-
-						if (!v[1].isEmpty()) {
-							Vector2 uv = texCoords.get(Integer.valueOf(v[1]) - 1);
-							vertex.uv = new Vector2(uv.x, 1.0f - uv.y);
-						}
-
-						if (!v[2].isEmpty()) {
-							Vector3 normal = normals.get(Integer.valueOf(v[2]) - 1);
-							vertex.normal = new Vector3(normal);
-						}
-
-						vertices.add(vertex);
-						indices.add(indices.size());
-					}
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
+	public static Mesh loadModel(String pathname) {
+		if (pathname.endsWith(PlyLoader.getFileType())) {
+			return PlyLoader.load(getResourcePath(pathname, classLoader));
 		}
 
-		return new Model(vertices, indices);
+		throw new RuntimeException("unsupported file type");
 	}
 
 	public static Texture loadTexture(String pathname, Texture.Format format, Texture.WrapMode wrapMode, Texture.FilterMode filterMode) {

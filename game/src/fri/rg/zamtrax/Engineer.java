@@ -6,13 +6,14 @@ import zamtrax.components.BoxCollider;
 import zamtrax.components.MeshFilter;
 import zamtrax.components.MeshRenderer;
 import zamtrax.components.RigidBody;
+import zamtrax.resources.AttributeType;
 import zamtrax.resources.BindingInfo;
 import zamtrax.resources.Material;
 import zamtrax.resources.Mesh;
 
 public final class Engineer {
 
-	public static GameObject createBox(float width, float height, float depth, float uvScale, BindingInfo bindingInfo, Material material) {
+	public static GameObject createBox(float width, float height, float depth, float uvScale, Material material) {
 		Vertex[] vertices = {
 				new Vertex(-0.5f, 0.5f, -0.5f, 1.0f, 1.0f),
 				new Vertex(-0.5f, -0.5f, -0.5f, 1.0f, 0.0f),
@@ -95,7 +96,7 @@ public final class Engineer {
 				.setVertices(vertices)
 				.setIndices(indices)
 				.calculateNormals()
-				.setBindingInfo(bindingInfo)
+				.setBindingInfo(new BindingInfo(AttributeType.POSITION, AttributeType.UV, AttributeType.NORMAL))
 				.build();
 
 		GameObject box = GameObject.create();
@@ -107,12 +108,12 @@ public final class Engineer {
 		return box;
 	}
 
-	public static void createArena(Arena arena, BindingInfo bindingInfo, Material material) {
+	public static void createArena(Arena arena, Material material) {
 		for (int x = 0; x < Arena.SIZE; x++) {
 			for (int y = 0; y < Arena.SIZE; y++) {
 				int tile = arena.getTile(x, y);
 
-				GameObject box = createBox(Arena.TILE_SIZE, tile, Arena.TILE_SIZE, 1.0f, bindingInfo, material);
+				GameObject box = createBox(Arena.TILE_SIZE, tile, Arena.TILE_SIZE, 1.0f, material);
 
 				box.getTransform().setPosition(new Vector3(x * Arena.TILE_SIZE, tile / 2.0f, y * Arena.TILE_SIZE));
 

@@ -3,54 +3,32 @@ package zamtrax.resources;
 import java.util.ArrayList;
 import java.util.List;
 
-public interface BindingInfo {
+public class BindingInfo {
 
-	List<AttributePointer> getAttributePointers();
+	private List<AttributePointer> attributePointers;
+	private int size;
 
-	int getSize();
+	public BindingInfo(AttributeType... attributeTypes) {
+		attributePointers = new ArrayList<>();
 
-	class Builder {
-
-		private class BindingInfoImpl implements BindingInfo {
-
-			private List<AttributePointer> attributePointers;
-			private int size;
-
-			BindingInfoImpl(List<AttributePointer> attributePointers) {
-				this.attributePointers = attributePointers;
-
-				attributePointers.forEach(ap -> size += ap.getAttributeType().getSize());
-			}
-
-			@Override
-			public List<AttributePointer> getAttributePointers() {
-				return attributePointers;
-			}
-
-			@Override
-			public int getSize() {
-				return size;
-			}
-
+		for (AttributeType type : attributeTypes) {
+			attributePointers.add(new AttributePointer(type, attributePointers.size()));
+			size += type.getSize();
 		}
+	}
 
-		private List<Attribute> attributes;
-		private List<AttributePointer> attributePointers;
+	public BindingInfo(List<AttributePointer> attributePointers) {
+		this.attributePointers = attributePointers;
 
-		public Builder() {
-			attributePointers = new ArrayList<>();
-		}
+		attributePointers.forEach(ap -> size += ap.getAttributeType().getSize());
+	}
 
-		public Builder bind(AttributeType attributeType, int location, CharSequence name) {
-			attributePointers.add(new AttributePointer(attributeType, location, name));
+	public List<AttributePointer> getAttributePointers() {
+		return attributePointers;
+	}
 
-			return this;
-		}
-
-		public BindingInfo build() {
-			return new BindingInfoImpl(attributePointers);
-		}
-
+	public int getSize() {
+		return size;
 	}
 
 }

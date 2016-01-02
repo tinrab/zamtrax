@@ -4,12 +4,10 @@ class AttributePointer {
 
 	private AttributeType attributeType;
 	private int location;
-	private CharSequence name;
 
-	public AttributePointer(AttributeType attributeType, int location, CharSequence name) {
+	public AttributePointer(AttributeType attributeType, int location) {
 		this.attributeType = attributeType;
 		this.location = location;
-		this.name = name;
 	}
 
 	public AttributeType getAttributeType() {
@@ -18,10 +16,6 @@ class AttributePointer {
 
 	public int getLocation() {
 		return location;
-	}
-
-	public CharSequence getName() {
-		return name;
 	}
 
 }

@@ -1,4 +1,4 @@
 #attribute position
-#attribute color
+#attribute uv
 
 #enable transformation

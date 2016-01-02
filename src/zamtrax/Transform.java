@@ -115,6 +115,10 @@ public final class Transform extends Component {
 		return getParentMatrix().transformPoint(position);
 	}
 
+	public void setPosition(float x, float y, float z) {
+		setPosition(new Vector3(x, y, z));
+	}
+
 	public void setPosition(Vector3 position) {
 		this.position.set(getParentMatrix().inverse().transformPoint(position));
 	}

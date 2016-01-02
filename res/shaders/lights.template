@@ -1,0 +1,130 @@
+struct Light
+{
+	vec4 color;
+	float intensity;
+
+	// directional
+	vec3 direction;
+
+	// point
+	vec3 position;
+	float range;
+
+	// spot
+	float cutoff;
+};
+
+struct Material
+{
+    float shininess;
+    float specularIntensity;
+};
+
+float linstep(float x, float low, float high)
+{
+    return clamp((x - low) / (high - low), 0.0, 1.0);
+}
+
+bool inRange(float x)
+{
+	return x >= 0.0 && x <= 1.0;
+}
+
+vec4 calculateLight(Light light, Material material, vec3 lightDirection, vec3 normal, vec4 position)
+{
+	float diffuseFactor = dot(normal, -lightDirection);
+
+	vec4 diffuseColor = vec4(0.0);
+	vec4 specularColor = vec4(0.0);
+
+	diffuseColor = light.color * light.intensity * diffuseFactor;
+
+	vec3 vertexToEye = normalize(-position.xyz);
+	vec3 reflectionDirection = reflect(-lightDirection, normal);
+	float specularFactor = max(0.0, dot(vertexToEye, reflectionDirection));
+
+	specularFactor = pow(specularFactor, material.shininess);
+	specularColor = light.color * specularFactor * material.specularIntensity;
+
+	return diffuseColor;
+}
+
+vec4 calculatePointLight(Light light, Material material, vec3 normal, vec4 position)
+{
+	vec3 lightDirection = position.xyz - light.position;
+	float distance = length(lightDirection);
+
+	if(distance > light.range) {
+		return vec4(0.0);
+	}
+
+	lightDirection = normalize(lightDirection);
+
+	vec4 color = calculateLight(light, material, lightDirection, normal, position);
+
+	float attenuation = light.range / (distance * distance);
+	/*
+	const float threshold = 0.01;
+
+	attenuation = clamp((attenuation - threshold) / (1.0 - threshold), 0.0, 1.0);
+	*/
+
+	return color * attenuation;
+}
+
+vec4 calculateSpotLight(Light light, Material material, vec3 normal, vec4 position)
+{
+	vec3 lightToFrag = normalize(position.xyz - light.position);
+	float spotFactor = dot(lightToFrag, light.direction);
+
+	if(spotFactor > light.cutoff) {
+		vec4 color = calculatePointLight(light, material, normal, position);
+
+		return color * (1.0 - (1.0 - spotFactor) / (1.0 - light.cutoff));
+	} else {
+		return vec4(0.0);
+	}
+}
+
+vec4 calculateDirectionalLight(Light light, Material material, vec3 normal, vec4 position)
+{
+    return calculateLight(light, material, -light.direction, normal, position);
+}
+
+uniform sampler2D shadowMap;
+uniform float minShadowVariance;
+uniform float lightBleed;
+uniform vec4 ambientIntensity;
+uniform Material material;
+uniform Light light;
+uniform int lightType;
+
+vec4 calculateLightFactor(vec4 position, vec3 normal)
+{
+	switch(lightType) {
+		case 1:
+			return calculateDirectionalLight(light, material, normal, position);
+	}
+
+    return vec4(1.0);
+}
+
+float calculateShadowFactor(vec4 shadowMapCoords)
+{
+    vec3 coords = shadowMapCoords.xyz / shadowMapCoords.w;
+    float compare = coords.z;
+
+    if(inRange(compare) && inRange(coords.x) && inRange(coords.y)) {
+		vec2 moments = texture(shadowMap, coords.xy).xy;
+
+		float p = step(compare, moments.x);
+		float variance = max(moments.y - moments.x * moments.x, minShadowVariance);
+
+		float d = compare - moments.x;
+		float pMax = linstep(variance / (variance + d * d), lightBleed, 1.0);
+
+		return min(max(p, pMax), 1.0);
+    } else {
+    	return 1.0;
+    }
+}

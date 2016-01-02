@@ -27,6 +27,7 @@ public abstract class Light extends Component {
 		minVariance = 0.00002f;
 		lightBleed = 0.4f;
 		cookieScale = 1.0f;
+		shadows = Shadows.NONE;
 	}
 
 	public Color getColor() {

@@ -105,18 +105,4 @@ public interface Mesh {
 		}
 	}
 
-	class Factory {
-
-		public static Mesh fromModel(Model model, BindingInfo bindingInfo) {
-			List<Vertex> vertices = new ArrayList<>();
-
-			return new Builder()
-					.setVertices(model.getVertices())
-					.setIndices(model.getIndices())
-					.setBindingInfo(bindingInfo)
-					.build();
-		}
-
-	}
-
 }

@@ -3,8 +3,6 @@ package fri.rg.zamtrax.level.player;
 import zamtrax.*;
 import zamtrax.components.Camera;
 import zamtrax.Transform;
-import zamtrax.components.DirectionalLight;
-import zamtrax.rendering.EmptyFilter;
 
 public class FreeLook extends Component {
 

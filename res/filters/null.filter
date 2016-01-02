@@ -1,0 +1,8 @@
+#version 330
+
+#include "filters/filter"
+
+void main()
+{
+    vDiffuseColor = texture(filterTexture, vUV);
+}

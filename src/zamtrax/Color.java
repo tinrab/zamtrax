@@ -59,11 +59,11 @@ public class Color {
 	}
 
 	public static Color createWhite() {
-		return new Color(1.0f, 1.0f, 1.0f, 1.0f);
+		return new Color(1.0f, 1.0f, 1.0f);
 	}
 
 	public static Color createBlack() {
-		return new Color(0.0f, 0.0f, 0.0f, 1.0f);
+		return new Color(0.0f, 0.0f, 0.0f);
 	}
 
 	public static Color createRed() {

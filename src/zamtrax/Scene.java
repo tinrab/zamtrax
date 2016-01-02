@@ -42,7 +42,7 @@ public class Scene implements Disposable {
 		logicModule.onCreate();
 		physicsModule.onCreate();
 		renderModule.onCreate();
-		uiModule.onCreate();
+		//uiModule.onCreate();
 	}
 
 	public void onExit() {

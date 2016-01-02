@@ -17,12 +17,13 @@ public final class Debug {
 	private Shader shader;
 
 	private Debug() {
-		BindingInfo bindingInfo = new BindingInfo.Builder()
-				.bind(AttributeType.POSITION, 0, "position")
-				.bind(AttributeType.COLOR, 1, "color")
-				.build();
+		BindingInfo bindingInfo = new BindingInfo(AttributeType.POSITION, AttributeType.COLOR);
 		vertexArray = new VertexArray(1000, bindingInfo);
-		shader = new Shader(Resources.loadText("shaders/debug.vs", Debug.class.getClassLoader()), Resources.loadText("shaders/debug.fs", Debug.class.getClassLoader()), bindingInfo, Arrays.asList(new Uniform("MVP")));
+
+		shader = new Shader.Builder()
+				.setVertexShaderSource(Resources.loadText("shaders/debug.vs", Debug.class.getClassLoader()))
+				.setFragmentShaderSource(Resources.loadText("shaders/debug.fs", Debug.class.getClassLoader()))
+				.build();
 	}
 
 	public void drawLine(Vector3 origin, Vector3 direction, float distance, Color color) {

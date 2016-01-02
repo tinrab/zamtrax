@@ -1,23 +1,48 @@
 package zamtrax.resources;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Material {
 
-	private Texture diffuse;
+	static class TextureMap {
+
+		private String name;
+		private Texture texture;
+
+		private TextureMap(String name, Texture texture) {
+			this.name = name;
+			this.texture = texture;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public Texture getTexture() {
+			return texture;
+		}
+
+	}
+
+	private Shader shader;
+	private List<TextureMap> textures;
 	private float shininess;
 	private float specularIntensity;
 
-	public Material(Texture diffuse) {
-		this.diffuse = diffuse;
+	public Material() {
 		shininess = 0.5f;
 		specularIntensity = 0.5f;
+
+		textures = new ArrayList<>();
 	}
 
-	public Texture getDiffuse() {
-		return diffuse;
+	public List<TextureMap> getTextures() {
+		return textures;
 	}
 
-	public void setDiffuse(Texture diffuse) {
-		this.diffuse = diffuse;
+	public void setTexture(String name, Texture texture) {
+		textures.add(new TextureMap(name, texture));
 	}
 
 	public float getShininess() {
@@ -34,6 +59,14 @@ public class Material {
 
 	public void setSpecularIntensity(float specularIntensity) {
 		this.specularIntensity = specularIntensity;
+	}
+
+	public Shader getShader() {
+		return shader;
+	}
+
+	public void setShader(Shader shader) {
+		this.shader = shader;
 	}
 
 }

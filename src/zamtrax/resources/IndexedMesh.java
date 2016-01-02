@@ -75,10 +75,7 @@ final class IndexedMesh implements Mesh {
 				switch (ap.getAttributeType()) {
 					case POSITION:
 						vb.put(v.position.toArray());
-
-						if (AttributeType.POSITION.getSize() == 4) {
-							vb.put(1.0f);
-						}
+						vb.put(1.0f);
 
 						break;
 					case UV:

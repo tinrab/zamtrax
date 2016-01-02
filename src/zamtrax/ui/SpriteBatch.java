@@ -24,18 +24,16 @@ public class SpriteBatch {
 	}
 
 	public SpriteBatch(int size) {
-		bindingInfo = new BindingInfo.Builder()
-				.bind(AttributeType.POSITION, 0, "position")
-				.bind(AttributeType.COLOR, 1, "color")
-				.bind(AttributeType.UV, 2, "uv")
-				.build();
+		bindingInfo = new BindingInfo(AttributeType.POSITION, AttributeType.COLOR, AttributeType.UV);
 
+		/*
 		shader = new Shader.Builder()
 				.setVertexShaderSource(Resources.loadText("shaders/ui.vs", getClass().getClassLoader()))
 				.setFragmentShaderSource(Resources.loadText("shaders/ui.fs", getClass().getClassLoader()))
 				.setBindingInfo(bindingInfo)
 				.addUniform("P")
 				.build();
+		*/
 
 		data = new VertexArray(size, bindingInfo);
 		color = Color.createWhite();
