@@ -1,10 +1,6 @@
-#version 330
+const float iteration = 4;
 
-#include "filters/filter"
-
-const float iteration = 0.5;
-
-void main()
+#shader
 {
     vec2 texelSize = vec2( 1.0 / textureSize );
     vec2 texelSize05 = texelSize * 0.5;
@@ -30,5 +26,5 @@ void main()
     texCoordSample.y = vUV.y - uvOffset.y;
     color += texture( filterTexture, texCoordSample );
 
-    vDiffuseColor = color * 0.25;
+    return color * 0.25;
 }

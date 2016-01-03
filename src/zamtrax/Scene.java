@@ -1,5 +1,6 @@
 package zamtrax;
 
+import zamtrax.rendering.Filter;
 import zamtrax.rendering.RenderModule;
 
 import java.util.ArrayList;
@@ -135,6 +136,10 @@ public class Scene implements Disposable {
 
 	public void addSceneListener(Listener sceneListener) {
 		sceneListeners.add(sceneListener);
+	}
+
+	protected void setFilter(int pass, String pathname) {
+		RenderModule.getInstance().setFilter(pass, pathname);
 	}
 
 	public boolean removeSceneListener(Listener sceneListener) {

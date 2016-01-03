@@ -1,5 +1,7 @@
 package zamtrax.resources;
 
+import zamtrax.Resources;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +32,15 @@ public class Material {
 	private float shininess;
 	private float specularIntensity;
 
-	public Material() {
+	public Material(String vertexShaderPathname, String fragmentShaderPathname) {
+		this(new Shader.Builder()
+				.setVertexShaderSource(Resources.loadText(vertexShaderPathname))
+				.setFragmentShaderSource(Resources.loadText(fragmentShaderPathname))
+				.build());
+	}
+
+	public Material(Shader shader) {
+		this.shader = shader;
 		shininess = 0.5f;
 		specularIntensity = 0.5f;
 
@@ -63,10 +73,6 @@ public class Material {
 
 	public Shader getShader() {
 		return shader;
-	}
-
-	public void setShader(Shader shader) {
-		this.shader = shader;
 	}
 
 }

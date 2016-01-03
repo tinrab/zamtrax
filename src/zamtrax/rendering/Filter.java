@@ -2,6 +2,7 @@ package zamtrax.rendering;
 
 import zamtrax.Matrix4;
 import zamtrax.Resources;
+import zamtrax.Vector2;
 import zamtrax.resources.Shader;
 import zamtrax.resources.Texture;
 
@@ -9,10 +10,14 @@ public class Filter {
 
 	private Shader shader;
 
-	public Filter(String vertexShaderPathname, String fragmentShaderPathname) {
+	public Filter(String fragmentShaderPathname) {
+		String fs = Resources.loadText(fragmentShaderPathname, Filter.class.getClassLoader());
+
+		fs = "#texture filterTexture\n#texture depthTexture\nuniform vec2 textureSize;\n" + fs;
+
 		shader = new Shader.Builder()
-				.setVertexShaderSource(Resources.loadText(vertexShaderPathname, Filter.class.getClassLoader()))
-				.setFragmentShaderSource(Resources.loadText(fragmentShaderPathname, Filter.class.getClassLoader()))
+				.setVertexShaderSource(Resources.loadText("filters/filter.vs", Filter.class.getClassLoader()))
+				.setFragmentShaderSource(fs)
 				.build();
 	}
 
@@ -25,6 +30,7 @@ public class Filter {
 
 		shader.setUniform("MVP", mvp);
 		shader.setUniform("filterTexture", 0);
+		shader.setUniform("textureSize", new Vector2(source.getWidth(), source.getHeight()));
 
 		source.bind(0);
 	}

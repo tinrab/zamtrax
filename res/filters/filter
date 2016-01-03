@@ -1,6 +1,0 @@
-in vec2 vUV;
-
-out vec4 vDiffuseColor;
-
-uniform sampler2D filterTexture;
-uniform vec2 textureSize;

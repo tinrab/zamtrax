@@ -5,6 +5,7 @@ public class Color {
 	public float r, g, b, a;
 
 	public Color() {
+		a = 1.0f;
 	}
 
 	public Color(float r, float g, float b, float a) {

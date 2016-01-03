@@ -59,14 +59,9 @@ public class Level extends Scene {
 		fl.setRotation(Quaternion.fromEuler(new Vector3(30, 0, 0).mul(Mathf.DEG_TO_RAD)));
 
 		{
-			Material stdMaterial = new Material();
+			Material stdMaterial = new Material("shaders/textured.vs", "shaders/textured.fs");
 
 			stdMaterial.setTexture("diffuse", Resources.loadTexture("textures/grid.png", Texture.Format.ARGB, Texture.WrapMode.REPEAT, Texture.FilterMode.NEAREST));
-
-			stdMaterial.setShader(new Shader.Builder()
-					.setVertexShaderSource(Resources.loadText("shaders/textured.vs"))
-					.setFragmentShaderSource(Resources.loadText("shaders/textured.fs"))
-					.build());
 
 			Engineer.createArena(arena, stdMaterial);
 		}
@@ -75,17 +70,14 @@ public class Level extends Scene {
 		//Engineer.createBox(1, 5, 1, 1, stdBindingInfo, stdMaterial).getTransform().setPosition(new Vector3(1, 0, 1));
 
 		GameObject sphere = GameObject.create();
-		Material vertexColored = new Material();
-
-		vertexColored.setShader(new Shader.Builder()
-				.setVertexShaderSource(Resources.loadText("shaders/vertexColor.vs"))
-				.setFragmentShaderSource(Resources.loadText("shaders/vertexColor.fs"))
-				.build());
+		Material vertexColored = new Material("shaders/vertexColor.vs", "shaders/vertexColor.fs");
 
 		sphere.addComponent(MeshFilter.class).setMesh(Resources.loadModel("models/sphere.ply"));
 		sphere.addComponent(MeshRenderer.class).setMaterial(vertexColored);
 
-		sphere.getTransform().setPosition(0, 10, 0);
+		sphere.getTransform().setPosition(5, 10, 5);
+
+		setFilter(1, "shaders/bloom.filter");
 	}
 
 	public Arena getArena() {

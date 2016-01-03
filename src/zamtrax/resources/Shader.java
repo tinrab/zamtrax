@@ -17,13 +17,15 @@ import static org.lwjgl.opengl.GL20.*;
 
 public class Shader {
 
+	private int pass;
 	private int program;
 	private Map<String, Uniform> uniformMap;
 	private BindingInfo bindingInfo;
 	private boolean enabledLights;
 	private boolean castShadows, receiveShadows;
 
-	protected Shader(boolean enabledLights, boolean castShadows, boolean receiveShadows, String vertexShaderSource, String fragmentShaderSource, BindingInfo bindingInfo, List<String> uniformNames) {
+	protected Shader(int pass, boolean enabledLights, boolean castShadows, boolean receiveShadows, String vertexShaderSource, String fragmentShaderSource, BindingInfo bindingInfo, List<String> uniformNames) {
+		this.pass = pass;
 		this.enabledLights = enabledLights;
 		this.castShadows = castShadows;
 		this.receiveShadows = receiveShadows;
@@ -223,6 +225,10 @@ public class Shader {
 		return receiveShadows;
 	}
 
+	public int getPass() {
+		return pass;
+	}
+
 	public static class Builder {
 
 		private static final String version = "330";
@@ -232,7 +238,7 @@ public class Shader {
 		private List<String> uniformNames;
 		private String vertexSource, fragmentSource;
 		private StringBuilder vertexShader, fragmentShader;
-
+		private int pass;
 		private boolean enabledTransformation;
 		private boolean enabledLights;
 		private boolean castShadows, recieveShadows;
@@ -272,7 +278,7 @@ public class Shader {
 			preprocessVertexShader(vertexSource);
 			preprocessFragmentShader(fragmentSource);
 
-			return new Shader(enabledLights, castShadows, recieveShadows, vertexShader.toString(), fragmentShader.toString(), new BindingInfo(attributePointers), uniformNames);
+			return new Shader(pass, enabledLights, castShadows, recieveShadows, vertexShader.toString(), fragmentShader.toString(), new BindingInfo(attributePointers), uniformNames);
 		}
 
 		private void preprocessVertexShader(String source) {
@@ -318,6 +324,8 @@ public class Shader {
 					uniformNames.add(name);
 
 					vertexShader.append(line);
+				} else if (line.startsWith("#pass")) {
+					pass = Integer.parseInt(line.substring("#pass".length()).trim());
 				}
 			}
 
@@ -389,6 +397,8 @@ public class Shader {
 				uniformNames.add("material.specularIntensity");
 
 				uniformNames.add("lightType");
+
+				fragmentShader.append("\nin vec4 vShadowMapCoords;");
 			}
 
 			attributePointers.forEach(ap -> {
@@ -397,13 +407,11 @@ public class Shader {
 				fragmentShader.append(String.format("\nin vec%d v%s;", type.getSize(), type.getName()));
 			});
 
-			fragmentShader.append("\nin vec4 vShadowMapCoords;");
-
 			for (String line : source.split("\n")) {
 				line = line.trim();
 
 				if (line.startsWith("uniform")) {
-					String name = line.substring("uniform".length()).trim();
+					String name = line.substring(line.lastIndexOf(' ') + 1, line.lastIndexOf(';')).trim();
 
 					uniformNames.add(name);
 				} else if (line.startsWith("#texture")) {

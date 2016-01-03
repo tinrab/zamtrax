@@ -1,10 +1,6 @@
-#version 330
-
-#include "filters/filter"
-
 uniform vec3 blurScale;
 
-void main()
+#shader
 {
     vec4 color = vec4(0.0);
 
@@ -16,5 +12,5 @@ void main()
     color += texture(filterTexture, vUV + vec2(2.0)  * blurScale.xy) * (6.0  / 64.0);
     color += texture(filterTexture, vUV + vec2(3.0)  * blurScale.xy) * (1.0  / 64.0);
 
-    vDiffuseColor = color;
+    return color;
 }
