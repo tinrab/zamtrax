@@ -4,7 +4,4 @@
 #attribute normal
 #attribute color
 
-#enable transformation
-
 #enable shadowCast
-#enable shadowReceive

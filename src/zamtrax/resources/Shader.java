@@ -21,12 +21,13 @@ public class Shader {
 	private int program;
 	private Map<String, Uniform> uniformMap;
 	private BindingInfo bindingInfo;
-	private boolean enabledLights;
+	private boolean enabledLights, enableAmbient;
 	private boolean castShadows, receiveShadows;
 
-	protected Shader(int pass, boolean enabledLights, boolean castShadows, boolean receiveShadows, String vertexShaderSource, String fragmentShaderSource, BindingInfo bindingInfo, List<String> uniformNames) {
+	public Shader(int pass, boolean enabledLights, boolean enableAmbient, boolean castShadows, boolean receiveShadows, String vertexShaderSource, String fragmentShaderSource, BindingInfo bindingInfo, List<String> uniformNames) {
 		this.pass = pass;
 		this.enabledLights = enabledLights;
+		this.enableAmbient = enableAmbient;
 		this.castShadows = castShadows;
 		this.receiveShadows = receiveShadows;
 		this.bindingInfo = bindingInfo;
@@ -156,25 +157,28 @@ public class Shader {
 		Color ambientIntensity = renderState.getAmbientIntenstiy();
 		Matrix4 mvp = viewProjection.mul(model);
 
+		setUniform("MVP", mvp);
+		setUniform("M", model);
+
+		if (enableAmbient) {
+			setUniform("ambientIntensity", ambientIntensity == null ? Color.createWhite() : ambientIntensity);
+		}
 
 		if (enabledLights) {
 			setUniform("material.shininess", material.getShininess());
 			setUniform("material.specularIntensity", material.getSpecularIntensity());
 
-			if (light instanceof DirectionalLight) {
-				DirectionalLight directionalLight = (DirectionalLight) light;
-
-				setUniform("lightType", 1);
-
-				setUniform("light.color", directionalLight.getColor());
-				setUniform("light.intensity", directionalLight.getIntensity());
-				setUniform("light.direction", directionalLight.getTransform().forward());
-			} else {
-				setUniform("ambientIntensity", ambientIntensity);
-				setUniform("lightType", 0);
-			}
-
 			if (light != null) {
+				if (light instanceof DirectionalLight) {
+					DirectionalLight directionalLight = (DirectionalLight) light;
+
+					setUniform("lightType", 1);
+
+					setUniform("light.color", directionalLight.getColor());
+					setUniform("light.intensity", directionalLight.getIntensity());
+					setUniform("light.direction", directionalLight.getTransform().forward());
+				}
+
 				if (receiveShadows && light.getShadows() == Light.Shadows.HARD) {
 					setUniform("shadowMap", 2);
 					renderState.getShadowMap().bind(2);
@@ -183,11 +187,13 @@ public class Shader {
 					setUniform("minShadowVariance", light.getMinVariance());
 					setUniform("lightBleed", light.getLightBleed());
 				}
+			} else {
+				//setUniform("ambientIntensity", Color.createWhite());
+				setUniform("lightType", 0);
 			}
+		} else {
+			setUniform("lightType", 0);
 		}
-
-		setUniform("MVP", mvp);
-		setUniform("M", model);
 
 		if (material != null) {
 			int i = 0;
@@ -229,6 +235,10 @@ public class Shader {
 		return enabledLights;
 	}
 
+	public boolean ambientEnabled() {
+		return enableAmbient;
+	}
+
 	public int getPass() {
 		return pass;
 	}
@@ -243,8 +253,7 @@ public class Shader {
 		private String vertexSource, fragmentSource;
 		private StringBuilder vertexShader, fragmentShader;
 		private int pass;
-		private boolean enabledTransformation;
-		private boolean enabledLights;
+		private boolean enabledLights, enableAmbient;
 		private boolean castShadows, recieveShadows;
 
 		public Builder() {
@@ -282,14 +291,19 @@ public class Shader {
 			preprocessVertexShader(vertexSource);
 			preprocessFragmentShader(fragmentSource);
 
+			System.out.println("-- VERTEX --");
 			System.out.println(vertexShader);
+			System.out.println("-- FRAGMENT --");
 			System.out.println(fragmentShader);
 
-			return new Shader(pass, enabledLights, castShadows, recieveShadows, vertexShader.toString(), fragmentShader.toString(), new BindingInfo(attributePointers), uniformNames);
+			return new Shader(pass, enabledLights, enableAmbient, castShadows, recieveShadows, vertexShader.toString(), fragmentShader.toString(), new BindingInfo(attributePointers), uniformNames);
 		}
 
 		private void preprocessVertexShader(String source) {
 			int attributeLocation = 0;
+
+			uniformNames.add("MVP");
+			uniformNames.add("M");
 
 			for (String line : source.split("\n")) {
 				line = line.trim();
@@ -314,12 +328,11 @@ public class Shader {
 				} else if (line.startsWith("#enable")) {
 					String what = line.substring("#enable".length()).trim();
 
-					if (what.equals("transformation")) {
-						enabledTransformation = true;
-						uniformNames.add("MVP");
-						uniformNames.add("M");
-					} else if (what.equals("lights")) {
+					if (what.equals("lights")) {
 						enabledLights = true;
+						enableAmbient = true;
+					} else if (what.equals("ambient")) {
+						enableAmbient = true;
 					} else if (what.equals("shadowCast")) {
 						castShadows = true;
 					} else if (what.equals("shadowReceive")) {
@@ -340,9 +353,7 @@ public class Shader {
 		}
 
 		private void createVertexShaderMain() {
-			if (enabledTransformation) {
-				vertexShader.append("\nuniform mat4 MVP;\nuniform mat4 M;");
-			}
+			vertexShader.append("\nuniform mat4 MVP;\nuniform mat4 M;");
 
 			if (enabledLights) {
 
@@ -378,22 +389,28 @@ public class Shader {
 				vertexShader.append("\nvShadowMapCoords = modelLightViewProjection * " + AttributeType.POSITION.getName() + ";");
 			}
 
-			if (enabledTransformation) {
-				vertexShader.append("\ngl_Position = MVP * " + AttributeType.POSITION.getName() + ";");
-			}
+			vertexShader.append("\ngl_Position = MVP * " + AttributeType.POSITION.getName() + ";");
 
 			vertexShader.append("\n}");
 		}
 
 		private void preprocessFragmentShader(String source) {
+			fragmentShader.append("\nuniform int lightType;");
+			uniformNames.add("lightType");
+
 			if (enabledLights || recieveShadows) {
 				fragmentShader.append(lightsTemplate);
+			}
+
+			if (enableAmbient) {
+				uniformNames.add("ambientIntensity");
+
+				fragmentShader.append("\nuniform vec4 ambientIntensity;");
 			}
 
 			if (enabledLights) {
 				uniformNames.add("cookie");
 				uniformNames.add("cookieScale");
-				uniformNames.add("ambientIntensity");
 
 				uniformNames.add("light.direction");
 				uniformNames.add("light.color");
@@ -404,8 +421,6 @@ public class Shader {
 
 				uniformNames.add("material.shininess");
 				uniformNames.add("material.specularIntensity");
-
-				uniformNames.add("lightType");
 			}
 
 			if (recieveShadows) {
@@ -446,6 +461,9 @@ public class Shader {
 
 			if (enabledLights) {
 				fragmentShader.append(String.format("*calculateLightFactor(v%s, v%s)", AttributeType.POSITION.getName(), AttributeType.NORMAL.getName()));
+			}
+
+			if (enableAmbient) {
 				fragmentShader.append("*ambientIntensity");
 			}
 

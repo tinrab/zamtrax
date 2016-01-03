@@ -94,10 +94,8 @@ vec4 calculateDirectionalLight(Light light, Material material, vec3 normal, vec4
 uniform sampler2D shadowMap;
 uniform float minShadowVariance;
 uniform float lightBleed;
-uniform vec4 ambientIntensity;
 uniform Material material;
 uniform Light light;
-uniform int lightType;
 
 vec4 calculateLightFactor(vec4 position, vec3 normal)
 {
@@ -111,10 +109,14 @@ vec4 calculateLightFactor(vec4 position, vec3 normal)
 
 float calculateShadowFactor(vec4 shadowMapCoords)
 {
-    vec3 coords = shadowMapCoords.xyz / shadowMapCoords.w;
-    float compare = coords.z;
+    if(lightType == 0) {
+        return vec4(1.0);
+    }
 
-    if(inRange(compare) && inRange(coords.x) && inRange(coords.y)) {
+    vec3 coords = shadowMapCoords.xyz / shadowMapCoords.w;
+
+    if(inRange(coords.x) && inRange(coords.y) && inRange(coords.z)) {
+    	float compare = coords.z;
 		vec2 moments = texture(shadowMap, coords.xy).xy;
 
 		float p = step(compare, moments.x);

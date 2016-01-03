@@ -26,5 +26,5 @@ const float iteration = 4;
     texCoordSample.y = vUV.y - uvOffset.y;
     color += texture( filterTexture, texCoordSample );
 
-    return color * 0.25;
+   return color * 0.25;
 }

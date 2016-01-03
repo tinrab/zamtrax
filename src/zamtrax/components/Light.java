@@ -24,8 +24,8 @@ public abstract class Light extends Component {
 		color = Color.createWhite();
 		intensity = 1.0f;
 		shadowSoftness = 1.0f;
-		minVariance = 0.00002f;
-		lightBleed = 0.4f;
+		minVariance = 0.002f;
+		lightBleed = 0.1f;
 		cookieScale = 1.0f;
 		shadows = Shadows.NONE;
 	}
@@ -102,7 +102,7 @@ public abstract class Light extends Component {
 		return cookieScale;
 	}
 
-	public Matrix4 getShadowViewProjection(Transform mainCamera) {
+	public Matrix4 getShadowViewProjection() {
 		Transform t = getTransform();
 
 		Matrix4 r = t.getRotation().conjugate().toMatrix();

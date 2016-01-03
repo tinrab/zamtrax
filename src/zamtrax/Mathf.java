@@ -82,4 +82,8 @@ public final class Mathf {
 		return (float) Math.floor(x);
 	}
 
+	public static float sign(float x) {
+		return x < 0.0f ? -1.0f : x > 0.0f ? 1.0f : 0.0f;
+	}
+
 }

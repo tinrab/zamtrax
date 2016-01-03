@@ -63,4 +63,16 @@ public final class Camera extends Component {
 		this.projection = new Matrix4(projection);
 	}
 
+	public Vector3 worldToViewportPoint(Vector3 worldPosition) {
+		Vector3 viewport = getViewProjection().transformPoint(worldPosition);
+
+		viewport.x /= viewport.z;
+		viewport.y /= viewport.z;
+
+		viewport.x = (viewport.x + 1.0f) / 2.0f;
+		viewport.y = (viewport.y + 1.0f) / 2.0f;
+
+		return viewport;
+	}
+
 }

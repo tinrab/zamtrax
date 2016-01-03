@@ -1,3 +1,1 @@
 #attribute position
-
-#enable transformation

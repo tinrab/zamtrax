@@ -20,6 +20,7 @@ public class Filter {
 				.setVertexShaderSource(Resources.loadText("filters/filter.vs", Filter.class.getClassLoader()))
 				.setFragmentShaderSource(fs)
 				.build();
+		enabled = true;
 	}
 
 	public void bind() {
@@ -31,6 +32,7 @@ public class Filter {
 
 		shader.setUniform("MVP", mvp);
 		shader.setUniform("filterTexture", 0);
+
 		shader.setUniform("textureSize", new Vector2(source.getWidth(), source.getHeight()));
 
 		source.bind(0);

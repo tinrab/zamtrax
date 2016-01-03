@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Material {
 
-	static class TextureMap {
+	public static class TextureMap {
 
 		private String name;
 		private Texture texture;
