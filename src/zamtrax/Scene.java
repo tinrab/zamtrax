@@ -142,6 +142,10 @@ public class Scene implements Disposable {
 		RenderModule.getInstance().setFilter(pass, pathname);
 	}
 
+	protected void addScreenFilter(Filter filter) {
+		RenderModule.getInstance().addScreenFilter(filter);
+	}
+
 	public boolean removeSceneListener(Listener sceneListener) {
 		return sceneListeners.remove(sceneListener);
 	}

@@ -35,7 +35,7 @@ public class Level extends Scene {
 
 			dl1.getTransform().setRotation(Quaternion.fromEuler(-50, -45, -10));
 			dl1.setColor(new Color(1.0f, 0.7f, 0.3f));
-			dl1.setIntensity(0.5f);
+			dl1.setIntensity(1.0f);
 			dl1.setShadows(Light.Shadows.HARD);
 
 			/*
@@ -68,7 +68,7 @@ public class Level extends Scene {
 
 		//Engineer.createBox(50, 1, 50, 1, stdBindingInfo, stdMaterial);
 		//Engineer.createBox(1, 5, 1, 1, stdBindingInfo, stdMaterial).getTransform().setPosition(new Vector3(1, 0, 1));
-
+/*
 		GameObject sphere = GameObject.create();
 		Material vertexColored = new Material("shaders/vertexColor.vs", "shaders/vertexColor.fs");
 
@@ -76,8 +76,8 @@ public class Level extends Scene {
 		sphere.addComponent(MeshRenderer.class).setMaterial(vertexColored);
 
 		sphere.getTransform().setPosition(5, 10, 5);
-
-		setFilter(1, "shaders/bloom.filter");
+*/
+		//setFilter(1, "shaders/bloom.filter");
 	}
 
 	public Arena getArena() {

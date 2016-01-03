@@ -156,25 +156,25 @@ public class Shader {
 		Color ambientIntensity = renderState.getAmbientIntenstiy();
 		Matrix4 mvp = viewProjection.mul(model);
 
+
 		if (enabledLights) {
 			setUniform("material.shininess", material.getShininess());
 			setUniform("material.specularIntensity", material.getSpecularIntensity());
 
-			if (light == null) {
-				setUniform("lightType", 0);
+			if (light instanceof DirectionalLight) {
+				DirectionalLight directionalLight = (DirectionalLight) light;
 
-				setUniform("ambientIntensity", ambientIntensity);
+				setUniform("lightType", 1);
+
+				setUniform("light.color", directionalLight.getColor());
+				setUniform("light.intensity", directionalLight.getIntensity());
+				setUniform("light.direction", directionalLight.getTransform().forward());
 			} else {
-				if (light instanceof DirectionalLight) {
-					DirectionalLight directionalLight = (DirectionalLight) light;
+				setUniform("ambientIntensity", ambientIntensity);
+				setUniform("lightType", 0);
+			}
 
-					setUniform("lightType", 1);
-
-					setUniform("light.color", directionalLight.getColor());
-					setUniform("light.intensity", directionalLight.getIntensity());
-					setUniform("light.direction", directionalLight.getTransform().forward());
-				}
-
+			if (light != null) {
 				if (receiveShadows && light.getShadows() == Light.Shadows.HARD) {
 					setUniform("shadowMap", 2);
 					renderState.getShadowMap().bind(2);
@@ -223,6 +223,10 @@ public class Shader {
 
 	public boolean receivesShadows() {
 		return receiveShadows;
+	}
+
+	public boolean lightsEnabled() {
+		return enabledLights;
 	}
 
 	public int getPass() {
@@ -277,6 +281,9 @@ public class Shader {
 
 			preprocessVertexShader(vertexSource);
 			preprocessFragmentShader(fragmentSource);
+
+			System.out.println(vertexShader);
+			System.out.println(fragmentShader);
 
 			return new Shader(pass, enabledLights, castShadows, recieveShadows, vertexShader.toString(), fragmentShader.toString(), new BindingInfo(attributePointers), uniformNames);
 		}
@@ -338,6 +345,10 @@ public class Shader {
 			}
 
 			if (enabledLights) {
+
+			}
+
+			if (recieveShadows) {
 				vertexShader.append("\nout vec4 vShadowMapCoords;\nuniform mat4 modelLightViewProjection;");
 				uniformNames.add("modelLightViewProjection");
 			}
@@ -363,7 +374,7 @@ public class Shader {
 				vertexShader.append(";");
 			});
 
-			if (enabledLights) {
+			if (recieveShadows) {
 				vertexShader.append("\nvShadowMapCoords = modelLightViewProjection * " + AttributeType.POSITION.getName() + ";");
 			}
 
@@ -375,13 +386,11 @@ public class Shader {
 		}
 
 		private void preprocessFragmentShader(String source) {
-			if (enabledLights) {
+			if (enabledLights || recieveShadows) {
 				fragmentShader.append(lightsTemplate);
+			}
 
-				uniformNames.add("shadowMap");
-				uniformNames.add("modelLightViewProjection");
-				uniformNames.add("minShadowVariance");
-				uniformNames.add("lightBleed");
+			if (enabledLights) {
 				uniformNames.add("cookie");
 				uniformNames.add("cookieScale");
 				uniformNames.add("ambientIntensity");
@@ -397,7 +406,13 @@ public class Shader {
 				uniformNames.add("material.specularIntensity");
 
 				uniformNames.add("lightType");
+			}
 
+			if (recieveShadows) {
+				uniformNames.add("shadowMap");
+				uniformNames.add("modelLightViewProjection");
+				uniformNames.add("minShadowVariance");
+				uniformNames.add("lightBleed");
 				fragmentShader.append("\nin vec4 vShadowMapCoords;");
 			}
 
@@ -424,7 +439,7 @@ public class Shader {
 					fragmentShader.append("\nvec4 customShader()");
 				}
 
-				fragmentShader.append(line);
+				fragmentShader.append("\n" + line);
 			}
 
 			fragmentShader.append("\nvoid main(){gl_FragColor = customShader()");
@@ -435,7 +450,7 @@ public class Shader {
 			}
 
 			if (recieveShadows) {
-				fragmentShader.append(String.format("*calculateShadowFactor(vShadowMapCoords)"));
+				fragmentShader.append("*calculateShadowFactor(vShadowMapCoords)");
 			}
 
 			fragmentShader.append(";}");

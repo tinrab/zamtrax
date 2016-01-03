@@ -8,7 +8,8 @@ import zamtrax.resources.Texture;
 
 public class Filter {
 
-	private Shader shader;
+	protected Shader shader;
+	protected boolean enabled;
 
 	public Filter(String fragmentShaderPathname) {
 		String fs = Resources.loadText(fragmentShaderPathname, Filter.class.getClassLoader());
@@ -37,6 +38,14 @@ public class Filter {
 
 	public void release() {
 		shader.release();
+	}
+
+	public Shader getShader() {
+		return shader;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
 	}
 
 }

@@ -3,5 +3,8 @@
 #attribute normal
 
 #enable transformation
-//#enable lights
-//#enable shadowReceive
+
+#enable lights
+
+#enable shadowReceive
+#enable shadowCast
