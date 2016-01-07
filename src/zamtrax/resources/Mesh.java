@@ -1,5 +1,6 @@
 package zamtrax.resources;
 
+import zamtrax.Color;
 import zamtrax.Vertex;
 
 import java.util.ArrayList;
@@ -13,6 +14,12 @@ public interface Mesh {
 	void render();
 
 	void dispose();
+
+	List<Vertex> getVertices();
+
+	List<Integer> getIndices();
+
+	MeshResource getResource();
 
 	class Builder {
 
@@ -45,8 +52,14 @@ public interface Mesh {
 			return this;
 		}
 
-		public Builder addVertex(Vertex vertex) {
-			vertices.add(vertex);
+		public Builder addVertices(Vertex... vertices) {
+			this.vertices.addAll(Arrays.asList(vertices));
+
+			return this;
+		}
+
+		public Builder addIndices(Integer... indices) {
+			this.indices.addAll(Arrays.asList(indices));
 
 			return this;
 		}
@@ -60,16 +73,6 @@ public interface Mesh {
 		public Builder setIndices(Integer... indices) {
 			this.indices.clear();
 			this.indices.addAll(Arrays.asList(indices));
-
-			return this;
-		}
-
-		public Builder setIndices(int... indices) {
-			this.indices.clear();
-
-			for (int i : indices) {
-				this.indices.add(i);
-			}
 
 			return this;
 		}

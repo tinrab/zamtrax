@@ -15,6 +15,10 @@ public final class Vertex {
 		uv = new Vector2(u, v);
 	}
 
+	public Vertex(Vector3 position) {
+		this.position = new Vector3(position);
+	}
+
 	public Vector3 getPosition() {
 		return position;
 	}
@@ -28,7 +32,7 @@ public final class Vertex {
 	}
 
 	public void setColor(Color color) {
-		this.color = color;
+		this.color = new Color(color);
 	}
 
 	public Vector3 getNormal() {

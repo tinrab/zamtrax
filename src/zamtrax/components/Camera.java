@@ -37,10 +37,14 @@ public final class Camera extends Component {
 	}
 
 	public Matrix4 getViewProjection() {
+		return projection.mul(getView());
+	}
+
+	public Matrix4 getView() {
 		Matrix4 r = transform.getRotation().conjugate().toMatrix();
 		Vector3 p = transform.getPosition().mul(-1.0f);
 
-		return projection.mul(r.mul(Matrix4.createTranslation(p)));
+		return r.mul(Matrix4.createTranslation(p));
 	}
 
 	public ClearFlags getClearFlags() {
@@ -61,6 +65,10 @@ public final class Camera extends Component {
 
 	public void setProjection(Matrix4 projection) {
 		this.projection = new Matrix4(projection);
+	}
+
+	public Matrix4 getProjection() {
+		return projection;
 	}
 
 	public Vector3 worldToViewportPoint(Vector3 worldPosition) {

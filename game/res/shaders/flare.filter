@@ -2,7 +2,7 @@ uniform float time;
 uniform float brightness;
 uniform vec2 position;
 
-#define dist 0.1
+#define dist 0.2
 #define intensity 1.5 / dist
 #define pattern 20.0
 #define tint  vec3(1.0, 0.9, 0.7)

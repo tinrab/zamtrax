@@ -152,6 +152,21 @@ final class IndexedMesh implements Mesh {
 	}
 
 	@Override
+	public List<Integer> getIndices() {
+		return indices;
+	}
+
+	@Override
+	public MeshResource getResource() {
+		return resource;
+	}
+
+	@Override
+	public List<Vertex> getVertices() {
+		return vertices;
+	}
+
+	@Override
 	public void dispose() {
 		resource.removeReference();
 	}

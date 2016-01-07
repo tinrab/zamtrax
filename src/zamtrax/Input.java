@@ -259,7 +259,7 @@ public final class Input {
 	private static final int PRESS = 0x1;
 
 	/**
-	 * The key was held down until it repeated.
+	 * The key was held pressed until it repeated.
 	 */
 	private static final int REPEAT = 0x2;
 

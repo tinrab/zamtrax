@@ -110,7 +110,7 @@ public final class RigidBody extends Component {
 			bRigidBody.getCollisionShape().calculateLocalInertia(0.0f, intertia);
 			bRigidBody.setMassProps(0.0f, intertia);
 
-			flags |= CollisionFlags.KINEMATIC_OBJECT;
+			flags |= CollisionFlags.STATIC_OBJECT;
 			bRigidBody.setActivationState(CollisionObject.DISABLE_DEACTIVATION);
 		} else {
 			Vector3f intertia = new Vector3f();

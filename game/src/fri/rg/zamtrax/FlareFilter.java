@@ -1,4 +1,4 @@
-package fri.rg.zamtrax.level;
+package fri.rg.zamtrax;
 
 import zamtrax.*;
 import zamtrax.components.Camera;

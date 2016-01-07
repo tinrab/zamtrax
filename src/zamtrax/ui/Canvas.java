@@ -1,6 +1,7 @@
 package zamtrax.ui;
 
 import zamtrax.Component;
+import zamtrax.Matrix4;
 
 public class Canvas extends Component {
 
@@ -13,6 +14,14 @@ public class Canvas extends Component {
 
 	public SpriteBatch getSpriteBatch() {
 		return spriteBatch;
+	}
+
+	public void setProjection(Matrix4 projection) {
+		spriteBatch.setProjection(projection);
+	}
+
+	public Matrix4 getProjection(){
+		return spriteBatch.getProjection();
 	}
 
 }

@@ -43,7 +43,7 @@ public class Scene implements Disposable {
 		logicModule.onCreate();
 		physicsModule.onCreate();
 		renderModule.onCreate();
-		//uiModule.onCreate();
+		uiModule.onCreate();
 	}
 
 	public void onExit() {
@@ -79,7 +79,7 @@ public class Scene implements Disposable {
 
 	final void render() {
 		renderModule.render();
-		//uiModule.render();
+		uiModule.render();
 	}
 
 	final void destroyGameObject(GameObject sceneObject) {
@@ -127,6 +127,7 @@ public class Scene implements Disposable {
 		}
 
 		gameObject.getComponents().add(component);
+		component.setEnabled(true);
 		component.onAdd();
 
 		fireOnAddComponent(component);

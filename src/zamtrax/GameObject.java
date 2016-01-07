@@ -17,6 +17,8 @@ public final class GameObject {
 		children = new ArrayList<>();
 
 		components.add(transform);
+
+		active = true;
 	}
 
 	public <T extends Component> T addComponent(Class<T> componentClass) {
@@ -37,7 +39,7 @@ public final class GameObject {
 		children.add(gameObject);
 
 		gameObject.parent = this;
-		gameObject.getTransform().setParent(transform);
+		gameObject.getTransform().setParent(transform, true);
 	}
 
 	public void destroy() {
@@ -113,6 +115,20 @@ public final class GameObject {
 					return childComponent;
 				}
 			}
+		}
+
+		return component;
+	}
+
+	public <T extends Component> T findComponentInAncestorsOfType(Class<T> componentClass) {
+		if (parent == null) {
+			return null;
+		}
+
+		T component = parent.getComponent(componentClass);
+
+		if (component == null) {
+			return parent.findComponentInAncestorsOfType(componentClass);
 		}
 
 		return component;

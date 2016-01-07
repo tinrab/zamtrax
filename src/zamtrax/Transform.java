@@ -127,6 +127,10 @@ public final class Transform extends Component {
 		return new Vector3(position);
 	}
 
+	public void setLocalPosition(float x, float y, float z) {
+		this.position.set(x, y, z);
+	}
+
 	public void setLocalPosition(Vector3 position) {
 		this.position = position;
 	}
@@ -157,6 +161,10 @@ public final class Transform extends Component {
 		}
 
 		return new Vector3(scale);
+	}
+
+	public void setScale(float x, float y, float z) {
+		setScale(new Vector3(x, y, z));
 	}
 
 	public void setScale(Vector3 scale) {

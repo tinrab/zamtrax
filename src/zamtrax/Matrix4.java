@@ -26,6 +26,10 @@ public class Matrix4 {
 		return elements[i][j];
 	}
 
+	public void set(int i, int j, float value) {
+		elements[i][j] = value;
+	}
+
 	public Matrix4 loadIdentity() {
 		elements[0][0] = 1;
 		elements[0][1] = 0;
@@ -68,63 +72,71 @@ public class Matrix4 {
 		return this;
 	}
 
+	public Matrix4 loadRotationAroundX(float angle) {
+		elements[0][0] = 1;
+		elements[0][1] = 0;
+		elements[0][2] = 0;
+		elements[0][3] = 0;
+		elements[1][0] = 0;
+		elements[1][1] = Mathf.fastCos(angle);
+		elements[1][2] = Mathf.fastSin(angle);
+		elements[1][3] = 0;
+		elements[2][0] = 0;
+		elements[2][1] = Mathf.fastSin(angle);
+		elements[2][2] = Mathf.fastCos(angle);
+		elements[2][3] = 0;
+		elements[3][0] = 0;
+		elements[3][1] = 0;
+		elements[3][2] = 0;
+		elements[3][3] = 1;
+
+		return this;
+	}
+
+	public Matrix4 loadRotationAroundY(float angle) {
+		elements[0][0] = Mathf.fastCos(angle);
+		elements[0][1] = 0;
+		elements[0][2] = -Mathf.fastSin(angle);
+		elements[0][3] = 0;
+		elements[1][0] = 0;
+		elements[1][1] = 1;
+		elements[1][2] = 0;
+		elements[1][3] = 0;
+		elements[2][0] = Mathf.fastSin(angle);
+		elements[2][1] = 0;
+		elements[2][2] = Mathf.fastCos(angle);
+		elements[2][3] = 0;
+		elements[3][0] = 0;
+		elements[3][1] = 0;
+		elements[3][2] = 0;
+		elements[3][3] = 1;
+
+		return this;
+	}
+
+	public Matrix4 loadRotationAroundZ(float angle) {
+		elements[0][0] = Mathf.fastCos(angle);
+		elements[0][1] = Mathf.fastSin(angle);
+		elements[0][2] = 0;
+		elements[0][3] = 0;
+		elements[1][0] = Mathf.fastSin(angle);
+		elements[1][1] = Mathf.fastCos(angle);
+		elements[1][2] = 0;
+		elements[1][3] = 0;
+		elements[2][0] = 0;
+		elements[2][1] = 0;
+		elements[2][2] = 1;
+		elements[2][3] = 0;
+		elements[3][0] = 0;
+		elements[3][1] = 0;
+		elements[3][2] = 0;
+		elements[3][3] = 1;
+
+		return this;
+	}
+
 	public Matrix4 loadRotation(float x, float y, float z) {
-		Matrix4 rx = new Matrix4();
-		Matrix4 ry = new Matrix4();
-		Matrix4 rz = new Matrix4();
-
-		rz.elements[0][0] = Mathf.cos(z);
-		rz.elements[0][1] = Mathf.sin(z);
-		rz.elements[0][2] = 0;
-		rz.elements[0][3] = 0;
-		rz.elements[1][0] = Mathf.sin(z);
-		rz.elements[1][1] = Mathf.cos(z);
-		rz.elements[1][2] = 0;
-		rz.elements[1][3] = 0;
-		rz.elements[2][0] = 0;
-		rz.elements[2][1] = 0;
-		rz.elements[2][2] = 1;
-		rz.elements[2][3] = 0;
-		rz.elements[3][0] = 0;
-		rz.elements[3][1] = 0;
-		rz.elements[3][2] = 0;
-		rz.elements[3][3] = 1;
-
-		rx.elements[0][0] = 1;
-		rx.elements[0][1] = 0;
-		rx.elements[0][2] = 0;
-		rx.elements[0][3] = 0;
-		rx.elements[1][0] = 0;
-		rx.elements[1][1] = Mathf.cos(x);
-		rx.elements[1][2] = Mathf.sin(x);
-		rx.elements[1][3] = 0;
-		rx.elements[2][0] = 0;
-		rx.elements[2][1] = Mathf.sin(x);
-		rx.elements[2][2] = Mathf.cos(x);
-		rx.elements[2][3] = 0;
-		rx.elements[3][0] = 0;
-		rx.elements[3][1] = 0;
-		rx.elements[3][2] = 0;
-		rx.elements[3][3] = 1;
-
-		ry.elements[0][0] = Mathf.cos(y);
-		ry.elements[0][1] = 0;
-		ry.elements[0][2] = -Mathf.sin(y);
-		ry.elements[0][3] = 0;
-		ry.elements[1][0] = 0;
-		ry.elements[1][1] = 1;
-		ry.elements[1][2] = 0;
-		ry.elements[1][3] = 0;
-		ry.elements[2][0] = Mathf.sin(y);
-		ry.elements[2][1] = 0;
-		ry.elements[2][2] = Mathf.cos(y);
-		ry.elements[2][3] = 0;
-		ry.elements[3][0] = 0;
-		ry.elements[3][1] = 0;
-		ry.elements[3][2] = 0;
-		ry.elements[3][3] = 1;
-
-		elements = rz.mul(ry.mul(rx)).elements;
+		elements = createRotationAroundZ(z).mul(createRotationAroundY(y).mul(createRotationAroundX(x))).elements;
 
 		return this;
 	}
@@ -430,15 +442,40 @@ public class Matrix4 {
 	public FloatBuffer toBuffer() {
 		direct.clear();
 
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				direct.put(elements[j][i]);
-			}
-		}
+		toBuffer(direct);
 
 		direct.flip();
 
 		return direct;
+	}
+
+	public void toBuffer(FloatBuffer buffer) {
+		buffer.put(elements[0][0]).put(elements[1][0]).put(elements[2][0]).put(elements[3][0]);
+		buffer.put(elements[0][1]).put(elements[1][1]).put(elements[2][1]).put(elements[3][1]);
+		buffer.put(elements[0][2]).put(elements[1][2]).put(elements[2][2]).put(elements[3][2]);
+		buffer.put(elements[0][3]).put(elements[1][3]).put(elements[2][3]).put(elements[3][3]);
+	}
+
+	public void toArray(float[] array, int start) {
+		array[start++] = elements[0][0];
+		array[start++] = elements[1][0];
+		array[start++] = elements[2][0];
+		array[start++] = elements[3][0];
+
+		array[start++] = elements[0][1];
+		array[start++] = elements[1][1];
+		array[start++] = elements[2][1];
+		array[start++] = elements[3][1];
+
+		array[start++] = elements[0][2];
+		array[start++] = elements[1][2];
+		array[start++] = elements[2][2];
+		array[start++] = elements[3][2];
+
+		array[start++] = elements[0][3];
+		array[start++] = elements[1][3];
+		array[start++] = elements[2][3];
+		array[start++] = elements[3][3];
 	}
 
 	javax.vecmath.Matrix4f toVecmath() {
@@ -515,6 +552,24 @@ public class Matrix4 {
 		Matrix4 m = new Matrix4();
 
 		return m.loadRotation(x, y, z);
+	}
+
+	public static Matrix4 createRotationAroundX(float angle) {
+		Matrix4 m = new Matrix4();
+
+		return m.loadRotationAroundX(angle);
+	}
+
+	public static Matrix4 createRotationAroundY(float angle) {
+		Matrix4 m = new Matrix4();
+
+		return m.loadRotationAroundY(angle);
+	}
+
+	public static Matrix4 createRotationAroundZ(float angle) {
+		Matrix4 m = new Matrix4();
+
+		return m.loadRotationAroundZ(angle);
 	}
 
 	public static Matrix4 createTranslation(Vector3 translation) {

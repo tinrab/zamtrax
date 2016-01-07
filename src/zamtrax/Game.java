@@ -1,34 +1,23 @@
 package zamtrax;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public final class Game implements Application.Listener {
 
 	private static Game instance;
 
 	private Application application;
-	private Map<Class, Scene> sceneMap;
 	private Scene currentScene;
 	private Class startScene;
 
-	private Game(Application application, List<Scene> scenes) {
+	private Game(Application application, Class<? extends Scene> startScene) {
 		this.application = application;
+		this.startScene = startScene;
+
 		application.setApplicationListener(this);
-
-		sceneMap = new HashMap<>();
-
-		for (Scene scene : scenes) {
-			sceneMap.put(scene.getClass(), scene);
-		}
-
-		startScene = scenes.get(scenes.size() - 1).getClass();
 	}
 
 	public void start() {
 		application.start();
+		enterScene(startScene);
 	}
 
 	public void exit() {
@@ -40,19 +29,21 @@ public final class Game implements Application.Listener {
 	}
 
 	public void enterScene(Class sceneClass) {
-		Scene scene = sceneMap.get(sceneClass);
+		try {
+			Scene scene = (Scene) sceneClass.newInstance();
 
-		if (scene == null) {
-			throw new RuntimeException("Scene not found");
+			if (currentScene != null) {
+				currentScene.onExit();
+				currentScene.dispose();
+			}
+
+			currentScene = scene;
+			currentScene.onEnter();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
 		}
-
-		if (currentScene != null) {
-			currentScene.onExit();
-			currentScene.dispose();
-		}
-
-		currentScene = scene;
-		currentScene.onEnter();
 	}
 
 	@Override
@@ -105,8 +96,8 @@ public final class Game implements Application.Listener {
 		private String title;
 		private boolean vSync;
 		private double targetUPS;
-		private List<Scene> scenes;
 		private ClassLoader classLoader;
+		private Class startScene;
 
 		public Starter() {
 			windowWidth = DEFAULT_WINDOW_WIDTH;
@@ -114,7 +105,6 @@ public final class Game implements Application.Listener {
 			title = DEFAULT_TITLE;
 			vSync = DEFAULT_VSYNC;
 			targetUPS = DEFAULT_TARGET_UPS;
-			scenes = new ArrayList<>();
 		}
 
 		public Starter setWindowSize(int width, int height) {
@@ -142,8 +132,8 @@ public final class Game implements Application.Listener {
 			return this;
 		}
 
-		public Starter addScene(Scene scene) {
-			scenes.add(scene);
+		public Starter setStartScene(Class<? extends Scene> startScene) {
+			this.startScene = startScene;
 
 			return this;
 		}
@@ -158,7 +148,7 @@ public final class Game implements Application.Listener {
 			try {
 				Application application = new DesktopApplication(windowWidth, windowHeight, title, vSync, targetUPS);
 
-				instance = new Game(application, scenes);
+				instance = new Game(application, startScene);
 				application.setApplicationListener(instance);
 
 				Resources.init(classLoader);

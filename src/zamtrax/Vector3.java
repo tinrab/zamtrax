@@ -140,8 +140,8 @@ public class Vector3 {
 	}
 
 	public Vector3 rotate(Vector3 axis, float angle) {
-		float sin = Mathf.sin(-angle);
-		float cos = Mathf.cos(-angle);
+		float sin = Mathf.fastSin(-angle);
+		float cos = Mathf.fastCos(-angle);
 
 		return cross(this, axis.mul(sin)).add((mul(cos)).add(axis.mul(dot(axis.mul(1.0f - cos)))));
 	}
@@ -169,6 +169,14 @@ public class Vector3 {
 		float dz = b.z - a.z;
 
 		return Mathf.sqrt(dx * dx + dy * dy + dz * dz);
+	}
+
+	public static float sqrDistance(Vector3 a, Vector3 b) {
+		float dx = b.x - a.x;
+		float dy = b.y - a.y;
+		float dz = b.z - a.z;
+
+		return dx * dx + dy * dy + dz * dz;
 	}
 
 	public float[] toArray() {

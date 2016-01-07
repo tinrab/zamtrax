@@ -41,8 +41,4 @@ public final class CapsuleCollider extends Collider {
 		updateShape();
 	}
 
-	public void linkRigidBody(RigidBody rigidBody) {
-		this.rigidBody = rigidBody;
-	}
-
 }

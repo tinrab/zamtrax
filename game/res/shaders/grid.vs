@@ -1,7 +1,7 @@
 #pass 0
 
 #attribute position
-#attribute uv
+#attribute color
 #attribute normal
 
 #enable lights

@@ -216,8 +216,8 @@ public class Quaternion {
 		float angle = Mathf.atan2(sin, cos);
 		float invSin = 1.0f / sin;
 
-		float srcFactor = Mathf.sin((1.0f - t) * angle) * invSin;
-		float destFactor = Mathf.sin(t * angle) * invSin;
+		float srcFactor = Mathf.fastSin((1.0f - t) * angle) * invSin;
+		float destFactor = Mathf.fastSin(t * angle) * invSin;
 
 		return a.mul(srcFactor).add(correctedDest.mul(destFactor));
 	}
@@ -228,9 +228,9 @@ public class Quaternion {
 
 	public static Quaternion fromAxisAngle(Vector3 axis, float angle) {
 		float a = (angle * Mathf.DEG_TO_RAD) / 2.0f;
-		float s = Mathf.sin(a);
+		float s = Mathf.fastSin(a);
 
-		return new Quaternion(axis.x * s, axis.y * s, axis.z * s, Mathf.cos(a));
+		return new Quaternion(axis.x * s, axis.y * s, axis.z * s, Mathf.fastCos(a));
 	}
 
 	public static Quaternion fromEuler(Vector3 eulerAngles) {

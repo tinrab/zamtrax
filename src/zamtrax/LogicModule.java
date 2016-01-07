@@ -14,7 +14,11 @@ class LogicModule extends Module {
 	}
 
 	private void update(float delta, GameObject sceneObject) {
-		sceneObject.getComponents().forEach(component -> component.update(delta));
+		sceneObject.getComponents().forEach(component -> {
+			if (component.isEnabled()) {
+				component.update(delta);
+			}
+		});
 
 		//sceneObject.getChildren().forEach(this::update);
 		List<GameObject> children = sceneObject.getChildren();
@@ -22,7 +26,9 @@ class LogicModule extends Module {
 		for (int i = 0; i < children.size(); i++) {
 			GameObject child = children.get(i);
 
-			update(delta, child);
+			if(child.isActive()) {
+				update(delta, child);
+			}
 		}
 	}
 

@@ -9,6 +9,13 @@ public class SphereCollider extends Collider {
 	private float radius;
 
 	@Override
+	public void onAdd() {
+		super.onAdd();
+
+		radius = 1.0f;
+	}
+
+	@Override
 	public CollisionShape getCollisionShape() {
 		return new SphereShape(radius);
 	}

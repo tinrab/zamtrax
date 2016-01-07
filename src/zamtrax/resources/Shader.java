@@ -3,6 +3,7 @@ package zamtrax.resources;
 import zamtrax.*;
 import zamtrax.components.DirectionalLight;
 import zamtrax.components.Light;
+import zamtrax.components.PointLight;
 import zamtrax.components.Renderer;
 import zamtrax.rendering.RenderState;
 
@@ -51,6 +52,19 @@ public class Shader {
 		bindUniforms();
 	}
 
+	public Shader(String vertexShaderSource, String fragmentShaderSource) {
+		uniformMap = new HashMap<>();
+
+		program = glCreateProgram();
+
+		if (program == 0) {
+			throw new RuntimeException(glGetProgramInfoLog(program));
+		}
+
+		compile(vertexShaderSource, GL_VERTEX_SHADER);
+		compile(fragmentShaderSource, GL_FRAGMENT_SHADER);
+	}
+
 	private void compile(String source, int type) {
 		int shader = glCreateShader(type);
 
@@ -72,7 +86,20 @@ public class Shader {
 		bindingInfo.getAttributePointers().forEach(ap -> glBindAttribLocation(program, ap.getLocation(), ap.getAttributeType().getName()));
 	}
 
-	private void link() {
+	public void bindAttribute(int location, String name) {
+		glBindAttribLocation(program, location, name);
+	}
+
+	public void bindUniform(String name) {
+		int location = glGetUniformLocation(program, name);
+		Uniform uniform = new Uniform(name);
+
+		uniform.setLocation(location);
+
+		uniformMap.put(name, uniform);
+	}
+
+	public void link() {
 		glLinkProgram(program);
 
 		if (glGetProgrami(program, GL_LINK_STATUS) == GL_FALSE) {
@@ -177,6 +204,15 @@ public class Shader {
 					setUniform("light.color", directionalLight.getColor());
 					setUniform("light.intensity", directionalLight.getIntensity());
 					setUniform("light.direction", directionalLight.getTransform().forward());
+				} else if (light instanceof PointLight) {
+					PointLight pointLight = (PointLight) light;
+
+					setUniform("lightType", 2);
+
+					setUniform("light.color", pointLight.getColor());
+					setUniform("light.intensity", pointLight.getIntensity());
+					setUniform("light.range", pointLight.getRange());
+					setUniform("light.position", pointLight.getTransform().getPosition());
 				}
 
 				if (receiveShadows && light.getShadows() == Light.Shadows.HARD) {
@@ -290,11 +326,6 @@ public class Shader {
 
 			preprocessVertexShader(vertexSource);
 			preprocessFragmentShader(fragmentSource);
-
-			System.out.println("-- VERTEX --");
-			System.out.println(vertexShader);
-			System.out.println("-- FRAGMENT --");
-			System.out.println(fragmentShader);
 
 			return new Shader(pass, enabledLights, enableAmbient, castShadows, recieveShadows, vertexShader.toString(), fragmentShader.toString(), new BindingInfo(attributePointers), uniformNames);
 		}

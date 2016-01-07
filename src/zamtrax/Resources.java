@@ -74,15 +74,11 @@ public final class Resources {
 					buffer.put((byte) ((rgb >> 8) & 0xFF));
 					buffer.put((byte) ((rgb) & 0xFF));
 
-					/*
 					if (hasAlpha) {
 						buffer.put((byte) ((rgb >> 24) & 0xFF));
 					} else {
 						buffer.put((byte) (0xFF));
 					}
-					*/
-
-					buffer.put((byte) 0xFF);
 				}
 			}
 

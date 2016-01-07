@@ -102,6 +102,8 @@ vec4 calculateLightFactor(vec4 position, vec3 normal)
 	switch(lightType) {
 		case 1:
 			return calculateDirectionalLight(light, material, normal, position);
+		case 2:
+			return calculatePointLight(light, material, normal, position);
 	}
 
     return vec4(1.0);

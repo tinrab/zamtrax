@@ -1,5 +1,6 @@
 package fri.rg.zamtrax;
 
+import fri.rg.zamtrax.menu.MainMenu;
 import zamtrax.Game;
 import zamtrax.Scene;
 

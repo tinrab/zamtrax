@@ -1,13 +1,6 @@
-#version 330
+#texture diffuse
 
-in vec4 vColor;
-in vec2 vUV;
-
-out vec4 vDiffuseColor;
-
-uniform sampler2D diffuse;
-
-void main()
+#shader
 {
-	vDiffuseColor = texture2D(diffuse, vUV) * vColor;
+	return texture2D(diffuse, vUV) * vCOLOR;
 }

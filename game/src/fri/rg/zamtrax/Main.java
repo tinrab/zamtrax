@@ -1,6 +1,7 @@
 package fri.rg.zamtrax;
 
-import fri.rg.zamtrax.level.Level;
+import fri.rg.zamtrax.menu.MainMenu;
+import fri.rg.zamtrax.tests.ParticleSystemTest;
 import zamtrax.Game;
 
 public class Main {
@@ -9,7 +10,7 @@ public class Main {
 		new Game.Starter()
 				.setWindowSize(1280, 720)
 				.setVSync(true)
-				.addScene(new Level())
+				.setStartScene(ParticleSystemTest.class)
 				.setClassLoader(ClassLoader.getSystemClassLoader())
 				.start();
 	}

@@ -2,7 +2,8 @@ package zamtrax;
 
 public abstract class Component {
 
-	private GameObject gameObject;
+	protected GameObject gameObject;
+	protected Transform transform;
 	private boolean enabled;
 
 	public void onAdd() {
@@ -26,10 +27,11 @@ public abstract class Component {
 
 	void setGameObject(GameObject gameObject) {
 		this.gameObject = gameObject;
+		transform = gameObject.getTransform();
 	}
 
 	public final Transform getTransform() {
-		return gameObject.getTransform();
+		return transform;
 	}
 
 	public final <T extends Component> T getComponent(Class<T> componentClass) {
@@ -42,6 +44,10 @@ public abstract class Component {
 
 	public final <T extends Component> T findComponentOfType(Class<T> componentClass) {
 		return gameObject.findComponentOfType(componentClass);
+	}
+
+	public final <T extends Component> T findComponentInAncestorsOfType(Class<T> componentClass){
+		return gameObject.findComponentInAncestorsOfType(componentClass);
 	}
 
 	public final void setEnabled(boolean enabled) {

@@ -1,6 +1,5 @@
 package zamtrax.components;
 
-import zamtrax.Game;
 import zamtrax.Mathf;
 import zamtrax.Matrix4;
 
@@ -22,7 +21,7 @@ public final class SpotLight extends Light {
 	}
 
 	public void setSpotAngle(float angle) {
-		cutoff = Mathf.cos(Mathf.DEG_TO_RAD * angle * 0.5f);
+		cutoff = Mathf.fastCos(Mathf.DEG_TO_RAD * angle * 0.5f);
 		setShadowProjection(Matrix4.createPerspective(angle, 1.0f, 0.01f, range));
 	}
 

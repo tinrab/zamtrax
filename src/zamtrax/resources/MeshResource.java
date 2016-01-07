@@ -8,7 +8,7 @@ import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
-final class MeshResource extends ReferencedResource {
+public final class MeshResource extends ReferencedResource {
 
 	private static Map<Integer, MeshResource> resourceMap = new HashMap<>();
 

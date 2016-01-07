@@ -26,23 +26,23 @@ public class SpriteBatch {
 	public SpriteBatch(int size) {
 		bindingInfo = new BindingInfo(AttributeType.POSITION, AttributeType.COLOR, AttributeType.UV);
 
-		/*
 		shader = new Shader.Builder()
 				.setVertexShaderSource(Resources.loadText("shaders/ui.vs", getClass().getClassLoader()))
 				.setFragmentShaderSource(Resources.loadText("shaders/ui.fs", getClass().getClassLoader()))
-				.setBindingInfo(bindingInfo)
-				.addUniform("P")
 				.build();
-		*/
 
 		data = new VertexArray(size, bindingInfo);
 		color = Color.createWhite();
 
-		resize(Game.getScreenWidth(), Game.getScreenHeight());
+		projection = Matrix4.createOrthographic(0.0f, Game.getScreenWidth(), Game.getScreenHeight(), 0.0f, -1.0f, 1.0f);
 	}
 
-	public void resize(int width, int height) {
-		projection = Matrix4.createOrthographic(0.0f, width, height, 0.0f, -1.0f, 1.0f);
+	public Matrix4 getProjection() {
+		return projection;
+	}
+
+	public void setProjection(Matrix4 projection) {
+		this.projection = projection;
 	}
 
 	public void begin() {
@@ -56,7 +56,7 @@ public class SpriteBatch {
 
 		shader.bind();
 
-		shader.setUniform("P", projection);
+		shader.setUniform("MVP", projection);
 	}
 
 	public void end() {
@@ -74,24 +74,47 @@ public class SpriteBatch {
 		this.color = new Color(color);
 	}
 
-	public void draw(Sprite sprite, float x, float y) {
-		draw(sprite, x, y, sprite.getWidth(), sprite.getHeight());
-	}
-
-	public void draw(Sprite sprite, float x, float y, float width, float height) {
-		draw(sprite.getTexture(), x, y, width, height, sprite.getU1(), sprite.getV1(), sprite.getU2(), sprite.getV2());
-	}
-
 	public void draw(Texture texture, float x, float y, float width, float height, float u1, float v1, float u2, float v2) {
 		checkFlush(texture);
 
-		putVertex(x, y, u1, v1);
-		putVertex(x, y + height, u1, v2);
-		putVertex(x + width, y + height, u2, v2);
+		putRect(x, y, width, height, u1, v1, u2, v2);
+	}
 
-		putVertex(x, y, u1, v1);
-		putVertex(x + width, y + height, u2, v2);
-		putVertex(x + width, y, u2, v1);
+	public void draw(Texture texture, float x, float y, float width, float height, float u1, float v1, float u2, float v2, float left, float right, float top, float bottom, Vector3 s, boolean fillCenter) {
+		checkFlush(texture);
+
+		float du = u2 - u1;
+		float dv = v2 - v1;
+
+		float cu1 = u1 + left / width * du;
+		float cv1 = v1 + top / height * dv;
+		float cu2 = u2 - right / width * du;
+		float cv2 = v2 - bottom / height * dv;
+
+		// TODO optimize math
+
+		// top left
+		putRect(x, y, left, top, u1, v1, cu1, cv1);
+		// bottom right
+		putRect(x + width * s.x - right, y + height * s.y - bottom, right, bottom, cu2, cv2, u2, v2);
+		// top right
+		putRect(x + width * s.x - right, y, right, top, cu2, v1, u2, cv1);
+		// bottom left
+		putRect(x, y + height * s.y - bottom, left, bottom, u1, cv2, cu1, v2);
+
+		// left
+		putRect(x, y + top, left, height * s.y - top - bottom, u1, cv1, cu1, cv2);
+		// right
+		putRect(x + width * s.x - right, y + top, right, height * s.y - top - bottom, cu2, cv1, u2, cv2);
+		// top
+		putRect(x + left, y, width * s.x - left - right, top, cu1, v1, cu2, cv1);
+		// bottom
+		putRect(x + left, y + height * s.y - bottom, width * s.x - left - right, bottom, cu1, cv2, cu2, v2);
+
+		// center
+		if (fillCenter) {
+			putRect(x + left, y + top, width * s.x - left - right, height * s.y - top - bottom, cu1, cv1, cu2, cv2);
+		}
 	}
 
 	public void draw(BMFont font, String text, float x, float y) {
@@ -108,7 +131,6 @@ public class SpriteBatch {
 
 	public void draw(BMFont font, String text, float x, float y, float sx, float sy, Justify horizontalJustification, Justify verticalJustification) {
 		float maxX = x;
-
 		float yOffset = 0;
 
 		if (verticalJustification == Justify.BOTTOM) {
@@ -188,6 +210,16 @@ public class SpriteBatch {
 		vertexCount++;
 	}
 
+	private void putRect(float x, float y, float width, float height, float u1, float v1, float u2, float v2) {
+		putVertex(x, y, u1, v1);
+		putVertex(x, y + height, u1, v2);
+		putVertex(x + width, y + height, u2, v2);
+
+		putVertex(x, y, u1, v1);
+		putVertex(x + width, y + height, u2, v2);
+		putVertex(x + width, y, u2, v1);
+	}
+
 	private void checkFlush(Texture texture) {
 		if (texture == null) {
 			throw new RuntimeException("texture is null");
@@ -203,11 +235,13 @@ public class SpriteBatch {
 	private void flush() {
 		render();
 		data.clear();
+		vertexCount = 0;
 	}
 
 	private void render() {
 		if (texture != null) {
-			texture.bind();
+			shader.setUniform("diffuse", 0);
+			texture.bind(0);
 		}
 
 		data.render(GL_TRIANGLES, 0, vertexCount);

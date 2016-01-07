@@ -35,12 +35,20 @@ public final class Mathf {
 		return x < min ? min : x > max ? max : x;
 	}
 
-	// Credits http://www.java-gaming.org/index.php?topic=24191.0
 	public static float sin(float x) {
-		return sin[(int) (x * radToIndex) & SIN_MASK];
+		return (float) Math.sin(x);
 	}
 
 	public static float cos(float x) {
+		return (float) Math.cos(x);
+	}
+
+	// Credits http://www.java-gaming.org/index.php?topic=24191.0
+	public static float fastSin(float x) {
+		return sin[(int) (x * radToIndex) & SIN_MASK];
+	}
+
+	public static float fastCos(float x) {
 		return cos[(int) (x * radToIndex) & SIN_MASK];
 	}
 
@@ -80,6 +88,10 @@ public final class Mathf {
 
 	public static float floor(float x) {
 		return (float) Math.floor(x);
+	}
+
+	public static int floorToInt(float x) {
+		return (int) floor(x);
 	}
 
 	public static float sign(float x) {
