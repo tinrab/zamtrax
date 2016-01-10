@@ -8,6 +8,8 @@ import zamtrax.resources.Texture;
 
 public class Filter {
 
+	private static Matrix4 mvp = Matrix4.createIdentity();
+
 	protected Shader shader;
 	protected boolean enabled;
 
@@ -28,8 +30,6 @@ public class Filter {
 	}
 
 	public void updateUniforms(Texture source, RenderState renderState) {
-		Matrix4 mvp = Matrix4.createIdentity();
-
 		shader.setUniform("MVP", mvp);
 		shader.setUniform("filterTexture", 0);
 

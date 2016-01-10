@@ -1,0 +1,8 @@
+uniform float intensity;
+
+#shader
+{
+   vec4 final = texture(filterTexture, vUV);
+
+   return final + vec4(intensity, 0.0, 0.0, 1.0);
+}

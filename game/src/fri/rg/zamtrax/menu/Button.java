@@ -9,9 +9,16 @@ import zamtrax.ui.Text;
 
 public class Button extends Component {
 
+	public interface OnReleaseListener {
+
+		void onRelease();
+
+	}
+
 	private Image image;
 	private Text text;
 	private Color normalColor, pressedColor;
+	private OnReleaseListener onReleaseListener;
 
 	@Override
 	public void onAdd() {
@@ -27,6 +34,12 @@ public class Button extends Component {
 			image.setTint(pressedColor);
 		} else {
 			image.setTint(normalColor);
+		}
+
+		if (image.wasReleased()) {
+			if (onReleaseListener != null) {
+				onReleaseListener.onRelease();
+			}
 		}
 	}
 
@@ -47,8 +60,12 @@ public class Button extends Component {
 		text.setHorizontalJustification(Justify.CENTER);
 		text.setVerticalJustification(Justify.CENTER);
 
-		text.getTransform().setPosition(0.0f, 0.0f, 0.0f);
+		text.getTransform().setPosition(0.0f, -2.0f, 0.0f);
 		text.getTransform().setScale(0.7f, 0.7f, 1.0f);
+	}
+
+	public void setOnReleaseListener(OnReleaseListener onReleaseListener) {
+		this.onReleaseListener = onReleaseListener;
 	}
 
 }

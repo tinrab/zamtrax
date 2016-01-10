@@ -28,9 +28,10 @@ public final class CharacterController extends Component {
 
 	@Override
 	public void onAdd() {
-		radius = 0.5f;
-		height = 1.0f;
-		stepHeight = 0.05f;
+		float scale = 0.25f;
+		radius = 1.75f * scale;
+		height = 1.75f * scale;
+		stepHeight = 0.35f * scale;
 
 		transform = getTransform();
 

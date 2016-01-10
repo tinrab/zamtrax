@@ -10,6 +10,7 @@ import zamtrax.resources.Texture;
 public class RenderState {
 
 	private Renderer renderer;
+	private Matrix4 projection;
 	private Matrix4 viewProjection;
 	private Color ambientIntenstiy;
 	private Light light;
@@ -17,6 +18,7 @@ public class RenderState {
 	private Texture shadowMap;
 
 	public void clear() {
+		projection = null;
 		renderer = null;
 		viewProjection = null;
 		ambientIntenstiy = null;
@@ -39,6 +41,14 @@ public class RenderState {
 
 	public void setViewProjection(Matrix4 viewProjection) {
 		this.viewProjection = viewProjection;
+	}
+
+	public Matrix4 getProjection() {
+		return projection;
+	}
+
+	public void setProjection(Matrix4 projection) {
+		this.projection = projection;
 	}
 
 	public Color getAmbientIntenstiy() {

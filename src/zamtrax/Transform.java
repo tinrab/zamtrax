@@ -111,6 +111,10 @@ public final class Transform extends Component {
 		this.parent = parent;
 	}
 
+	public void lookAt(Vector3 point) {
+		setRotation(Quaternion.fromLookAt(point.sub(getPosition()), Vector3.UP));
+	}
+
 	public Vector3 getPosition() {
 		return getParentMatrix().transformPoint(position);
 	}

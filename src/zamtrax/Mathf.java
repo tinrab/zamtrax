@@ -3,7 +3,7 @@ package zamtrax;
 public final class Mathf {
 
 	public static final float PI = 3.14159265359f;
-	public static final float TAU = PI * 2.0f;
+	public static final float PI2 = PI * 2.0f;
 	public static final float RAD_TO_DEG = 180.0f / PI;
 	public static final float DEG_TO_RAD = PI / 180.0f;
 
@@ -94,8 +94,16 @@ public final class Mathf {
 		return (int) floor(x);
 	}
 
+	public static int roundToInt(float x) {
+		return Math.round(x);
+	}
+
 	public static float sign(float x) {
 		return x < 0.0f ? -1.0f : x > 0.0f ? 1.0f : 0.0f;
+	}
+
+	public static float lerp(float a, float b, float t) {
+		return a + (b - a) * t;
 	}
 
 }

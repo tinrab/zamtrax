@@ -6,7 +6,7 @@ public enum Block {
 
 	NULL(null),
 	BASIC(new Color(0.2f, 0.2f, 0.2f)),
-	ORE(new Color(0.2f, 0.5f, 1.0f));
+	BRIGHT(new Color(0.8f, 0.8f, 0.8f));
 
 	private final Color color;
 

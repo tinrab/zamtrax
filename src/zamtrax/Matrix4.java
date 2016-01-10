@@ -250,74 +250,78 @@ public class Matrix4 {
 	}
 
 	public Matrix4 mul(Matrix4 m) {
-		Matrix4 r = new Matrix4();
+		Matrix4 out = new Matrix4();
 
-		r.elements[0][0] = elements[0][0] * m.elements[0][0] +
+		return mul(m, out);
+	}
+
+	public Matrix4 mul(Matrix4 m, Matrix4 out) {
+		out.elements[0][0] = elements[0][0] * m.elements[0][0] +
 				elements[0][1] * m.elements[1][0] +
 				elements[0][2] * m.elements[2][0] +
 				elements[0][3] * m.elements[3][0];
-		r.elements[0][1] = elements[0][0] * m.elements[0][1] +
+		out.elements[0][1] = elements[0][0] * m.elements[0][1] +
 				elements[0][1] * m.elements[1][1] +
 				elements[0][2] * m.elements[2][1] +
 				elements[0][3] * m.elements[3][1];
-		r.elements[0][2] = elements[0][0] * m.elements[0][2] +
+		out.elements[0][2] = elements[0][0] * m.elements[0][2] +
 				elements[0][1] * m.elements[1][2] +
 				elements[0][2] * m.elements[2][2] +
 				elements[0][3] * m.elements[3][2];
-		r.elements[0][3] = elements[0][0] * m.elements[0][3] +
+		out.elements[0][3] = elements[0][0] * m.elements[0][3] +
 				elements[0][1] * m.elements[1][3] +
 				elements[0][2] * m.elements[2][3] +
 				elements[0][3] * m.elements[3][3];
-		r.elements[1][0] = elements[1][0] * m.elements[0][0] +
+		out.elements[1][0] = elements[1][0] * m.elements[0][0] +
 				elements[1][1] * m.elements[1][0] +
 				elements[1][2] * m.elements[2][0] +
 				elements[1][3] * m.elements[3][0];
-		r.elements[1][1] = elements[1][0] * m.elements[0][1] +
+		out.elements[1][1] = elements[1][0] * m.elements[0][1] +
 				elements[1][1] * m.elements[1][1] +
 				elements[1][2] * m.elements[2][1] +
 				elements[1][3] * m.elements[3][1];
-		r.elements[1][2] = elements[1][0] * m.elements[0][2] +
+		out.elements[1][2] = elements[1][0] * m.elements[0][2] +
 				elements[1][1] * m.elements[1][2] +
 				elements[1][2] * m.elements[2][2] +
 				elements[1][3] * m.elements[3][2];
-		r.elements[1][3] = elements[1][0] * m.elements[0][3] +
+		out.elements[1][3] = elements[1][0] * m.elements[0][3] +
 				elements[1][1] * m.elements[1][3] +
 				elements[1][2] * m.elements[2][3] +
 				elements[1][3] * m.elements[3][3];
-		r.elements[2][0] = elements[2][0] * m.elements[0][0] +
+		out.elements[2][0] = elements[2][0] * m.elements[0][0] +
 				elements[2][1] * m.elements[1][0] +
 				elements[2][2] * m.elements[2][0] +
 				elements[2][3] * m.elements[3][0];
-		r.elements[2][1] = elements[2][0] * m.elements[0][1] +
+		out.elements[2][1] = elements[2][0] * m.elements[0][1] +
 				elements[2][1] * m.elements[1][1] +
 				elements[2][2] * m.elements[2][1] +
 				elements[2][3] * m.elements[3][1];
-		r.elements[2][2] = elements[2][0] * m.elements[0][2] +
+		out.elements[2][2] = elements[2][0] * m.elements[0][2] +
 				elements[2][1] * m.elements[1][2] +
 				elements[2][2] * m.elements[2][2] +
 				elements[2][3] * m.elements[3][2];
-		r.elements[2][3] = elements[2][0] * m.elements[0][3] +
+		out.elements[2][3] = elements[2][0] * m.elements[0][3] +
 				elements[2][1] * m.elements[1][3] +
 				elements[2][2] * m.elements[2][3] +
 				elements[2][3] * m.elements[3][3];
-		r.elements[3][0] = elements[3][0] * m.elements[0][0] +
+		out.elements[3][0] = elements[3][0] * m.elements[0][0] +
 				elements[3][1] * m.elements[1][0] +
 				elements[3][2] * m.elements[2][0] +
 				elements[3][3] * m.elements[3][0];
-		r.elements[3][1] = elements[3][0] * m.elements[0][1] +
+		out.elements[3][1] = elements[3][0] * m.elements[0][1] +
 				elements[3][1] * m.elements[1][1] +
 				elements[3][2] * m.elements[2][1] +
 				elements[3][3] * m.elements[3][1];
-		r.elements[3][2] = elements[3][0] * m.elements[0][2] +
+		out.elements[3][2] = elements[3][0] * m.elements[0][2] +
 				elements[3][1] * m.elements[1][2] +
 				elements[3][2] * m.elements[2][2] +
 				elements[3][3] * m.elements[3][2];
-		r.elements[3][3] = elements[3][0] * m.elements[0][3] +
+		out.elements[3][3] = elements[3][0] * m.elements[0][3] +
 				elements[3][1] * m.elements[1][3] +
 				elements[3][2] * m.elements[2][3] +
 				elements[3][3] * m.elements[3][3];
 
-		return r;
+		return out;
 	}
 
 	public Matrix4 transpose() {

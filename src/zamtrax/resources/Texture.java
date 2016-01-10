@@ -87,7 +87,7 @@ public final class Texture implements Disposable {
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, fm);
 		}
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, glFormat, GL_UNSIGNED_BYTE, buffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, width, height, 0, glFormat, GL_UNSIGNED_BYTE, buffer);
 
 		release();
 	}

@@ -1,4 +1,6 @@
+#texture diffuse
+
 #shader
 {
-    return vCOLOR;
+    return texture(diffuse, fract(vUV)) * vCOLOR;
 }

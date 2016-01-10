@@ -1,12 +1,16 @@
 package fri.rg.zamtrax.level;
 
+import fri.rg.zamtrax.level.pathfinding.AStar;
+import fri.rg.zamtrax.level.pathfinding.Agent;
+import fri.rg.zamtrax.level.pathfinding.Map;
+import fri.rg.zamtrax.level.pathfinding.Path;
 import zamtrax.Vector3;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class Arena {
+public class Arena implements Map {
 
 	public interface ChunkIterator {
 
@@ -14,11 +18,10 @@ public class Arena {
 
 	}
 
-	public static final int SIZE = 4 * 2 + 1;
+	public static final int SIZE = 3 * 2 + 1;
 	public static final int HEIGHT = 2;
 
 	private Chunk[][][] chunks;
-	private Vector3 spawnPoint;
 
 	public Arena() {
 		chunks = new Chunk[SIZE][HEIGHT][SIZE];
@@ -30,8 +33,6 @@ public class Arena {
 				}
 			}
 		}
-
-		spawnPoint = new Vector3();
 	}
 
 	public void forEachChunk(ChunkIterator chunkIterator) {
@@ -64,8 +65,28 @@ public class Arena {
 		return chunks;
 	}
 
-	public Vector3 getSpawnPoint() {
-		return spawnPoint;
+	@Override
+	public int getWidth() {
+		return SIZE * Chunk.SIZE;
+	}
+
+	@Override
+	public int getHeight() {
+		return SIZE * Chunk.SIZE;
+	}
+
+	@Override
+	public boolean isBlocked(Agent agent, int x, int y) {
+		return getBlock(x, 1, y) != Block.NULL;
+	}
+
+	@Override
+	public float getCost(Agent agent, int sx, int sy, int tx, int ty) {
+		return 1.0f;
+	}
+
+	public Path findPath(Agent agent, int sx, int sy, int tx, int ty) {
+		return AStar.findPath(this, agent, sx, sy, tx, ty, false);
 	}
 
 }

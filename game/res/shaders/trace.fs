@@ -1,0 +1,4 @@
+#shader
+{
+    return vCOLOR;
+}

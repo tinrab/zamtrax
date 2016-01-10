@@ -9,34 +9,43 @@ import zamtrax.resources.Texture;
 public class FlareFilter extends Filter {
 
 	private Vector3 worldPosition;
+	private float brightness;
 
 	public FlareFilter() {
 		super("shaders/flare.filter");
 
 		worldPosition = new Vector3();
+		brightness = 1.0f;
 	}
 
 	@Override
 	public void updateUniforms(Texture source, RenderState renderState) {
-		Matrix4 mvp = Matrix4.createIdentity();
-
-		shader.setUniform("MVP", mvp);
-		shader.setUniform("filterTexture", 0);
-		shader.setUniform("textureSize", new Vector2(Game.getScreenWidth(), Game.getScreenHeight()));
-		shader.setUniform("time", (float) Time.getInstance().currentMillis());
+		super.updateUniforms(source, renderState);
 
 		Vector3 viewportPoint = Camera.getMainCamera().worldToViewportPoint(worldPosition);
 
 		if (viewportPoint.z < 0.0f) {
 			shader.setUniform("brightness", 0.0f);
 		} else {
-			shader.setUniform("brightness", 1.0f);
+			shader.setUniform("brightness", brightness);
 			shader.setUniform("position", new Vector2(viewportPoint.x, viewportPoint.y));
 		}
 	}
 
 	public void setWorldPosition(Vector3 worldPosition) {
 		this.worldPosition = worldPosition;
+	}
+
+	public Vector3 getWorldPosition() {
+		return worldPosition;
+	}
+
+	public void setBrightness(float brightness) {
+		this.brightness = brightness;
+	}
+
+	public float getBrightness() {
+		return brightness;
 	}
 
 }

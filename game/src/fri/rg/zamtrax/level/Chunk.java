@@ -8,12 +8,15 @@ public class Chunk {
 
 	}
 
-	public static final int SIZE = 8;
+	public static final int SIZE = 4;
+	public static final float BLOCK_SIZE = 1.5f;
 
 	private Block[][][] blocks;
 
 	public Chunk() {
 		blocks = new Block[SIZE][SIZE][SIZE];
+
+		forEachBlock((block, x, y, z) -> blocks[x][y][z] = Block.NULL);
 	}
 
 	public void forEachBlock(BlockIterator blockIterator) {

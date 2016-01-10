@@ -1,8 +1,10 @@
 package fri.rg.zamtrax.level;
 
 import zamtrax.*;
+import zamtrax.components.MeshCollider;
 import zamtrax.components.MeshFilter;
 import zamtrax.components.MeshRenderer;
+import zamtrax.components.RigidBody;
 import zamtrax.resources.*;
 
 import java.util.Arrays;
@@ -40,8 +42,6 @@ public class ArenaFactory {
 
 	}
 
-	private static final int VOXEL_SIZE = 1;
-
 	private static VoxelFace[][][] voxels = new VoxelFace[Chunk.SIZE][Chunk.SIZE][Chunk.SIZE];
 
 	private static class VoxelFace {
@@ -60,14 +60,7 @@ public class ArenaFactory {
 	}
 
 	public static void generate(Arena arena) {
-		int[][] tiles = new int[Arena.SIZE][Arena.SIZE];
-
-		for (int i = 0; i < tiles.length; i++) {
-			for (int j = 0; j < tiles[0].length; j++) {
-				tiles[i][j] = Chunk.SIZE * Arena.HEIGHT;
-			}
-		}
-
+		boolean[][] tiles = new boolean[Arena.SIZE][Arena.SIZE];
 		int[][] maze = new int[(tiles.length - 1) / 2][(tiles[0].length - 1) / 2];
 
 		generateMaze(maze, 0, 0);
@@ -78,56 +71,115 @@ public class ArenaFactory {
 				int ty = j * 2 + 1;
 				int m = maze[i][j];
 
-				tiles[tx][ty] = 1;
+				tiles[tx][ty] = true;
 
 				if ((m & Direction.NORTH.bit) != 0) {
-					tiles[tx][ty - 1] = 1;
+					tiles[tx][ty - 1] = true;
 				}
 
 				if ((m & Direction.SOUTH.bit) != 0) {
-					tiles[tx][ty + 1] = 1;
+					tiles[tx][ty + 1] = true;
 				}
 
 				if ((m & Direction.EAST.bit) != 0) {
-					tiles[tx + 1][ty] = 1;
+					tiles[tx + 1][ty] = true;
 				}
 
 				if ((m & Direction.WEST.bit) != 0) {
-					tiles[tx - 1][ty] = 1;
+					tiles[tx - 1][ty] = true;
 				}
 			}
 		}
 
-		// wals
-		for (int i = 0; i < tiles.length; i++) {
-			tiles[i][0] = Arena.HEIGHT * Chunk.SIZE;
-			tiles[i][tiles.length - 1] = Arena.HEIGHT * Chunk.SIZE;
-			tiles[0][i] = Arena.HEIGHT * Chunk.SIZE;
-			tiles[tiles.length - 1][i] = Arena.HEIGHT * Chunk.SIZE;
-		}
-
-		SimplexNoise simplex = new SimplexNoise(1337);
-		float scale = 0.01f;
+		SimplexNoise simplex = new SimplexNoise(System.nanoTime());
 
 		arena.forEachChunk((chunk, x, y, z) -> {
-			int tile = (int) (tiles[x][z] * simplex.noise(x, z)) - Chunk.SIZE * y;
+			if (y == 0) {
+				fillBottom(arena, x, z, Block.BASIC, 1);
 
-			if (tile < 1) {
-				tile = 1;
+				if (!tiles[x][z]) {
+					fillBottom(arena, x, z, Block.BASIC, (int) ((simplex.noise(x, z) * 0.5f + 0.5f) * Chunk.SIZE * 2));
+				}
 			}
+		});
 
-			for (int bx = 0; bx < Chunk.SIZE; bx++) {
-				for (int by = 0; by < Chunk.SIZE; by++) {
-					for (int bz = 0; bz < Chunk.SIZE; bz++) {
-						if (by >= tile || ((bx == 0 || bz == 0 || bx == Chunk.SIZE - 1 || bz == Chunk.SIZE - 1) && by >= tile || by == tile - 1 && simplex.noise(bx + x, by + y, bz + z) > 0.5f)) {
-							chunk.setBlock(Block.NULL, bx, by, bz);
-						} else {
-							chunk.setBlock(Block.BASIC, bx, by, bz);
+		for (int x = 0; x < Arena.SIZE * Chunk.SIZE; x++) {
+			int y = Chunk.SIZE - 1 + Random.randomInteger(Chunk.SIZE);
+			boolean inBounds = false;
+			int lastZ = 0;
+
+			for (int z = 0; z < Arena.SIZE * Chunk.SIZE; z++) {
+				if (z - lastZ > Chunk.SIZE * 2) {
+					inBounds = false;
+				}
+
+				if (arena.getBlock(x, y, z) != Block.NULL) {
+					if (inBounds && arena.getBlock(x, y, z - 1) == Block.NULL) {
+						inBounds = false;
+
+						for (int zz = lastZ; zz <= z; zz++) {
+							arena.setBlock(Block.BRIGHT, x, y, zz);
+						}
+					} else {
+						inBounds = true;
+						lastZ = z;
+					}
+				}
+			}
+		}
+
+		for (int z = 0; z < Arena.SIZE * Chunk.SIZE; z++) {
+			int y = Chunk.SIZE - 1 + Random.randomInteger(Chunk.SIZE);
+			boolean inBounds = false;
+			int lastX = 0;
+
+			for (int x = 0; x < Arena.SIZE * Chunk.SIZE; x++) {
+				if (x - lastX > Chunk.SIZE * 2) {
+					inBounds = false;
+				}
+
+				if (arena.getBlock(x, y, z) != Block.NULL) {
+					if (inBounds && arena.getBlock(x - 1, y, z) == Block.NULL) {
+						inBounds = false;
+
+						for (int xx = lastX; xx <= x; xx++) {
+							arena.setBlock(Block.BRIGHT, xx, y, z);
+						}
+					} else {
+						inBounds = true;
+						lastX = x;
+					}
+				}
+			}
+		}
+
+		for (int x = 1; x < Arena.SIZE * Chunk.SIZE - 1; x++) {
+			for (int z = 1; z < Arena.SIZE * Chunk.SIZE - 1; z++) {
+				for (int y = 1; y < Arena.HEIGHT * Chunk.SIZE - 1; y++) {
+					if (Random.randomInteger(20) == 0) {
+						if (arena.getBlock(x, y, z) == Block.NULL &&
+								arena.getBlock(x - 1, y, z) != Block.NULL ||
+								arena.getBlock(x + 1, y, z) != Block.NULL ||
+								arena.getBlock(x, y - 1, z) != Block.NULL ||
+								arena.getBlock(x, y + 1, z) != Block.NULL ||
+								arena.getBlock(x, y, z - 1) != Block.NULL ||
+								arena.getBlock(x, y, z + 1) != Block.NULL) {
+							arena.setBlock(Block.BASIC, x, y, z);
 						}
 					}
 				}
 			}
-		});
+		}
+	}
+
+	private static void fillBottom(Arena arena, int cx, int cz, Block block, int height) {
+		for (int x = 0; x < Chunk.SIZE; x++) {
+			for (int z = 0; z < Chunk.SIZE; z++) {
+				for (int y = 0; y < Arena.SIZE * Chunk.SIZE && y < height; y++) {
+					arena.setBlock(block, cx * Chunk.SIZE + x, y, cz * Chunk.SIZE + z);
+				}
+			}
+		}
 	}
 
 	private static void generateMaze(int[][] maze, int x, int y) {
@@ -150,17 +202,23 @@ public class ArenaFactory {
 
 	public static GameObject createMesh(Arena arena) {
 		Material material = new Material("shaders/grid.vs", "shaders/grid.fs");
+		material.setTexture("diffuse", Resources.loadTexture("textures/grid.png", Texture.Format.ARGB, Texture.WrapMode.REPEAT, Texture.FilterMode.NEAREST));
 
-		Chunk[][][] chunks = arena.getChunks();
 		GameObject arenaRoot = GameObject.create();
 
 		arena.forEachChunk((chunk, x, y, z) -> {
-			GameObject chunkObject = GameObject.create(arenaRoot);
+			Mesh mesh = create(chunk);
 
-			chunkObject.addComponent(MeshFilter.class).setMesh(create(chunk));
-			chunkObject.addComponent(MeshRenderer.class).setMaterial(material);
+			if (mesh.getVertices().size() > 0) {
+				GameObject chunkObject = GameObject.create(arenaRoot);
 
-			chunkObject.getTransform().setPosition(x * Chunk.SIZE, y * Chunk.SIZE, z * Chunk.SIZE);
+				chunkObject.getTransform().setPosition(x * Chunk.SIZE * Chunk.BLOCK_SIZE, y * Chunk.SIZE * Chunk.BLOCK_SIZE, z * Chunk.SIZE * Chunk.BLOCK_SIZE);
+
+				chunkObject.addComponent(MeshFilter.class).setMesh(mesh);
+				chunkObject.addComponent(MeshRenderer.class).setMaterial(material);
+				chunkObject.addComponent(MeshCollider.class);
+				chunkObject.addComponent(RigidBody.class).setKinematic(true);
+			}
 		});
 
 		return arenaRoot;
@@ -171,7 +229,7 @@ public class ArenaFactory {
 		Mesh.Builder meshBuilder = new Mesh.Builder();
 		int indexOffset = 0;
 
-		meshBuilder.setBindingInfo(new BindingInfo(AttributeType.POSITION, AttributeType.COLOR, AttributeType.NORMAL));
+		meshBuilder.setBindingInfo(new BindingInfo(AttributeType.POSITION, AttributeType.UV, AttributeType.COLOR, AttributeType.NORMAL));
 		meshBuilder.calculateNormals();
 
 		for (int x = 0; x < Chunk.SIZE; x++) {
@@ -283,15 +341,20 @@ public class ArenaFactory {
 									VoxelFace voxel = mask[n];
 
 									{
-										Vertex v1 = new Vertex(bottomLeft.mul(VOXEL_SIZE));
-										Vertex v2 = new Vertex(bottomRight.mul(VOXEL_SIZE));
-										Vertex v3 = new Vertex(topLeft.mul(VOXEL_SIZE));
-										Vertex v4 = new Vertex(topRight.mul(VOXEL_SIZE));
+										Vertex v1 = new Vertex(bottomLeft.mul(Chunk.BLOCK_SIZE));
+										Vertex v2 = new Vertex(bottomRight.mul(Chunk.BLOCK_SIZE));
+										Vertex v3 = new Vertex(topLeft.mul(Chunk.BLOCK_SIZE));
+										Vertex v4 = new Vertex(topRight.mul(Chunk.BLOCK_SIZE));
 
 										v1.setColor(voxel.block.getColor());
 										v2.setColor(voxel.block.getColor());
 										v3.setColor(voxel.block.getColor());
 										v4.setColor(voxel.block.getColor());
+
+										v1.setUV(new Vector2(0.0f, 1).mul(h, w));
+										v2.setUV(new Vector2(1, 1).mul(h, w));
+										v3.setUV(new Vector2(0.0f, 0.0f).mul(h, w));
+										v4.setUV(new Vector2(1, 0.0f).mul(h, w));
 
 										meshBuilder.addVertices(v1, v2, v3, v4);
 

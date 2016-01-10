@@ -28,4 +28,8 @@ public final class Random {
 		return min + random.nextInt(max - min);
 	}
 
+	public static float gauss() {
+		return (float) random.nextGaussian();
+	}
+
 }

@@ -1,17 +1,16 @@
 package zamtrax.resources;
 
+import javafx.scene.effect.*;
 import zamtrax.*;
-import zamtrax.components.DirectionalLight;
+import zamtrax.components.*;
 import zamtrax.components.Light;
-import zamtrax.components.PointLight;
-import zamtrax.components.Renderer;
 import zamtrax.rendering.RenderState;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.StringReader;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL20.*;
@@ -186,6 +185,7 @@ public class Shader {
 
 		setUniform("MVP", mvp);
 		setUniform("M", model);
+		setUniform("P", viewProjection);
 
 		if (enableAmbient) {
 			setUniform("ambientIntensity", ambientIntensity == null ? Color.createWhite() : ambientIntensity);
@@ -194,6 +194,7 @@ public class Shader {
 		if (enabledLights) {
 			setUniform("material.shininess", material.getShininess());
 			setUniform("material.specularIntensity", material.getSpecularIntensity());
+			setUniform("useCookie", false);
 
 			if (light != null) {
 				if (light instanceof DirectionalLight) {
@@ -213,6 +214,17 @@ public class Shader {
 					setUniform("light.intensity", pointLight.getIntensity());
 					setUniform("light.range", pointLight.getRange());
 					setUniform("light.position", pointLight.getTransform().getPosition());
+				} else if (light instanceof SpotLight) {
+					SpotLight spotLight = (SpotLight) light;
+
+					setUniform("lightType", 3);
+
+					setUniform("light.color", spotLight.getColor());
+					setUniform("light.intensity", spotLight.getIntensity());
+					setUniform("light.range", spotLight.getRange());
+					setUniform("light.position", spotLight.getTransform().getPosition());
+					setUniform("light.cutoff", spotLight.getCutoff());
+					setUniform("light.direction", spotLight.getTransform().forward());
 				}
 
 				if (receiveShadows && light.getShadows() == Light.Shadows.HARD) {
@@ -222,6 +234,16 @@ public class Shader {
 					setUniform("modelLightViewProjection", renderState.getLightViewProjection().mul(model));
 					setUniform("minShadowVariance", light.getMinVariance());
 					setUniform("lightBleed", light.getLightBleed());
+
+					if (light.getCookie() != null) {
+						setUniform("cookie", 3);
+						setUniform("useCookie", true);
+						setUniform("cookieScale", light.getCookieScale());
+
+						light.getCookie().bind(3);
+					} else {
+						setUniform("useCookie", false);
+					}
 				}
 			} else {
 				//setUniform("ambientIntensity", Color.createWhite());
@@ -291,6 +313,7 @@ public class Shader {
 		private int pass;
 		private boolean enabledLights, enableAmbient;
 		private boolean castShadows, recieveShadows;
+		private String customVertexShader;
 
 		public Builder() {
 			attributePointers = new ArrayList<>();
@@ -331,60 +354,75 @@ public class Shader {
 		}
 
 		private void preprocessVertexShader(String source) {
-			int attributeLocation = 0;
+			try {
+				int attributeLocation = 0;
 
-			uniformNames.add("MVP");
-			uniformNames.add("M");
+				uniformNames.add("MVP");
+				uniformNames.add("M");
+				uniformNames.add("P");
 
-			for (String line : source.split("\n")) {
-				line = line.trim();
+				BufferedReader br = new BufferedReader(new StringReader(source));
+				String line;
 
-				if (line.startsWith("#attribute")) {
-					String name = line.substring("#attribute".length()).trim();
-					AttributeType type = AttributeType.POSITION;
+				while ((line = br.readLine()) != null) {
+					line = line.trim();
 
-					if (name.equals("position")) {
-						type = AttributeType.POSITION;
-					} else if (name.equals("uv")) {
-						type = AttributeType.UV;
-					} else if (name.equals("normal")) {
-						type = AttributeType.NORMAL;
-					} else if (name.equals("color")) {
-						type = AttributeType.COLOR;
+					if (line.startsWith("#attribute")) {
+						String name = line.substring("#attribute".length()).trim();
+						AttributeType type = AttributeType.POSITION;
+
+						if (name.equals("position")) {
+							type = AttributeType.POSITION;
+						} else if (name.equals("uv")) {
+							type = AttributeType.UV;
+						} else if (name.equals("normal")) {
+							type = AttributeType.NORMAL;
+						} else if (name.equals("color")) {
+							type = AttributeType.COLOR;
+						}
+
+						attributePointers.add(new AttributePointer(type, attributeLocation));
+						vertexShader.append(String.format("\nin layout(location = %d) vec%d %s;", attributeLocation++, type.getSize(), type.getName()));
+						vertexShader.append(String.format("\nout vec%d v%s;", type.getSize(), type.getName()));
+					} else if (line.startsWith("#enable")) {
+						String what = line.substring("#enable".length()).trim();
+
+						if (what.equals("lights")) {
+							enabledLights = true;
+							enableAmbient = true;
+						} else if (what.equals("ambient")) {
+							enableAmbient = true;
+						} else if (what.equals("shadowCast")) {
+							castShadows = true;
+						} else if (what.equals("shadowReceive")) {
+							recieveShadows = true;
+						}
+					} else if (line.startsWith("uniform")) {
+						String name = line.substring(line.lastIndexOf(' ') + 1, line.lastIndexOf(';')).trim();
+
+						uniformNames.add(name);
+
+						vertexShader.append(line);
+					} else if (line.startsWith("#pass")) {
+						pass = Integer.parseInt(line.substring("#pass".length()).trim());
+					} else if (line.startsWith("#shader")) {
+						customVertexShader = line.substring("#shader".length());
+
+						while ((line = br.readLine()) != null) {
+							customVertexShader += line;
+						}
 					}
-
-					attributePointers.add(new AttributePointer(type, attributeLocation));
-					vertexShader.append(String.format("\nin layout(location = %d) vec%d %s;", attributeLocation++, type.getSize(), type.getName()));
-					vertexShader.append(String.format("\nout vec%d v%s;", type.getSize(), type.getName()));
-				} else if (line.startsWith("#enable")) {
-					String what = line.substring("#enable".length()).trim();
-
-					if (what.equals("lights")) {
-						enabledLights = true;
-						enableAmbient = true;
-					} else if (what.equals("ambient")) {
-						enableAmbient = true;
-					} else if (what.equals("shadowCast")) {
-						castShadows = true;
-					} else if (what.equals("shadowReceive")) {
-						recieveShadows = true;
-					}
-				} else if (line.startsWith("uniform")) {
-					String name = line.substring(line.lastIndexOf(' ') + 1, line.lastIndexOf(';')).trim();
-
-					uniformNames.add(name);
-
-					vertexShader.append(line);
-				} else if (line.startsWith("#pass")) {
-					pass = Integer.parseInt(line.substring("#pass".length()).trim());
 				}
-			}
 
-			createVertexShaderMain();
+				createVertexShaderMain();
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
 		}
 
 		private void createVertexShaderMain() {
-			vertexShader.append("\nuniform mat4 MVP;\nuniform mat4 M;");
+			vertexShader.append("\nuniform mat4 MVP;\nuniform mat4 M;\nuniform mat4 P;");
 
 			if (enabledLights) {
 
@@ -395,13 +433,16 @@ public class Shader {
 				uniformNames.add("modelLightViewProjection");
 			}
 
+			if (customVertexShader != null) {
+				vertexShader.append("vec4 customShader()" + customVertexShader);
+			}
+
 			vertexShader.append("\nvoid main(){");
 
 			attributePointers.forEach(ap -> {
 				String name = ap.getAttributeType().getName();
 
 				vertexShader.append("\nv");
-
 				vertexShader.append(name);
 				vertexShader.append(" = ");
 
@@ -420,7 +461,11 @@ public class Shader {
 				vertexShader.append("\nvShadowMapCoords = modelLightViewProjection * " + AttributeType.POSITION.getName() + ";");
 			}
 
-			vertexShader.append("\ngl_Position = MVP * " + AttributeType.POSITION.getName() + ";");
+			if (customVertexShader != null) {
+				vertexShader.append("\ngl_Position = customShader();");
+			} else {
+				vertexShader.append("\ngl_Position = MVP * " + AttributeType.POSITION.getName() + ";");
+			}
 
 			vertexShader.append("\n}");
 		}
@@ -452,6 +497,10 @@ public class Shader {
 
 				uniformNames.add("material.shininess");
 				uniformNames.add("material.specularIntensity");
+
+				uniformNames.add("cookie");
+				uniformNames.add("cookieScale");
+				uniformNames.add("useCookie");
 			}
 
 			if (recieveShadows) {
@@ -488,7 +537,14 @@ public class Shader {
 				fragmentShader.append("\n" + line);
 			}
 
-			fragmentShader.append("\nvoid main(){gl_FragColor = customShader()");
+			fragmentShader.append("\nvoid main(){");
+
+			if(recieveShadows) {
+				fragmentShader.append("\nvec4 cookieColor = vec4(1.0);");
+				fragmentShader.append("if(useCookie){cookieColor = calculateCookie(cookie,vShadowMapCoords,cookieScale); }");
+			}
+
+			fragmentShader.append("gl_FragColor = customShader()");
 
 			if (enabledLights) {
 				fragmentShader.append(String.format("*calculateLightFactor(v%s, v%s)", AttributeType.POSITION.getName(), AttributeType.NORMAL.getName()));
@@ -499,7 +555,7 @@ public class Shader {
 			}
 
 			if (recieveShadows) {
-				fragmentShader.append("*calculateShadowFactor(vShadowMapCoords)");
+				fragmentShader.append("*cookieColor*calculateShadowFactor(vShadowMapCoords)");
 			}
 
 			fragmentShader.append(";}");

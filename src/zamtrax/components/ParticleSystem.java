@@ -1,16 +1,9 @@
 package zamtrax.components;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GLUtil;
 import zamtrax.*;
+import zamtrax.rendering.Filter;
 import zamtrax.resources.Shader;
-
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL31.*;
-import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL33.*;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -19,6 +12,15 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
+import static org.lwjgl.opengl.GL33.glVertexAttribDivisor;
+
 public class ParticleSystem extends Component {
 
 	private static final int ATTRIBUTE_POSITION = 0;
@@ -26,7 +28,7 @@ public class ParticleSystem extends Component {
 	private static final int ATTRIBUTE_MVP = 2;
 
 	private static final int MAX_PARTICLES = 500000;
-	private static final int INSTANCE_DATA_LENGTH = 16;
+	private static final int INSTANCE_DATA_LENGTH = 4 + 16;
 
 	public enum SortMode {
 		NONE, BY_DISTANCE, YOUNGEST_FIRST, OLDEST_FIRST
@@ -43,8 +45,13 @@ public class ParticleSystem extends Component {
 	private Comparator<Particle> byDistance, youngestFirst, oldestFirst;
 	private BlendMode blendMode;
 
+	private Color startColor, endColor;
+	private float rotationSpeed;
+
 	private FloatBuffer buffer;
 	private int vao, staticVBO, streamVBO, ibo;
+
+	private Filter filter;
 
 	@Override
 	public void onAdd() {
@@ -52,11 +59,14 @@ public class ParticleSystem extends Component {
 
 		gravity = new Vector3(0.0f, 0.0f, 0.0f);
 		particles = new ArrayList<>();
-		sortMode = SortMode.NONE;
 
+		sortMode = SortMode.NONE;
 		byDistance = (a, b) -> a.distance < b.distance ? -1 : 1;
 		youngestFirst = (a, b) -> a.age < b.age ? -1 : 1;
 		oldestFirst = (a, b) -> a.age > b.age ? -1 : 1;
+
+		startColor = Color.createWhite();
+		endColor = Color.createWhite();
 
 		shader = new Shader(Resources.loadText("shaders/particle.vs"), Resources.loadText("shaders/particle.fs"));
 		shader.bindAttribute(ATTRIBUTE_POSITION, "position");
@@ -65,7 +75,7 @@ public class ParticleSystem extends Component {
 		shader.link();
 
 		{
-			FloatBuffer staticBuffer = BufferUtils.createFloatBuffer(MAX_PARTICLES * INSTANCE_DATA_LENGTH);
+			FloatBuffer staticBuffer = BufferUtils.createFloatBuffer(3 * 4);
 			IntBuffer indexBuffer = BufferUtils.createIntBuffer(6);
 			staticVBO = glGenBuffers();
 			ibo = glGenBuffers();
@@ -75,21 +85,17 @@ public class ParticleSystem extends Component {
 			glBindVertexArray(vao);
 
 			staticBuffer.put(new float[]{
-					//  X     Y   Z    R     G     B
-					0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, // vertex 0
-					-0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f, // vertex 1
-					0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 1.0f, // vertex 2
-					-0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 1.0f, // vertex 3
+					0.5f, 0.5f, 0.5f,
+					-0.5f, 0.5f, 0.5f,
+					0.5f, -0.5f, 0.5f,
+					-0.5f, -0.5f, 0.5f
 			});
 			staticBuffer.flip();
 
 			glBufferData(GL_ARRAY_BUFFER, staticBuffer, GL_STATIC_DRAW);
 
 			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
-
-			glVertexAttribPointer(ATTRIBUTE_POSITION, 3, GL_FLOAT, false, 6 * Float.BYTES, 0);
-			glVertexAttribPointer(ATTRIBUTE_COLOR, 3, GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
+			glVertexAttribPointer(ATTRIBUTE_POSITION, 3, GL_FLOAT, false, 3 * Float.BYTES, 0);
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
@@ -110,11 +116,22 @@ public class ParticleSystem extends Component {
 
 			glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLES * INSTANCE_DATA_LENGTH * Float.BYTES, GL_STREAM_DRAW);
 
-			for (int i = 0; i < 4; i++) {
-				glEnableVertexAttribArray(ATTRIBUTE_MVP + i);
-				glVertexAttribDivisor(ATTRIBUTE_MVP + i, 1);
-				glVertexAttribPointer(ATTRIBUTE_MVP + i, 4, GL_FLOAT, false, 16 * Float.BYTES, i * 4 * Float.BYTES);
-			}
+			glEnableVertexAttribArray(ATTRIBUTE_COLOR);
+			glVertexAttribDivisor(ATTRIBUTE_COLOR, 1);
+			glVertexAttribPointer(ATTRIBUTE_COLOR, 4, GL_FLOAT, false, INSTANCE_DATA_LENGTH * Float.BYTES, 0);
+
+			glEnableVertexAttribArray(ATTRIBUTE_MVP + 0);
+			glEnableVertexAttribArray(ATTRIBUTE_MVP + 1);
+			glEnableVertexAttribArray(ATTRIBUTE_MVP + 2);
+			glEnableVertexAttribArray(ATTRIBUTE_MVP + 3);
+			glVertexAttribDivisor(ATTRIBUTE_MVP + 0, 1);
+			glVertexAttribDivisor(ATTRIBUTE_MVP + 1, 1);
+			glVertexAttribDivisor(ATTRIBUTE_MVP + 2, 1);
+			glVertexAttribDivisor(ATTRIBUTE_MVP + 3, 1);
+			glVertexAttribPointer(ATTRIBUTE_MVP + 0, 4, GL_FLOAT, false, INSTANCE_DATA_LENGTH * Float.BYTES, 4 * Float.BYTES);
+			glVertexAttribPointer(ATTRIBUTE_MVP + 1, 4, GL_FLOAT, false, INSTANCE_DATA_LENGTH * Float.BYTES, 8 * Float.BYTES);
+			glVertexAttribPointer(ATTRIBUTE_MVP + 2, 4, GL_FLOAT, false, INSTANCE_DATA_LENGTH * Float.BYTES, 12 * Float.BYTES);
+			glVertexAttribPointer(ATTRIBUTE_MVP + 3, 4, GL_FLOAT, false, INSTANCE_DATA_LENGTH * Float.BYTES, 16 * Float.BYTES);
 		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -131,10 +148,25 @@ public class ParticleSystem extends Component {
 		while (particleIterator.hasNext()) {
 			Particle p = particleIterator.next();
 
-			if (p.update(delta)) {
+			{
+				p.velocity.x += gravity.x * delta * p.gravity;
+				p.velocity.y += gravity.y * delta * p.gravity;
+				p.velocity.z += gravity.z * delta * p.gravity;
+
+				p.position.x += p.velocity.x * delta;
+				p.position.y += p.velocity.y * delta;
+				p.position.z += p.velocity.z * delta;
+
+				p.age += delta;
+				p.rotation += rotationSpeed * delta;
+
+				p.color.set(Color.lerp(startColor, endColor, p.age / p.lifetime));
+			}
+
+			if (p.age > p.lifetime) {
 				particleIterator.remove();
 			} else {
-				p.distance = Vector3.sqrDistance(cameraPosition, p.getPosition());
+				p.distance = Vector3.sqrDistance(cameraPosition, p.position);
 			}
 		}
 
@@ -151,14 +183,17 @@ public class ParticleSystem extends Component {
 		}
 	}
 
-	public void emit(Vector3 position) {
-		particles.add(new Particle(this, position, Random.direction().mul(5.0f), 0, 10, 10, 0.1f));
+	public void emit(Particle particle) {
+		particle.color.set(startColor);
+
+		particles.add(particle);
 	}
 
 	private void updateVBO(Matrix4 view, Matrix4 projection) {
 		buffer.clear();
 
 		for (Particle p : particles) {
+			buffer.put(p.color.r).put(p.color.g).put(p.color.b).put(p.color.a);
 			projection.mul(p.getModelView(view)).toBuffer(buffer);
 		}
 
@@ -225,9 +260,36 @@ public class ParticleSystem extends Component {
 		this.sortMode = sortMode;
 	}
 
+	public Color getStartColor() {
+		return startColor;
+	}
+
+	public void setStartColor(Color startColor) {
+		this.startColor = startColor;
+	}
+
+	public Color getEndColor() {
+		return endColor;
+	}
+
+	public void setEndColor(Color endColor) {
+		this.endColor = endColor;
+	}
+
+	public void setRotationSpeed(float rotationSpeed) {
+		this.rotationSpeed = rotationSpeed;
+	}
+
+	public Filter getFilter() {
+		return filter;
+	}
+
+	public void setFilter(Filter filter) {
+		this.filter = filter;
+	}
+
 	public static class Particle {
 
-		private ParticleSystem particleSystem;
 		private Vector3 position;
 		private Vector3 velocity;
 		private float gravity;
@@ -235,70 +297,39 @@ public class ParticleSystem extends Component {
 		private float rotation;
 		private float scale;
 		private float age;
-		private Color color;
 		private float distance;
+		private Color color;
 
-		public Particle(ParticleSystem particleSystem, Vector3 position, Vector3 velocity, float gravity, float lifetime, float rotation, float scale) {
-			this.particleSystem = particleSystem;
+		public Particle() {
+			position = new Vector3();
+			velocity = new Vector3();
+			color = Color.createWhite();
+			gravity = 1.0f;
+			scale = 1.0f;
+		}
+
+		public void setPosition(Vector3 position) {
 			this.position = position;
+		}
+
+		public void setVelocity(Vector3 velocity) {
 			this.velocity = velocity;
-			this.gravity = gravity;
+		}
+
+		public void setLifetime(float lifetime) {
 			this.lifetime = lifetime;
-			this.rotation = rotation;
+		}
+
+		public void setScale(float scale) {
 			this.scale = scale;
-			color = new Color();
 		}
 
-		public Vector3 getPosition() {
-			return position;
+		public void setRotation(float rotation) {
+			this.rotation = rotation;
 		}
 
-		public Vector3 getVelocity() {
-			return velocity;
-		}
-
-		public float getGravity() {
-			return gravity;
-		}
-
-		public float getLifetime() {
-			return lifetime;
-		}
-
-		public float getRotation() {
-			return rotation;
-		}
-
-		public float getScale() {
-			return scale;
-		}
-
-		public float getAge() {
-			return age;
-		}
-
-		public Color getColor() {
-			return color;
-		}
-
-		public void setColor(Color color) {
-			this.color = color;
-		}
-
-		public boolean update(float delta) {
-			Vector3 g = particleSystem.getGravity();
-
-			velocity.x += g.x * delta * gravity;
-			velocity.y += g.y * delta * gravity;
-			velocity.z += g.z * delta * gravity;
-
-			position.x += velocity.x * delta;
-			position.y += velocity.y * delta;
-			position.z += velocity.z * delta;
-
-			age += delta;
-
-			return age > lifetime;
+		public void setGravity(float gravity) {
+			this.gravity = gravity;
 		}
 
 		public Matrix4 getModelView(Matrix4 view) {
@@ -317,8 +348,9 @@ public class ParticleSystem extends Component {
 			model.set(2, 2, view.get(2, 2));
 
 			Matrix4 rot = Quaternion.fromEuler(0, 0, rotation).toMatrix();
+			Matrix4 scl = Matrix4.createScale(scale, scale, scale);
 
-			return view.mul(model.mul(rot.mul(Matrix4.createScale(scale, scale, scale))));
+			return view.mul(model.mul(rot.mul(scl)));
 		}
 
 	}

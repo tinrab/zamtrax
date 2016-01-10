@@ -10,6 +10,7 @@ public final class GameObject {
 	private List<Component> components;
 	private List<GameObject> children;
 	private boolean active;
+	private String tag;
 
 	GameObject() {
 		transform = new Transform();
@@ -17,8 +18,10 @@ public final class GameObject {
 		children = new ArrayList<>();
 
 		components.add(transform);
+		transform.setGameObject(this);
 
 		active = true;
+		tag = "";
 	}
 
 	public <T extends Component> T addComponent(Class<T> componentClass) {
@@ -49,6 +52,10 @@ public final class GameObject {
 	}
 
 	public boolean isActive() {
+		if (parent != null) {
+			return active && parent.isActive();
+		}
+
 		return active;
 	}
 
@@ -92,6 +99,18 @@ public final class GameObject {
 		return children;
 	}
 
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+
+	public boolean compareTag(String tag) {
+		return this.tag.equals(tag);
+	}
+
 	public static GameObject create() {
 		return Game.getInstance().getCurrentScene().createGameObject(null);
 	}
@@ -132,6 +151,10 @@ public final class GameObject {
 		}
 
 		return component;
+	}
+
+	public final GameObject getChildByIndex(int index) {
+		return children.get(index);
 	}
 
 }

@@ -79,4 +79,8 @@ public class Color {
 		return new Color(0.0f, 0.0f, 1.0f);
 	}
 
+	public static Color lerp(Color a, Color b, float t) {
+		return new Color(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, a.a + (b.a - a.a) * t);
+	}
+
 }

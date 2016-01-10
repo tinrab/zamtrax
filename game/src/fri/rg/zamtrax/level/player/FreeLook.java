@@ -7,7 +7,7 @@ import zamtrax.Transform;
 public class FreeLook extends Component {
 
 	private static final float MOUSE_SENSITIVITY = 8.0f;
-	private static final float SPEED = 50.0f;
+	private static final float SPEED = 80.0f;
 	private static final float SMOOTHING = 0.2f;
 
 	private Transform transform;

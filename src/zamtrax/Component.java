@@ -38,6 +38,10 @@ public abstract class Component {
 		return gameObject.getComponent(componentClass);
 	}
 
+	public final <T extends Component> T addComponent(Class<T> componentClass) {
+		return gameObject.addComponent(componentClass);
+	}
+
 	public final boolean isEnabled() {
 		return enabled && gameObject.isActive();
 	}
@@ -46,7 +50,7 @@ public abstract class Component {
 		return gameObject.findComponentOfType(componentClass);
 	}
 
-	public final <T extends Component> T findComponentInAncestorsOfType(Class<T> componentClass){
+	public final <T extends Component> T findComponentInAncestorsOfType(Class<T> componentClass) {
 		return gameObject.findComponentInAncestorsOfType(componentClass);
 	}
 

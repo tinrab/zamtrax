@@ -36,7 +36,7 @@ public final class RenderModule extends Module implements Scene.Listener {
 	private Shader shadowMapGenerator;
 	private Matrix4 biasMatrix;
 	private Texture shadowMap, shadowMapTempTarget;
-	private Texture screenTexture;
+	private Texture screenTexture, postTexture;
 
 	private Filter nullFilter;
 	private Filter fxaaFilter;
@@ -64,10 +64,15 @@ public final class RenderModule extends Module implements Scene.Listener {
 		filterVertexArray = new VertexArray(6, new BindingInfo(AttributeType.POSITION, AttributeType.UV));
 
 		screenTexture = new Texture(GL_TEXTURE_2D, Game.getScreenWidth(), Game.getScreenHeight(),
-				new int[]{GL_NEAREST, GL_NEAREST}, true,
-				new int[]{GL_RGBA, GL_DEPTH_COMPONENT32},
-				new int[]{GL_BGRA, GL_DEPTH_COMPONENT},
-				new int[]{GL_COLOR_ATTACHMENT0_EXT, GL_DEPTH_ATTACHMENT_EXT});
+				new int[]{GL_NEAREST}, true,
+				new int[]{GL_RGBA},
+				new int[]{GL_RGBA},
+				new int[]{GL_COLOR_ATTACHMENT0_EXT});
+		postTexture = new Texture(GL_TEXTURE_2D, Game.getScreenWidth(), Game.getScreenHeight(),
+				new int[]{GL_NEAREST}, true,
+				new int[]{GL_RGBA},
+				new int[]{GL_RGBA},
+				new int[]{GL_COLOR_ATTACHMENT0_EXT});
 
 		shadowMapGenerator = new Shader.Builder()
 				.setFragmentShaderSource(Resources.loadText("shaders/shadowMapGenerator.fs", getClass().getClassLoader()))
@@ -86,40 +91,43 @@ public final class RenderModule extends Module implements Scene.Listener {
 	public void render() {
 		Camera camera = Camera.getMainCamera();
 		Matrix4 view = camera.getView();
-		Matrix4 viewProjection = camera.getProjection().mul(view);
+		Matrix4 projection = camera.getProjection();
+		Matrix4 viewProjection = projection.mul(view);
 
 		glFrontFace(GL_CW);
 		glCullFace(GL_BACK);
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
 
-		//screenTexture.bindAsRenderTarget();
+		screenTexture.bindAsRenderTarget();
 
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-/*
-		ambientPass(viewProjection);
 
-		lightingPass(viewProjection);
+		ambientPass(projection, viewProjection);
 
-		applyFilter(fxaaFilter, screenTexture, null);
-		*/
+		lightingPass(projection, viewProjection);
 
-		renderParticles(view, camera.getProjection());
+		renderParticles(view, projection);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+		int i = 0;
+
+		for (Filter screenFilter : screenFilters) {
+			if (screenFilter.isEnabled()) {
+				applyFilter(screenFilter, i % 2 == 0 ? screenTexture : postTexture, i % 2 == 0 ? postTexture : screenTexture);
+
+				i++;
+			}
+		}
+
+		glDisable(GL_BLEND);
+
+		applyFilter(nullFilter, i % 2 == 0 ? screenTexture : postTexture, null);
 
 		/*
-		screenFilters.forEach(screenFilter -> {
-			if (screenFilter.isEnabled()) {
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
-				applyFilter(screenFilter, null, null);
-
-				glDisable(GL_BLEND);
-			}
-		});
-		*/
-
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDisable(GL_DEPTH_TEST);
@@ -130,6 +138,7 @@ public final class RenderModule extends Module implements Scene.Listener {
 		debug.drawGrid(Vector3.ZERO, 16, 16, 1.0f, new Color(1.0f, 1.0f, 1.0f, 0.1f));
 		glEnable(GL_DEPTH_TEST);
 		glDisable(GL_BLEND);
+		*/
 	}
 
 	private void renderParticles(Matrix4 view, Matrix4 projection) {
@@ -146,30 +155,37 @@ public final class RenderModule extends Module implements Scene.Listener {
 		glDisable(GL_BLEND);
 	}
 
-	private void ambientPass(Matrix4 viewProjection) {
+	private void ambientPass(Matrix4 projection, Matrix4 viewProjection) {
 		renderState.clear();
 
+		renderState.setProjection(projection);
 		renderState.setViewProjection(viewProjection);
 		renderState.setAmbientIntenstiy(ambientLight);
 
 		for (Renderer renderer : renderers) {
-			renderState.setRenderer(renderer);
+			if (renderer.isEnabled()) {
+				renderState.setRenderer(renderer);
 
-			Shader shader = renderer.getMaterial().getShader();
+				Shader shader = renderer.getMaterial().getShader();
 
-			shader.bind();
+				shader.bind();
+				shader.updateUniforms(renderState);
 
-			shader.updateUniforms(renderState);
-			renderer.render();
+				renderer.render();
 
-			shader.release();
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, 0);
+				shader.release();
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, 0);
+			}
 		}
 	}
 
-	private void lightingPass(Matrix4 viewProjection) {
+	private void lightingPass(Matrix4 projection, Matrix4 viewProjection) {
 		for (Light light : lights) {
+			if (!light.isEnabled()) {
+				continue;
+			}
+
 			renderState.clear();
 
 			shadowMap.bindAsRenderTarget();
@@ -187,12 +203,13 @@ public final class RenderModule extends Module implements Scene.Listener {
 			glDepthMask(false);
 			glDepthFunc(GL_EQUAL);
 
+			renderState.setProjection(projection);
 			renderState.setViewProjection(viewProjection);
 			renderState.setLight(light);
 			renderState.setShadowMap(shadowMap);
 
 			for (Renderer renderer : renderers) {
-				if (!renderer.getMaterial().getShader().lightsEnabled()) {
+				if (renderer.isEnabled() && !renderer.getMaterial().getShader().lightsEnabled()) {
 					continue;
 				}
 
@@ -226,7 +243,7 @@ public final class RenderModule extends Module implements Scene.Listener {
 		shadowMapGenerator.bind();
 
 		renderers.forEach(renderer -> {
-			if (renderer.getMaterial().getShader().castsShadows()) {
+			if (renderer.isEnabled() && renderer.getMaterial().getShader().castsShadows()) {
 				shadowMapGenerator.setUniform("MVP", lightViewProjection.mul(renderer.getTransform().getLocalToWorldMatrix()));
 
 				renderer.render();
@@ -267,7 +284,8 @@ public final class RenderModule extends Module implements Scene.Listener {
 		filterVertexArray.put(1, 1, 0, 1).put(1, 1);
 		filterVertexArray.put(1, -1, 0, 1).put(1, 0);
 
-		glClear(GL_DEPTH_BUFFER_BIT);
+		glClearColor(0, 0, 0, 0);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 		filter.bind();
 		filter.updateUniforms(source, renderState);

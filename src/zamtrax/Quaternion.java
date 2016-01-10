@@ -185,41 +185,40 @@ public class Quaternion {
 		return m.loadRotation(forward, up, right);
 	}
 
+	public Vector3 getEulerAngles() {
+		Vector3 euler = new Vector3();
+
+		euler.x = Mathf.atan2(2 * (w * x + y * z), 1 - 2 * (x * x + y * y));
+		euler.y = Mathf.asin(2 * (w * y - z * x));
+		euler.z = Mathf.atan2(2 * (w * z + x * y), 1 - 2 * (y * y + z * z));
+
+		return euler;
+	}
+
 	public javax.vecmath.Quat4f toVecmath() {
 		return new javax.vecmath.Quat4f(x, y, z, w);
 	}
 
-	public static Quaternion nlerp(Quaternion a, Quaternion b, float t) {
-		Quaternion correctedDest = b;
-
-		if (a.dot(b) < 0.0f)
-			correctedDest = new Quaternion(-b.x, -b.y, -b.z, -b.w);
-
-		return correctedDest.sub(a).mul(t).add(a).normalized();
-	}
-
 	public static Quaternion slerp(Quaternion a, Quaternion b, float t) {
-		final float EPSILON = 1e3f;
+		float cosAngle = a.dot(b);
+		final boolean allowFlip = true;
 
-		float cos = a.dot(b);
-		Quaternion correctedDest = b;
+		float c1, c2;
 
-		if (cos < 0.0f) {
-			cos = -cos;
-			correctedDest = new Quaternion(-b.x, -b.y, -b.z, -b.w);
+		if ((1.0 - Mathf.abs(cosAngle)) < 0.01) {
+			c1 = 1.0f - t;
+			c2 = t;
+		} else {
+			float angle = Mathf.acos(Mathf.abs(cosAngle));
+			float sinAngle = Mathf.sin(angle);
+			c1 = Mathf.sin(angle * (1.0f - t)) / sinAngle;
+			c2 = Mathf.sin(angle * t) / sinAngle;
 		}
 
-		if (Mathf.abs(cos) >= 1.0f - EPSILON)
-			return nlerp(a, correctedDest, t);
+		if (allowFlip && (cosAngle < 0.0))
+			c1 = -c1;
 
-		float sin = Mathf.sqrt(1.0f - cos * cos);
-		float angle = Mathf.atan2(sin, cos);
-		float invSin = 1.0f / sin;
-
-		float srcFactor = Mathf.fastSin((1.0f - t) * angle) * invSin;
-		float destFactor = Mathf.fastSin(t * angle) * invSin;
-
-		return a.mul(srcFactor).add(correctedDest.mul(destFactor));
+		return new Quaternion(c1 * a.x + c2 * b.x, c1 * a.y + c2 * b.y, c1 * a.z + c2 * b.z, c1 * a.w + c2 * b.w);
 	}
 
 	public static Quaternion createIdentity() {
@@ -243,6 +242,14 @@ public class Quaternion {
 		Quaternion rz = fromAxisAngle(Vector3.BACK, z);
 
 		return rz.mul(ry.mul(rx));
+	}
+
+	public static Quaternion fromLookAt(Vector3 direction, Vector3 up) {
+		Vector3 f = direction.normalized();
+		Vector3 r = Vector3.cross(f, up).normalized();
+		Vector3 u = Vector3.cross(r, f);
+
+		return new Quaternion(Matrix4.createRotation(f, up));
 	}
 
 }

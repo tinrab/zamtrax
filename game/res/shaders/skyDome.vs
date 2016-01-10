@@ -1,0 +1,2 @@
+#attribute position
+#attribute uv

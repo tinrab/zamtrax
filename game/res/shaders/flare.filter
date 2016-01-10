@@ -2,10 +2,10 @@ uniform float time;
 uniform float brightness;
 uniform vec2 position;
 
-#define dist 0.2
+#define dist 0.1
 #define intensity 1.5 / dist
 #define pattern 20.0
-#define tint  vec3(1.0, 0.9, 0.7)
+#define tint  vec3(0.4, 0.8, 1.0)
 #define chromaShift 1.0
 
 vec3 tex2D(vec2 uv){
@@ -36,23 +36,24 @@ vec3 flare(float px, float py, float pz, float cShift, float i)
 #shader
 {
     vec2 uv = gl_FragCoord.xy / textureSize.xy;
+    vec4 ft = texture(filterTexture, vUV);
 
-	vec3 finalColor =vec3(0.0);
+	vec3 finalColor = vec3(0.0);
 
 	float tt = 1.0 / abs( distance(uv, position) * intensity );
 	float v = 1.0 / abs( length((position-uv) * vec2(0.03, 1.0)) * (intensity*10.0) );
 
 	finalColor += tex2D(uv)*0.5;
 	finalColor += vec3(tt)*tint;
-	finalColor += vec3( v )*tint;
+	finalColor += vec3(v)*tint;
 
 	finalColor += flare(0.00005, 16.0, 0.0, 0.2, 1.0);
-	finalColor += flare(0.5, 2.0, 0.0, 0.1, 1.0);
-	finalColor += flare(20.0, 1.0, 0.0, 0.05, 1.0);
-	finalColor += flare(-10.0, 1.0, 0.0, 0.1, 1.0);
-	finalColor += flare(-10.0, 2.0, 0.0, 0.05, 2.0);
-	finalColor += flare(-1.0, 1.0, 0.0, 0.1, 2.0);
-	finalColor += flare(-0.00005, 16.0, 0.0, 0.2, 2.0);
+    finalColor += flare(0.5, 2.0, 0.0, 0.1, 1.0);
+    finalColor += flare(20.0, 1.0, 0.0, 0.05, 1.0);
+    finalColor += flare(-10.0, 1.0, 0.0, 0.1, 1.0);
+    finalColor += flare(-10.0, 2.0, 0.0, 0.05, 2.0);
+    finalColor += flare(-1.0, 1.0, 0.0, 0.1, 2.0);
+    finalColor += flare(-0.00005, 16.0, 0.0, 0.2, 2.0);
 
-	return vec4( finalColor, 0.0 ) * brightness;
+	return ft + vec4( finalColor, 1.0 ) * brightness;
 }

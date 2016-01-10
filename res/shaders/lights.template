@@ -97,6 +97,10 @@ uniform float lightBleed;
 uniform Material material;
 uniform Light light;
 
+uniform bool useCookie;
+uniform float cookieScale;
+uniform sampler2D cookie;
+
 vec4 calculateLightFactor(vec4 position, vec3 normal)
 {
 	switch(lightType) {
@@ -104,6 +108,8 @@ vec4 calculateLightFactor(vec4 position, vec3 normal)
 			return calculateDirectionalLight(light, material, normal, position);
 		case 2:
 			return calculatePointLight(light, material, normal, position);
+		case 3:
+			return calculateSpotLight(light, material, normal, position);
 	}
 
     return vec4(1.0);
@@ -131,4 +137,12 @@ float calculateShadowFactor(vec4 shadowMapCoords)
     } else {
     	return 1.0;
     }
+}
+
+vec4 calculateCookie(sampler2D cookie, vec4 shadowMapCoords, float cookieScale)
+{
+    vec3 coords = shadowMapCoords.xyz / shadowMapCoords.w;
+    vec4 color = texture(cookie, coords.xy * cookieScale);
+
+    return color;
 }
