@@ -35,8 +35,8 @@ public class PlyLoader {
 		Vector<plyPropertyType> face_types = new Vector<plyPropertyType>();
 
 		try {
-			InputStream is1 = new FileInputStream(pathname);
-			InputStream is2 = new FileInputStream(pathname);
+			InputStream is1 = PlyLoader.class.getClassLoader().getResourceAsStream(pathname);
+			InputStream is2 = PlyLoader.class.getClassLoader().getResourceAsStream(pathname);
 
 			Scanner ins = new Scanner(is1);
 

@@ -12,14 +12,14 @@ import java.util.Map;
 
 public class BMFontParser extends DefaultHandler {
 
-	private File file;
 	private Texture texture;
 	private int lineHeight;
 	private Map<Character, BMFontCharacter> chars;
 	private Map<Integer, Map<Integer, Integer>> kernings;
+	private String dir;
 
-	public BMFontParser(File file) {
-		this.file = file;
+	public BMFontParser(String dir) {
+		this.dir = dir;
 		chars = new HashMap<>();
 		kernings = new HashMap<>();
 	}
@@ -38,7 +38,6 @@ public class BMFontParser extends DefaultHandler {
 	}
 
 	private void parsePage(Attributes attributes) {
-		String dir = file.getParentFile().getName();
 		String pathname = dir + "/" + attributes.getValue("file");
 
 		texture = Resources.loadTexture(pathname, Texture.Format.ARGB, Texture.WrapMode.CLAMP, Texture.FilterMode.LINEAR);

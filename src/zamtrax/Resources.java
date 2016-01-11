@@ -13,7 +13,9 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 public final class Resources {
@@ -29,20 +31,20 @@ public final class Resources {
 	}
 
 	public static String loadText(String pathname, ClassLoader classLoader) {
-		pathname = getResourcePath(pathname, classLoader);
+		//pathname = getResourcePath(pathname, classLoader);
 
-		try (FileReader fr = new FileReader(new File(pathname))) {
-
+		try (InputStream fs = classLoader.getResourceAsStream(pathname)) {
 			StringBuilder sb = new StringBuilder();
 			int ch;
 
-			while ((ch = fr.read()) != -1) {
+			while ((ch = fs.read()) != -1) {
 				sb.append((char) ch);
 			}
 
 			return sb.toString();
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 
 		return null;
@@ -50,17 +52,15 @@ public final class Resources {
 
 	public static Mesh loadModel(String pathname) {
 		if (pathname.endsWith(PlyLoader.getFileType())) {
-			return PlyLoader.load(getResourcePath(pathname, classLoader));
+			return PlyLoader.load(pathname);
 		}
 
 		throw new RuntimeException("unsupported file type");
 	}
 
 	public static Texture loadTexture(String pathname, Texture.Format format, Texture.WrapMode wrapMode, Texture.FilterMode filterMode) {
-		pathname = getResourcePath(pathname, classLoader);
-
 		try {
-			BufferedImage image = ImageIO.read(new File(pathname));
+			BufferedImage image = ImageIO.read(classLoader.getResourceAsStream(pathname));
 			int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
 
 			ByteBuffer buffer = BufferUtils.createByteBuffer(image.getHeight() * image.getWidth() * 4);
@@ -86,8 +86,11 @@ public final class Resources {
 
 			return new Texture(image.getWidth(), image.getHeight(), buffer, format, wrapMode, filterMode);
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			System.exit(1);
 		}
+
+		return null;
 	}
 
 	public static BMFont loadFont(String pathname) {
@@ -95,27 +98,20 @@ public final class Resources {
 	}
 
 	public static BMFont loadFont(String pathname, ClassLoader classLoader) {
-		File file = new File(getResourcePath(pathname, classLoader));
-
 		try {
 			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 			SAXParser parser = parserFactory.newSAXParser();
-			BMFontParser handler = new BMFontParser(file);
+			BMFontParser handler = new BMFontParser(pathname.substring(0, pathname.indexOf('/')));
 
-			parser.parse(file, handler);
+			parser.parse(classLoader.getResourceAsStream(pathname), handler);
 
 			return handler.getResult();
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			System.exit(1);
 		}
-	}
 
-	private static String getResourcePath(String pathname, ClassLoader classLoader) {
-		try {
-			return classLoader.getResource(pathname).getFile();
-		} catch (Exception e) {
-			throw new RuntimeException("Error loading resource " + pathname);
-		}
+		return null;
 	}
 
 }
