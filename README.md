@@ -1,6 +1,6 @@
 # Zamtrax
 
-Runnable [JAR](https://drive.google.com/open?id=0B5dN6w6eVDL5TGlQdmt1d0ZFdWM)
+Runnable [JAR](bin/Zamtrax.jar)
 
 ![alt text](docs/1.png)
 
